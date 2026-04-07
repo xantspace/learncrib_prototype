@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – My Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-50">
+<div class="container-app pb-28">
+
+  <!-- Header -->
+  <div class="px-5 pt-12 pb-6 flex items-center justify-between">
+    <h1 class="font-outfit font-bold text-2xl" style="color:var(--secondary)">Profile</h1>
+    <button class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+      <i data-lucide="settings" class="w-5 h-5 text-gray-400"></i>
+    </button>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="px-5 mb-8">
+    <div class="glass-card p-6 flex flex-col items-center text-center">
+      <div class="relative mb-4">
+        <div class="w-24 h-24 rounded-3xl border-4 border-white flex items-center justify-center font-outfit font-bold text-white text-3xl shadow-lg" style="background:linear-gradient(135deg,hsl(340,70%,55%),hsl(340,50%,40%))">AM</div>
+        <button class="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-white shadow-md flex items-center justify-center border border-gray-100">
+           <i data-lucide="camera" class="w-4 h-4 text-gray-400"></i>
+        </button>
+      </div>
+      <h2 class="font-outfit font-bold text-xl" style="color:var(--secondary)">Amara Murphy</h2>
+      <p class="font-inter text-sm" style="color:rgba(26,43,68,.5)">amara.murphy@example.com</p>
+      
+      <div class="flex gap-2 mt-4">
+        <span class="badge badge-teal">Student</span>
+        <span class="badge badge-navy">JAMB Candidate</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Section -->
+  <div class="px-5 mb-8">
+    <div class="glass-card p-5" style="background:linear-gradient(135deg, #0A1444 0%, #152775 100%)">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <p class="font-inter text-xs text-white opacity-60 uppercase tracking-widest">LearnCrib Wallet</p>
+          <h3 class="font-outfit font-bold text-3xl text-white mt-1">₦5,400.00</h3>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-white bg-opacity-10 flex items-center justify-center">
+          <i data-lucide="wallet" class="w-5 h-5 text-white"></i>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button class="btn-primary flex-1 justify-center py-2 text-sm" style="background:white; color:var(--secondary)">
+          <i data-lucide="plus" class="w-4 h-4"></i> Top Up
+        </button>
+        <button class="flex-1 justify-center py-2 text-sm text-white font-outfit font-semibold border border-white border-opacity-20 rounded-2xl">
+          History
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu List -->
+  <div class="px-5 flex flex-col gap-3">
+    
+    <div class="glass-card overflow-hidden">
+      <a href="#" class="flex items-center gap-4 p-4 active:bg-gray-50 border-b border-gray-50">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+          <i data-lucide="user" class="w-5 h-5 text-blue-500"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Personal Information</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.4)">Name, Email, Phone</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+      </a>
+      <a href="student-sessions.html" class="flex items-center gap-4 p-4 active:bg-gray-50 border-b border-gray-50">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+          <i data-lucide="calendar" class="w-5 h-5 text-purple-500"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Session History</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.4)">View all past learning</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+      </a>
+      <a href="#" class="flex items-center gap-4 p-4 active:bg-gray-50">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+          <i data-lucide="shield" class="w-5 h-5 text-amber-500"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Security</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.4)">Password, Biometrics</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+      </a>
+    </div>
+
+    <div class="glass-card overflow-hidden">
+      <a href="help-support.html" class="flex items-center gap-4 p-4 active:bg-gray-50 border-b border-gray-50">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+          <i data-lucide="help-circle" class="w-5 h-5 text-emerald-500"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Help & Support</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.4)">FAQs, Contact us</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+      </a>
+      <a href="login.html" class="flex items-center gap-4 p-4 active:bg-gray-50">
+        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+          <i data-lucide="log-out" class="w-5 h-5 text-red-500"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Logout</p>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+      </a>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="student-dashboard.html" class="nav-item">
+    <i data-lucide="home" class="w-5 h-5"></i><span>Home</span>
+  </a>
+  <a href="student-sessions.html" class="nav-item">
+    <i data-lucide="calendar" class="w-5 h-5"></i><span>Sessions</span>
+  </a>
+  <a href="messages.html" class="nav-item">
+    <i data-lucide="message-square" class="w-5 h-5"></i><span>Messages</span>
+  </a>
+  <a href="student-profile.html" class="nav-item active">
+    <i data-lucide="user" class="w-5 h-5"></i><span>Profile</span>
+  </a>
+</nav>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

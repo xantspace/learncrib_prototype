@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Payment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app px-5 pt-12 pb-40">
+
+  <button onclick="history.back()" class="flex items-center gap-2 text-sm mb-6" style="color:var(--secondary);opacity:.6">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+  </button>
+  <h1 class="font-outfit font-bold text-2xl mb-1" style="color:var(--secondary)">Payment</h1>
+  <p class="font-inter text-sm mb-6" style="color:rgba(26,43,68,.5)">Secure checkout — your details are encrypted</p>
+
+  <!-- Booking Summary -->
+  <div class="glass-card p-4 mb-6" style="border-left:4px solid var(--primary)">
+    <p class="font-inter text-xs font-semibold uppercase tracking-widest mb-3" style="color:rgba(26,43,68,.4)">Booking Summary</p>
+    <div class="flex flex-col gap-2 text-sm font-inter">
+      <div class="flex justify-between"><span style="color:rgba(26,43,68,.6)">Tutor</span><span class="font-medium" style="color:var(--secondary)">Kolade Okonkwo</span></div>
+      <div class="flex justify-between"><span style="color:rgba(26,43,68,.6)">Subject</span><span class="font-medium" style="color:var(--secondary)">Mathematics</span></div>
+      <div class="flex justify-between"><span style="color:rgba(26,43,68,.6)">Date & Time</span><span class="font-medium" style="color:var(--secondary)">Mon, Apr 7 · 9:00 AM</span></div>
+      <div class="flex justify-between"><span style="color:rgba(26,43,68,.6)">Duration</span><span class="font-medium" style="color:var(--secondary)">1 hour</span></div>
+      <div class="flex justify-between"><span style="color:rgba(26,43,68,.6)">Type</span><span class="font-medium" style="color:var(--secondary)">Online</span></div>
+    </div>
+  </div>
+
+  <!-- Total Amount -->
+  <div class="text-center mb-7">
+    <p class="font-inter text-sm" style="color:rgba(26,43,68,.5)">Total Amount</p>
+    <p class="font-outfit font-bold text-5xl mt-1" style="color:var(--secondary)">₦2,750</p>
+    <p class="font-inter text-xs mt-1" style="color:rgba(26,43,68,.4)">₦2,500 session + ₦250 platform fee</p>
+  </div>
+
+  <!-- Payment Method -->
+  <h3 class="font-outfit font-semibold text-sm mb-3 flex items-center gap-2" style="color:var(--secondary)">
+    <i data-lucide="credit-card" class="w-4 h-4" style="color:var(--primary)"></i>
+    Payment Method
+  </h3>
+  <div class="flex flex-col gap-3 mb-5">
+    <div onclick="selectMethod(this,'card')" class="method glass-card p-4 flex items-center gap-4 cursor-pointer border-2" style="border-color:var(--primary)">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:var(--primary-light)">
+        <i data-lucide="credit-card" class="w-5 h-5" style="color:var(--primary)"></i>
+      </div>
+      <div class="flex-1">
+        <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Debit / Credit Card</p>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Visa, Mastercard, Verve</p>
+      </div>
+      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center" style="border-color:var(--primary)">
+        <div id="dot-card" class="w-2.5 h-2.5 rounded-full" style="background:var(--primary)"></div>
+      </div>
+    </div>
+
+    <div onclick="selectMethod(this,'bank')" class="method glass-card p-4 flex items-center gap-4 cursor-pointer border-2 border-transparent">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100">
+        <i data-lucide="landmark" class="w-5 h-5" style="color:var(--secondary);opacity:.5"></i>
+      </div>
+      <div class="flex-1">
+        <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Bank Transfer</p>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Direct transfer via USSD</p>
+      </div>
+      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center border-gray-300">
+        <div id="dot-bank" class="w-2.5 h-2.5 rounded-full hidden" style="background:var(--primary)"></div>
+      </div>
+    </div>
+
+    <div onclick="selectMethod(this,'wallet')" class="method glass-card p-4 flex items-center gap-4 cursor-pointer border-2 border-transparent">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100">
+        <i data-lucide="wallet" class="w-5 h-5" style="color:var(--secondary);opacity:.5"></i>
+      </div>
+      <div class="flex-1">
+        <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">LearnCrib Wallet</p>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Balance: ₦5,400</p>
+      </div>
+      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center border-gray-300">
+        <div id="dot-wallet" class="w-2.5 h-2.5 rounded-full hidden" style="background:var(--primary)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Form -->
+  <div id="card-form" class="flex flex-col gap-4 slide-up">
+    <div>
+      <p class="font-inter text-xs font-semibold uppercase tracking-widest mb-2" style="color:rgba(26,43,68,.4)">Card Details</p>
+      <div class="input-wrapper">
+        <i data-lucide="credit-card" class="w-4 h-4 input-icon"></i>
+        <input type="text" placeholder="Card number" class="input-field" maxlength="19" id="card-num" oninput="formatCard()" />
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="input-wrapper">
+        <i data-lucide="calendar" class="w-4 h-4 input-icon"></i>
+        <input type="text" placeholder="MM / YY" class="input-field" maxlength="7" />
+      </div>
+      <div class="input-wrapper">
+        <i data-lucide="lock" class="w-4 h-4 input-icon"></i>
+        <input type="text" placeholder="CVV" class="input-field" maxlength="3" />
+      </div>
+    </div>
+    <div class="input-wrapper">
+      <i data-lucide="user" class="w-4 h-4 input-icon"></i>
+      <input type="text" placeholder="Cardholder name" class="input-field" />
+    </div>
+
+    <!-- Save Card -->
+    <label class="flex items-center gap-3 cursor-pointer">
+      <div id="save-box" onclick="toggleSave()" class="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all" style="border-color:var(--primary)">
+        <i data-lucide="check" class="w-3 h-3 text-white hidden" id="save-check"></i>
+      </div>
+      <span class="font-inter text-sm" style="color:rgba(26,43,68,.65)">Save card for future payments</span>
+    </label>
+  </div>
+
+</div>
+
+<!-- Sticky Pay Button -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-5 pb-8 pt-4 z-50" style="background:linear-gradient(to top,white 75%,transparent)">
+  <button onclick="pay()" class="btn-primary w-full justify-center" style="display:flex;padding:1rem">
+    <i data-lucide="lock" class="w-5 h-5"></i>
+    Pay ₦2,750 Securely
+  </button>
+  <p class="text-center text-xs font-inter mt-2" style="color:rgba(26,43,68,.4)">
+    <i data-lucide="shield-check" class="w-3 h-3 inline-block mr-1" style="color:var(--primary)"></i>
+    256-bit SSL encrypted · Powered by Paystack
+  </p>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center hidden" style="background:rgba(255,255,255,.95)">
+  <div class="w-16 h-16 rounded-full border-4 border-gray-100 mb-6" style="border-top-color:var(--primary);animation:spin 1s linear infinite"></div>
+  <p class="font-outfit font-bold text-xl" style="color:var(--secondary)">Processing…</p>
+  <p class="font-inter text-sm mt-1" style="color:rgba(26,43,68,.5)">Please don't close this page</p>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script>
+  lucide.createIcons();
+  let saveCard = false;
+
+  function selectMethod(el, id) {
+    document.querySelectorAll('.method').forEach(m => {
+      m.style.borderColor = 'transparent';
+      m.querySelector('[id^="dot-"]').classList.add('hidden');
+      m.querySelector('.rounded-full.border-2').style.borderColor = '#D1D5DB';
+    });
+    el.style.borderColor = 'var(--primary)';
+    document.getElementById('dot-'+id).classList.remove('hidden');
+    el.querySelector('.rounded-full.border-2').style.borderColor = 'var(--primary)';
+    document.getElementById('card-form').style.display = id === 'card' ? 'flex' : 'none';
+  }
+
+  function toggleSave() {
+    saveCard = !saveCard;
+    document.getElementById('save-box').style.background = saveCard ? 'var(--primary)' : 'transparent';
+    document.getElementById('save-check').classList.toggle('hidden', !saveCard);
+    lucide.createIcons();
+  }
+
+  function formatCard() {
+    let v = document.getElementById('card-num').value.replace(/\D/g,'').substring(0,16);
+    document.getElementById('card-num').value = v.replace(/(.{4})/g,'$1 ').trim();
+  }
+
+  function pay() {
+    document.getElementById('loading').classList.remove('hidden');
+    setTimeout(() => { window.location.href = 'booking-confirmation.html'; }, 2200);
+  }
+</script>
+</body>
+</html>

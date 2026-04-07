@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Notifications</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-50">
+<div class="container-app pb-28">
+
+  <!-- Header -->
+  <div class="px-5 pt-12 pb-6 flex items-center justify-between sticky top-0 bg-white z-40 bg-opacity-90 backdrop-blur-md">
+    <button onclick="history.back()" class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+      <i data-lucide="arrow-left" class="w-4 h-4 text-gray-500"></i>
+    </button>
+    <h1 class="font-outfit font-bold text-xl" style="color:var(--secondary)">Notifications</h1>
+    <button class="text-xs font-inter font-semibold" style="color:var(--primary)">Clear all</button>
+  </div>
+
+  <!-- Notification List -->
+  <div class="px-5 flex flex-col gap-3">
+     
+     <p class="font-outfit font-semibold text-xs uppercase tracking-widest mt-2" style="color:rgba(26,43,68,.4)">Today</p>
+
+     <div class="glass-card p-4 flex gap-4 active:bg-gray-50 bg-white shadow-sm border-l-4" style="border-left-color:var(--primary)">
+        <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
+           <i data-lucide="calendar" class="w-5 h-5 text-teal-600"></i>
+        </div>
+        <div class="flex-1">
+           <div class="flex justify-between items-start">
+              <h3 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">New Session Scheduled</h3>
+              <span class="text-xs font-inter" style="color:rgba(26,43,68,.3)">2m ago</span>
+           </div>
+           <p class="font-inter text-xs mt-1 leading-relaxed" style="color:rgba(26,43,68,.6)">Amara M. has booked a Mathematics session for <strong>Mon, Apr 7 at 9:00 AM</strong>.</p>
+           <button class="mt-3 text-xs font-inter font-bold" style="color:var(--primary)">View Details</button>
+        </div>
+     </div>
+
+     <div class="glass-card p-4 flex gap-4 bg-white shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+           <i data-lucide="message-square" class="w-5 h-5 text-orange-600"></i>
+        </div>
+        <div class="flex-1">
+           <div class="flex justify-between items-start">
+              <h3 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">New Message</h3>
+              <span class="text-xs font-inter" style="color:rgba(26,43,68,.3)">1h ago</span>
+           </div>
+           <p class="font-inter text-xs mt-1 leading-relaxed" style="color:rgba(26,43,68,.6)"><strong>Kolade O.:</strong> "Looking forward to our session tomorrow! 📚"</p>
+        </div>
+     </div>
+
+     <p class="font-outfit font-semibold text-xs uppercase tracking-widest mt-4" style="color:rgba(26,43,68,.4)">Yesterday</p>
+
+     <div class="glass-card p-4 flex gap-4 opacity-75 grayscale bg-gray-50 border-gray-100">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+           <i data-lucide="credit-card" class="w-5 h-5 text-blue-600"></i>
+        </div>
+        <div class="flex-1">
+           <div class="flex justify-between items-start">
+              <h3 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Top-up Successful</h3>
+              <span class="text-xs font-inter" style="color:rgba(26,43,68,.3)">Yesterday</span>
+           </div>
+           <p class="font-inter text-xs mt-1 leading-relaxed" style="color:rgba(26,43,68,.6)">Your wallet has been credited with <strong>₦5,000.00</strong>. Happy learning!</p>
+        </div>
+     </div>
+
+     <div class="glass-card p-4 flex gap-4 opacity-75 grayscale bg-gray-50 border-gray-100">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+           <i data-lucide="award" class="w-5 h-5 text-emerald-600"></i>
+        </div>
+        <div class="flex-1">
+           <div class="flex justify-between items-start">
+              <h3 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Profile Verified</h3>
+              <span class="text-xs font-inter" style="color:rgba(26,43,68,.3)">2 days ago</span>
+           </div>
+           <p class="font-inter text-xs mt-1 leading-relaxed" style="color:rgba(26,43,68,.6)">Congratulations! Your KYC documents have been verified.</p>
+        </div>
+     </div>
+
+  </div>
+
+</div>
+
+<!-- Bottom Nav Placeholder (context dependent) -->
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

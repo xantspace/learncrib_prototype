@@ -1,0 +1,207 @@
+/* ============================================
+   LearnCrib – Global Stylesheet
+   Tech: Tailwind CSS (via CDN) + Custom CSS
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
+
+:root {
+  --primary:       #1939D4; /* LearnCrib Blue */
+  --primary-light: rgba(25, 57, 212, 0.12);
+  --primary-glow:  rgba(25, 57, 212, 0.4);
+  --secondary:     #0A1444; /* Midnight (Headings) */
+  --accent:        #F0B429; /* Forge Gold */
+  --body-text:     #2D2D2D; /* Charcoal */
+  --surface:       #F7F7F5; /* Ivory */
+  --glass-light:   rgba(255, 255, 255, 0.75);
+  --glass-dark:    rgba(10, 20, 68, 0.8);
+  --bg-mesh-1:     #F7F7F5;
+  --bg-mesh-2:     #FFFFFF;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: radial-gradient(ellipse at top left, var(--bg-mesh-1) 0%, white 40%),
+              radial-gradient(ellipse at bottom right, var(--bg-mesh-2) 0%, white 50%);
+  min-height: 100vh;
+  color: var(--body-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Headings ─────────────────────────────── */
+h1, h2, h3, h4, h5 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--secondary); font-weight: 700; }
+
+/* ── Glass Card ───────────────────────────── */
+.glass-card {
+  background: var(--glass-light);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px rgba(0,168,157,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,168,157,0.15);
+}
+
+/* ── Primary Button ───────────────────────── */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 9999px;
+  padding: 0.75rem 2rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-primary:hover {
+  box-shadow: 0 0 20px var(--primary-glow);
+  transform: scale(1.02);
+}
+
+/* ── Ghost Button ─────────────────────────── */
+.btn-ghost {
+  background: transparent;
+  color: var(--secondary);
+  border-radius: 9999px;
+  padding: 0.75rem 2rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1.5px solid rgba(26,43,68,0.2);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Input Field ──────────────────────────── */
+.input-field {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem;
+  border: 1.5px solid rgba(26,43,68,0.15);
+  border-radius: 0.875rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  background: rgba(255,255,255,0.8);
+  color: var(--secondary);
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+.input-wrapper { position: relative; }
+.input-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(26,43,68,0.45);
+  pointer-events: none;
+}
+
+/* ── Floating illustration ────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+.float-anim { animation: float 4s ease-in-out infinite; }
+
+/* ── Slide fade-in ────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.slide-up { animation: slideUp 0.5s ease forwards; }
+
+/* ── Skeleton shimmer ─────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 0.6rem;
+}
+
+/* ── Pulse dot (availability) ─────────────── */
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0,168,157,0.7); }
+  70%  { transform: scale(1);   box-shadow: 0 0 0 8px rgba(0,168,157,0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0,168,157,0); }
+}
+.pulse-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: inline-block;
+  animation: pulse-ring 1.8s infinite;
+}
+
+/* ── Bottom nav ───────────────────────────── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--glass-light);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.5);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0.75rem 1rem 1.25rem;
+  z-index: 50;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; transition: color 0.2s;
+  color: rgba(26,43,68,0.45);
+  font-size: 0.7rem; font-family: 'Inter', sans-serif;
+}
+.nav-item.active, .nav-item:hover { color: var(--primary); }
+
+/* ── Star rating ──────────────────────────── */
+.star { color: var(--accent); }
+
+/* ── Badge ────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+.badge-teal   { background: var(--primary-light); color: var(--primary); }
+.badge-navy   { background: rgba(26,43,68,0.1);   color: var(--secondary); }
+.badge-accent { background: hsla(45,100%,50%,0.15); color: hsl(40,100%,35%); }
+
+/* ── Scrollbar ────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,168,157,0.3); border-radius: 4px; }
+
+/* ── Max width container ──────────────────── */
+.container-app {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}

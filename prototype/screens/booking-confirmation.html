@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Booking Confirmed!</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    @keyframes pop-in {
+      0%   { transform: scale(0); opacity: 0; }
+      70%  { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    @keyframes ring {
+      0%, 100% { transform: rotate(-8deg); }
+      50%       { transform: rotate(8deg); }
+    }
+    .pop-in   { animation: pop-in 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.3s both; }
+    .ring-anim { animation: ring 0.4s ease-in-out 1s 3; }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity:1; }
+      100% { transform: translateY(60px) rotate(720deg); opacity:0; }
+    }
+    .confetti { position:absolute; width:8px; height:8px; border-radius:2px; animation: confetti-fall 1.2s ease-out forwards; }
+  </style>
+</head>
+<body>
+<div class="container-app px-5 pt-16 pb-10 flex flex-col items-center min-h-screen text-center relative overflow-hidden">
+
+  <!-- Confetti -->
+  <div id="confetti-container" class="absolute top-24 left-1/2 -translate-x-1/2 w-48 h-1 pointer-events-none"></div>
+
+  <!-- Success Icon -->
+  <div class="pop-in w-28 h-28 rounded-full flex items-center justify-center mb-6 shadow-lg" style="background:linear-gradient(135deg,var(--primary),#0F2391)">
+    <i data-lucide="check" class="w-14 h-14 text-white" style="stroke-width:3"></i>
+  </div>
+
+  <!-- Copy -->
+  <span class="badge badge-teal mb-3 text-xs uppercase tracking-widest">Booking Confirmed</span>
+  <h1 class="font-outfit font-bold text-3xl mb-2" style="color:var(--secondary)">You're all set! 🎉</h1>
+  <p class="font-inter text-base leading-relaxed mb-8" style="color:rgba(26,43,68,.6);max-width:280px">
+    Your session with <strong style="color:var(--secondary)">Kolade Okonkwo</strong> is booked for <strong style="color:var(--secondary)">Monday, 9:00 AM</strong>.
+  </p>
+
+  <!-- Session Detail Card -->
+  <div class="glass-card p-5 w-full text-left mb-6">
+    <p class="font-inter text-xs font-semibold uppercase tracking-widest mb-4" style="color:rgba(26,43,68,.4)">Session Details</p>
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--primary-light)">
+          <i data-lucide="calendar-days" class="w-4 h-4" style="color:var(--primary)"></i>
+        </div>
+        <div>
+          <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Date & Time</p>
+          <p class="text-sm font-inter font-medium" style="color:var(--secondary)">Monday, Apr 7 · 9:00 – 10:00 AM</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--primary-light)">
+          <i data-lucide="book-open" class="w-4 h-4" style="color:var(--primary)"></i>
+        </div>
+        <div>
+          <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Subject</p>
+          <p class="text-sm font-inter font-medium" style="color:var(--secondary)">Advanced Mathematics</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--primary-light)">
+          <i data-lucide="globe" class="w-4 h-4" style="color:var(--primary)"></i>
+        </div>
+        <div>
+          <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Session Type</p>
+          <p class="text-sm font-inter font-medium" style="color:var(--secondary)">Online (Video Call)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--primary-light)">
+          <i data-lucide="receipt" class="w-4 h-4" style="color:var(--primary)"></i>
+        </div>
+        <div>
+          <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Amount Paid</p>
+          <p class="text-sm font-outfit font-bold" style="color:var(--primary)">₦2,750</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutor Contact -->
+  <div class="glass-card p-4 w-full flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,var(--primary),#0F2391)">KO</div>
+    <div class="flex-1 text-left">
+      <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Kolade Okonkwo</p>
+      <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">+234 801 234 5678</p>
+    </div>
+    <a href="messages.html" class="w-10 h-10 rounded-2xl flex items-center justify-center" style="background:var(--primary-light)">
+      <i data-lucide="message-circle" class="w-5 h-5" style="color:var(--primary)"></i>
+    </a>
+    <a href="tel:+2348012345678" class="w-10 h-10 rounded-2xl flex items-center justify-center bg-gray-100">
+      <i data-lucide="phone" class="w-5 h-5" style="color:var(--secondary);opacity:.5"></i>
+    </a>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex flex-col gap-3 w-full">
+    <button class="btn-primary w-full justify-center" style="display:flex">
+      <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+      Add to Calendar
+    </button>
+    <a href="messages.html" class="btn-ghost w-full justify-center" style="display:flex">
+      <i data-lucide="message-circle" class="w-4 h-4"></i>
+      Chat with Tutor
+    </a>
+    <a href="student-dashboard.html" class="font-inter text-sm text-center mt-2" style="color:rgba(26,43,68,.5)">
+      Return to Home
+    </a>
+  </div>
+
+</div>
+
+<script>
+  lucide.createIcons();
+
+  // Spawn confetti
+  const colors = ['#1939D4','#F0B429','#0A1444','#4A6CF7','#FFFFFF'];
+  const container = document.getElementById('confetti-container');
+  for (let i = 0; i < 20; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.cssText = `
+      background:${colors[i%colors.length]};
+      left:${Math.random()*180-40}px;
+      top:${Math.random()*-20}px;
+      transform:rotate(${Math.random()*360}deg);
+      animation-delay:${Math.random()*0.8}s;
+      animation-duration:${0.9+Math.random()*0.6}s;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+    `;
+    container.appendChild(c);
+  }
+</script>
+</body>
+</html>

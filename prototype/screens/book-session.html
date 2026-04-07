@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Book Session</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app px-5 pt-12 pb-40">
+
+  <!-- Header -->
+  <button onclick="history.back()" class="flex items-center gap-2 text-sm mb-6" style="color:var(--secondary);opacity:.6">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+  </button>
+  <h1 class="font-outfit font-bold text-2xl mb-1" style="color:var(--secondary)">Book a Session</h1>
+  <p class="font-inter text-sm mb-6" style="color:rgba(26,43,68,.5)">Choose your details and confirm</p>
+
+  <!-- Tutor Summary Card -->
+  <div class="glass-card p-4 flex items-center gap-4 mb-6">
+    <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-xl" style="background:linear-gradient(135deg,var(--primary),hsl(175,80%,25%))">KO</div>
+    <div class="flex-1">
+      <h3 class="font-outfit font-semibold text-base" style="color:var(--secondary)">Kolade Okonkwo</h3>
+      <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Mathematics · Physics</p>
+      <div class="flex items-center gap-1 mt-1">
+        <i data-lucide="star" class="w-3.5 h-3.5 star fill-current"></i>
+        <span class="text-xs font-semibold">4.9</span>
+      </div>
+    </div>
+    <span class="font-outfit font-bold text-lg" style="color:var(--primary)">₦2,500<br><span class="font-inter font-normal text-xs" style="color:rgba(26,43,68,.4)">/hr</span></span>
+  </div>
+
+  <!-- Date Picker -->
+  <div class="mb-5">
+    <h3 class="font-outfit font-semibold text-sm mb-3 flex items-center gap-2" style="color:var(--secondary)">
+      <i data-lucide="calendar-days" class="w-4 h-4" style="color:var(--primary)"></i>
+      Select Date
+    </h3>
+    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div onclick="selectDate(this)" class="date-btn flex flex-col items-center gap-1 flex-shrink-0 px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 border-2" style="border-color:var(--primary);background:var(--primary-light)">
+        <span class="font-inter text-xs" style="color:var(--primary)">Mon</span>
+        <span class="font-outfit font-bold text-base" style="color:var(--primary)">7</span>
+      </div>
+      <div onclick="selectDate(this)" class="date-btn flex flex-col items-center gap-1 flex-shrink-0 px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 border-2 border-transparent bg-gray-50">
+        <span class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Tue</span>
+        <span class="font-outfit font-bold text-base" style="color:var(--secondary)">8</span>
+      </div>
+      <div onclick="selectDate(this)" class="date-btn flex flex-col items-center gap-1 flex-shrink-0 px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 border-2 border-transparent bg-gray-50">
+        <span class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Wed</span>
+        <span class="font-outfit font-bold text-base" style="color:var(--secondary)">9</span>
+      </div>
+      <div onclick="selectDate(this)" class="date-btn flex flex-col items-center gap-1 flex-shrink-0 px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 border-2 border-transparent opacity-30 bg-gray-50">
+        <span class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Thu</span>
+        <span class="font-outfit font-bold text-base" style="color:var(--secondary)">10</span>
+      </div>
+      <div onclick="selectDate(this)" class="date-btn flex flex-col items-center gap-1 flex-shrink-0 px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 border-2 border-transparent bg-gray-50">
+        <span class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Fri</span>
+        <span class="font-outfit font-bold text-base" style="color:var(--secondary)">11</span>
+      </div>
+      <div onclick="selectDate(this)" class="date-btn flex flex-col items-center gap-1 flex-shrink-0 px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 border-2 border-transparent bg-gray-50">
+        <span class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Sat</span>
+        <span class="font-outfit font-bold text-base" style="color:var(--secondary)">12</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time Slots -->
+  <div class="mb-5">
+    <h3 class="font-outfit font-semibold text-sm mb-3 flex items-center gap-2" style="color:var(--secondary)">
+      <i data-lucide="clock" class="w-4 h-4" style="color:var(--primary)"></i>
+      Select Time
+    </h3>
+    <div class="grid grid-cols-3 gap-2">
+      <div onclick="selectTime(this)" class="time-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2" style="border-color:var(--primary);background:var(--primary-light);color:var(--primary)">9:00 AM</div>
+      <div onclick="selectTime(this)" class="time-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2 border-transparent bg-gray-50" style="color:var(--secondary)">10:00 AM</div>
+      <div onclick="selectTime(this)" class="time-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2 border-transparent bg-gray-50" style="color:var(--secondary)">11:00 AM</div>
+      <div onclick="selectTime(this)" class="time-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2 border-transparent opacity-30 bg-gray-50" style="color:var(--secondary)">12:00 PM</div>
+      <div onclick="selectTime(this)" class="time-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2 border-transparent bg-gray-50" style="color:var(--secondary)">2:00 PM</div>
+      <div onclick="selectTime(this)" class="time-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2 border-transparent bg-gray-50" style="color:var(--secondary)">4:00 PM</div>
+    </div>
+  </div>
+
+  <!-- Duration -->
+  <div class="mb-5">
+    <h3 class="font-outfit font-semibold text-sm mb-3 flex items-center gap-2" style="color:var(--secondary)">
+      <i data-lucide="timer" class="w-4 h-4" style="color:var(--primary)"></i>
+      Duration
+    </h3>
+    <div class="grid grid-cols-3 gap-2">
+      <div onclick="selectDuration(this,'30min','1,250')" class="dur-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2 border-transparent bg-gray-50" style="color:var(--secondary)">30 min</div>
+      <div onclick="selectDuration(this,'1hr','2,500')" class="dur-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2" style="border-color:var(--primary);background:var(--primary-light);color:var(--primary)">1 hour</div>
+      <div onclick="selectDuration(this,'2hr','5,000')" class="dur-btn text-center py-2.5 rounded-2xl text-xs font-inter font-medium cursor-pointer transition-all border-2 border-transparent bg-gray-50" style="color:var(--secondary)">2 hours</div>
+    </div>
+  </div>
+
+  <!-- Session Type -->
+  <div class="mb-5">
+    <h3 class="font-outfit font-semibold text-sm mb-3 flex items-center gap-2" style="color:var(--secondary)">
+      <i data-lucide="monitor-smartphone" class="w-4 h-4" style="color:var(--primary)"></i>
+      Session Type
+    </h3>
+    <div class="grid grid-cols-2 gap-3">
+      <div onclick="selectType(this)" class="type-btn glass-card p-4 flex flex-col items-center gap-2 cursor-pointer border-2" style="border-color:var(--primary)">
+        <i data-lucide="globe" class="w-6 h-6" style="color:var(--primary)"></i>
+        <span class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Online</span>
+        <span class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Video call</span>
+      </div>
+      <div onclick="selectType(this)" class="type-btn glass-card p-4 flex flex-col items-center gap-2 cursor-pointer border-2 border-transparent">
+        <i data-lucide="home" class="w-6 h-6" style="color:rgba(26,43,68,.4)"></i>
+        <span class="font-outfit font-semibold text-sm" style="color:var(--secondary)">In-Person</span>
+        <span class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Tutor's location</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Topic -->
+  <div class="mb-5">
+    <h3 class="font-outfit font-semibold text-sm mb-3 flex items-center gap-2" style="color:var(--secondary)">
+      <i data-lucide="book-open" class="w-4 h-4" style="color:var(--primary)"></i>
+      Subject / Topic
+    </h3>
+    <div class="input-wrapper">
+      <i data-lucide="edit-3" class="w-4 h-4 input-icon"></i>
+      <input type="text" placeholder="e.g. Differentiation & Integration" class="input-field" />
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="mb-5">
+    <h3 class="font-outfit font-semibold text-sm mb-3 flex items-center gap-2" style="color:var(--secondary)">
+      <i data-lucide="file-text" class="w-4 h-4" style="color:var(--primary)"></i>
+      Special Notes <span class="font-inter font-normal text-xs" style="color:rgba(26,43,68,.4)">(optional)</span>
+    </h3>
+    <textarea placeholder="Anything the tutor should know…" class="input-field resize-none" style="padding:0.875rem 1rem;height:80px"></textarea>
+  </div>
+
+</div>
+
+<!-- Sticky Bottom: Price Breakdown + Pay -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-5 pb-8 pt-4 z-50" style="background:linear-gradient(to top,white 75%,transparent)">
+  <div class="glass-card p-4 mb-3">
+    <div class="flex justify-between text-sm font-inter mb-1">
+      <span style="color:rgba(26,43,68,.6)">₦2,500 × 1 hr</span>
+      <span style="color:var(--secondary)">₦2,500</span>
+    </div>
+    <div class="flex justify-between text-sm font-inter mb-2">
+      <span style="color:rgba(26,43,68,.6)">Platform fee</span>
+      <span style="color:var(--secondary)">₦250</span>
+    </div>
+    <div class="flex justify-between font-outfit font-bold border-t pt-2" style="border-color:rgba(26,43,68,.1)">
+      <span style="color:var(--secondary)">Total</span>
+      <span id="total-price" style="color:var(--primary)">₦2,750</span>
+    </div>
+  </div>
+  <a href="payment.html" class="btn-primary w-full justify-center" style="display:flex">
+    <i data-lucide="credit-card" class="w-4 h-4"></i>
+    Proceed to Payment
+  </a>
+</div>
+
+<style>.no-scrollbar::-webkit-scrollbar{display:none;}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}</style>
+<script>
+  lucide.createIcons();
+
+  function selectDate(el) {
+    document.querySelectorAll('.date-btn').forEach(b => {
+      b.style.borderColor = 'transparent';
+      b.style.background = '#F9FAFB';
+      b.querySelectorAll('span').forEach(s => { s.style.color = ''; });
+    });
+    el.style.borderColor = 'var(--primary)';
+    el.style.background = 'var(--primary-light)';
+    el.querySelectorAll('span').forEach(s => s.style.color = 'var(--primary)');
+  }
+
+  function selectTime(el) {
+    document.querySelectorAll('.time-btn').forEach(b => {
+      b.style.borderColor = 'transparent'; b.style.background = '#F9FAFB'; b.style.color = 'var(--secondary)';
+    });
+    el.style.borderColor = 'var(--primary)'; el.style.background = 'var(--primary-light)'; el.style.color = 'var(--primary)';
+  }
+
+  function selectDuration(el, label, price) {
+    document.querySelectorAll('.dur-btn').forEach(b => {
+      b.style.borderColor = 'transparent'; b.style.background = '#F9FAFB'; b.style.color = 'var(--secondary)';
+    });
+    el.style.borderColor = 'var(--primary)'; el.style.background = 'var(--primary-light)'; el.style.color = 'var(--primary)';
+  }
+
+  function selectType(el) {
+    document.querySelectorAll('.type-btn').forEach(b => {
+      b.style.borderColor = 'transparent';
+      b.querySelector('[data-lucide]').style.color = 'rgba(26,43,68,.4)';
+    });
+    el.style.borderColor = 'var(--primary)';
+    el.querySelector('[data-lucide]').style.color = 'var(--primary)';
+    lucide.createIcons();
+  }
+</script>
+</body>
+</html>

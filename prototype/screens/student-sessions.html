@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – My Sessions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app pb-28">
+
+  <!-- Header -->
+  <div class="px-5 pt-12 pb-2">
+    <h1 class="font-outfit font-bold text-2xl" style="color:var(--secondary)">My Sessions</h1>
+    <p class="font-inter text-sm mt-0.5" style="color:rgba(26,43,68,.5)">Track and manage your learning</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="px-5 mt-4 flex gap-1 sticky top-0 z-30 pb-3 pt-1" style="background:white">
+    <button onclick="switchTab('upcoming')" id="tab-upcoming" class="flex-1 py-2.5 rounded-2xl text-sm font-outfit font-semibold transition-all" style="background:var(--primary);color:white">Upcoming</button>
+    <button onclick="switchTab('completed')" id="tab-completed" class="flex-1 py-2.5 rounded-2xl text-sm font-outfit font-semibold transition-all" style="background:transparent;color:rgba(26,43,68,.5)">Completed</button>
+    <button onclick="switchTab('cancelled')" id="tab-cancelled" class="flex-1 py-2.5 rounded-2xl text-sm font-outfit font-semibold transition-all" style="background:transparent;color:rgba(26,43,68,.5)">Cancelled</button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="px-5 mt-2">
+
+    <!-- Upcoming -->
+    <div id="content-upcoming" class="flex flex-col gap-3">
+      <div class="glass-card p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <span class="badge badge-teal text-xs">Upcoming</span>
+            <h3 class="font-outfit font-semibold text-base mt-1.5" style="color:var(--secondary)">Advanced Mathematics</h3>
+            <p class="font-inter text-sm" style="color:rgba(26,43,68,.55)">with Kolade Okonkwo</p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-base" style="background:linear-gradient(135deg,var(--primary),hsl(175,80%,25%))">KO</div>
+        </div>
+        <div class="flex items-center gap-3 mb-3 text-xs font-inter" style="color:rgba(26,43,68,.55)">
+          <span class="flex items-center gap-1"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> Mon, Apr 7</span>
+          <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 9:00 – 10:00 AM</span>
+          <span class="flex items-center gap-1"><i data-lucide="globe" class="w-3.5 h-3.5"></i> Online</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex-1 py-2 rounded-xl text-xs font-inter font-medium border" style="border-color:rgba(26,43,68,.15);color:rgba(26,43,68,.6)">Reschedule</button>
+          <button class="flex-1 py-2 rounded-xl text-xs font-inter font-medium border" style="border-color:rgba(220,38,38,.3);color:rgb(220,38,38)">Cancel</button>
+          <a href="messages.html" class="flex-1 py-2 rounded-xl text-xs font-outfit font-semibold flex items-center justify-center gap-1" style="background:var(--primary-light);color:var(--primary)">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Chat
+          </a>
+        </div>
+      </div>
+
+      <div class="glass-card p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <span class="badge badge-teal text-xs">Upcoming</span>
+            <h3 class="font-outfit font-semibold text-base mt-1.5" style="color:var(--secondary)">English Literature</h3>
+            <p class="font-inter text-sm" style="color:rgba(26,43,68,.55)">with Fatima Bello</p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-base" style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(220,40%,30%))">FB</div>
+        </div>
+        <div class="flex items-center gap-3 mb-3 text-xs font-inter" style="color:rgba(26,43,68,.55)">
+          <span class="flex items-center gap-1"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> Wed, Apr 9</span>
+          <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 3:00 PM</span>
+          <span class="flex items-center gap-1"><i data-lucide="home" class="w-3.5 h-3.5"></i> In-Person</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex-1 py-2 rounded-xl text-xs font-inter font-medium border" style="border-color:rgba(26,43,68,.15);color:rgba(26,43,68,.6)">Reschedule</button>
+          <button class="flex-1 py-2 rounded-xl text-xs font-inter font-medium border" style="border-color:rgba(220,38,38,.3);color:rgb(220,38,38)">Cancel</button>
+          <a href="messages.html" class="flex-1 py-2 rounded-xl text-xs font-outfit font-semibold flex items-center justify-center gap-1" style="background:var(--primary-light);color:var(--primary)">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Chat
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed -->
+    <div id="content-completed" class="flex flex-col gap-3 hidden">
+      <div class="glass-card p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <span class="badge text-xs" style="background:rgba(34,197,94,.12);color:rgb(21,128,61)">Completed</span>
+            <h3 class="font-outfit font-semibold text-base mt-1.5" style="color:var(--secondary)">Introduction to Physics</h3>
+            <p class="font-inter text-sm" style="color:rgba(26,43,68,.55)">with Chidi Abiodun</p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-base" style="background:linear-gradient(135deg,hsl(45,80%,55%),hsl(30,80%,50%))">CA</div>
+        </div>
+        <div class="flex items-center gap-3 mb-3 text-xs font-inter" style="color:rgba(26,43,68,.55)">
+          <span class="flex items-center gap-1"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> Fri, Apr 4</span>
+          <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 2 hours</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="flex gap-0.5">
+            <i data-lucide="star" class="w-4 h-4 star fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star fill-current"></i>
+          </div>
+          <button class="text-xs font-outfit font-semibold" style="color:var(--primary)">Edit Review</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancelled -->
+    <div id="content-cancelled" class="flex flex-col gap-3 hidden">
+      <!-- Empty state -->
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-4" style="background:rgba(26,43,68,.05)">
+          <i data-lucide="x-circle" class="w-10 h-10" style="color:rgba(26,43,68,.2)"></i>
+        </div>
+        <h3 class="font-outfit font-semibold text-lg mb-2" style="color:var(--secondary)">No cancelled sessions</h3>
+        <p class="font-inter text-sm" style="color:rgba(26,43,68,.45);max-width:220px">You haven't cancelled any sessions. Keep it up!</p>
+        <a href="student-dashboard.html" class="btn-primary mt-6" style="font-size:.85rem;padding:.65rem 1.5rem">
+          <i data-lucide="search" class="w-4 h-4"></i>
+          Find a Tutor
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="student-dashboard.html" class="nav-item">
+    <i data-lucide="home" class="w-5 h-5"></i><span>Home</span>
+  </a>
+  <a href="student-sessions.html" class="nav-item active">
+    <i data-lucide="calendar" class="w-5 h-5"></i><span>Sessions</span>
+  </a>
+  <a href="messages.html" class="nav-item">
+    <i data-lucide="message-square" class="w-5 h-5"></i><span>Messages</span>
+  </a>
+  <a href="student-profile.html" class="nav-item">
+    <i data-lucide="user" class="w-5 h-5"></i><span>Profile</span>
+  </a>
+</nav>
+
+<script>
+  lucide.createIcons();
+  function switchTab(tab) {
+    ['upcoming','completed','cancelled'].forEach(t => {
+      const btn = document.getElementById('tab-'+t);
+      const content = document.getElementById('content-'+t);
+      if (t === tab) {
+        btn.style.background = 'var(--primary)'; btn.style.color = 'white';
+        content.classList.remove('hidden');
+      } else {
+        btn.style.background = 'transparent'; btn.style.color = 'rgba(26,43,68,.5)';
+        content.classList.add('hidden');
+      }
+    });
+    lucide.createIcons();
+  }
+</script>
+</body>
+</html>

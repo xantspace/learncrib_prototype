@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app px-6 pt-12 pb-10 flex flex-col min-h-screen">
+
+  <!-- Back -->
+  <button onclick="history.back()" class="flex items-center gap-2 text-sm mb-8" style="color:var(--secondary);opacity:.6">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+  </button>
+
+  <!-- Header -->
+  <div class="mb-8 slide-up">
+    <div class="flex items-center gap-3 mb-4">
+      <img src="../assets/img/logo_b.png" alt="LearnCrib Logo" class="h-10 object-contain" />
+    </div>
+    <h1 class="font-outfit font-bold text-3xl mt-4" style="color:var(--secondary)">Welcome back</h1>
+    <p class="font-inter text-sm mt-1" style="color:rgba(26,43,68,.55)">Login to continue your learning journey</p>
+  </div>
+
+  <!-- Form -->
+  <form action="student-dashboard.html" method="GET" class="flex flex-col gap-4 slide-up" style="animation-delay:.1s">
+
+    <!-- Email -->
+    <div class="input-wrapper">
+      <i data-lucide="mail" class="w-4 h-4 input-icon"></i>
+      <input type="email" placeholder="Email or phone number" class="input-field" required />
+    </div>
+
+    <!-- Password -->
+    <div class="input-wrapper">
+      <i data-lucide="lock" class="w-4 h-4 input-icon"></i>
+      <input type="password" placeholder="Password" class="input-field" id="pwd" required />
+      <button type="button" onclick="togglePwd()" class="absolute right-3 top-1/2 -translate-y-1/2" style="color:rgba(26,43,68,.4)">
+        <i data-lucide="eye" class="w-4 h-4" id="eye-icon"></i>
+      </button>
+    </div>
+
+    <!-- Remember + Forgot -->
+    <div class="flex items-center justify-between mt-1">
+      <label class="flex items-center gap-2 cursor-pointer select-none">
+        <div id="toggle-remember" onclick="toggleRemember()" class="w-10 h-5 rounded-full relative transition-colors duration-300 cursor-pointer" style="background:rgba(26,43,68,.15)">
+          <span id="toggle-knob" class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-300"></span>
+        </div>
+        <span class="text-xs font-inter" style="color:rgba(26,43,68,.6)">Remember me</span>
+      </label>
+      <a href="#" class="text-xs font-inter font-medium" style="color:var(--primary)">Forgot password?</a>
+    </div>
+
+    <!-- Login CTA -->
+    <button type="submit" class="btn-primary justify-center mt-2">
+      <i data-lucide="log-in" class="w-4 h-4"></i>
+      Login
+    </button>
+
+    <!-- Divider -->
+    <div class="flex items-center gap-3 my-2">
+      <div class="flex-1 h-px bg-gray-200"></div>
+      <span class="text-xs font-inter" style="color:rgba(26,43,68,.4)">or continue with</span>
+      <div class="flex-1 h-px bg-gray-200"></div>
+    </div>
+
+    <!-- Social -->
+    <div class="grid grid-cols-2 gap-3">
+      <button type="button" class="glass-card flex items-center justify-center gap-2 py-3 px-4 text-sm font-inter font-medium" style="color:var(--secondary)">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Google
+      </button>
+      <button type="button" class="glass-card flex items-center justify-center gap-2 py-3 px-4 text-sm font-inter font-medium" style="color:var(--secondary)">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Footer -->
+  <p class="mt-auto text-center text-sm font-inter pt-8" style="color:rgba(26,43,68,.55)">
+    Don't have an account?
+    <a href="signup.html" class="font-semibold" style="color:var(--primary)">Sign up</a>
+  </p>
+
+</div>
+
+<script>
+  lucide.createIcons();
+  let remember = false;
+  function toggleRemember() {
+    remember = !remember;
+    const t = document.getElementById('toggle-remember');
+    const k = document.getElementById('toggle-knob');
+    t.style.background = remember ? 'var(--primary)' : 'rgba(26,43,68,.15)';
+    k.style.transform = remember ? 'translateX(20px)' : 'translateX(0)';
+  }
+  let shown = false;
+  function togglePwd() {
+    shown = !shown;
+    document.getElementById('pwd').type = shown ? 'text' : 'password';
+    document.getElementById('eye-icon').setAttribute('data-lucide', shown ? 'eye-off' : 'eye');
+    lucide.createIcons();
+  }
+</script>
+</body>
+</html>

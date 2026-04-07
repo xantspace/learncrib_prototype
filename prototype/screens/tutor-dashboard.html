@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Tutor Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app pb-28">
+
+  <!-- Header -->
+  <div class="px-5 pt-10 pb-4">
+    <div class="flex items-center justify-between mb-4">
+      <img src="../assets/img/logo_b.png" alt="LearnCrib Logo" class="h-6 object-contain" />
+    </div>
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Tutor Dashboard</p>
+        <h1 class="font-outfit font-bold text-xl" style="color:var(--secondary)">Hello, Kolade</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="notifications.html" class="relative w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+          <i data-lucide="bell" class="w-5 h-5" style="color:var(--secondary)"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background:var(--accent)"></span>
+        </a>
+        <a href="tutor-profile-edit.html" class="w-10 h-10 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-sm" style="background:linear-gradient(135deg,var(--primary),#0F2391)">KO</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Availability Toggle -->
+  <div class="px-5 mb-5">
+    <div class="glass-card p-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="pulse-dot"></span>
+        <div>
+          <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Available for sessions</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Students can book you now</p>
+        </div>
+      </div>
+      <div id="avail-toggle" onclick="toggleAvail()" class="w-12 h-6 rounded-full relative transition-colors duration-300 cursor-pointer" style="background:var(--primary)">
+        <span id="avail-knob" class="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-300" style="transform:translateX(24px)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Earnings Summary -->
+  <div class="px-5 mb-5">
+    <a href="tutor-earnings.html" class="block rounded-3xl p-5" style="background:linear-gradient(135deg,var(--secondary) 0%,hsl(220,50%,25%) 100%)">
+      <p class="font-inter text-xs text-white opacity-60 mb-1">Total Earnings This Month</p>
+      <h2 class="font-outfit font-bold text-4xl text-white mb-1">₦128,500</h2>
+      <p class="font-inter text-xs text-white opacity-60 mb-4">+₦24,000 from last month</p>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-white bg-opacity-10 rounded-2xl p-3 text-center">
+          <p class="font-outfit font-bold text-lg text-white">₦8,500</p>
+          <p class="text-xs text-white opacity-60">Today</p>
+        </div>
+        <div class="bg-white bg-opacity-10 rounded-2xl p-3 text-center">
+          <p class="font-outfit font-bold text-lg text-white">₦42K</p>
+          <p class="text-xs text-white opacity-60">This Week</p>
+        </div>
+        <div class="bg-white bg-opacity-10 rounded-2xl p-3 text-center">
+          <p class="font-outfit font-bold text-lg text-white">₦12K</p>
+          <p class="text-xs text-white opacity-60">Pending</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="px-5 mb-5">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="glass-card p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center" style="background:var(--primary-light)">
+          <i data-lucide="users" class="w-5 h-5" style="color:var(--primary)"></i>
+        </div>
+        <div>
+          <p class="font-outfit font-bold text-2xl" style="color:var(--secondary)">47</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Total Students</p>
+        </div>
+      </div>
+      <div class="glass-card p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center" style="background:hsla(45,100%,50%,0.12)">
+          <i data-lucide="star" class="w-5 h-5" style="color:var(--accent)"></i>
+        </div>
+        <div>
+          <p class="font-outfit font-bold text-2xl" style="color:var(--secondary)">4.9</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Avg Rating</p>
+        </div>
+      </div>
+      <div class="glass-card p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center" style="background:var(--primary-light)">
+          <i data-lucide="check-circle" class="w-5 h-5" style="color:var(--primary)"></i>
+        </div>
+        <div>
+          <p class="font-outfit font-bold text-2xl" style="color:var(--secondary)">213</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Sessions Done</p>
+        </div>
+      </div>
+      <div class="glass-card p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center" style="background:rgba(26,43,68,.08)">
+          <i data-lucide="trending-up" class="w-5 h-5" style="color:var(--secondary)"></i>
+        </div>
+        <div>
+          <p class="font-outfit font-bold text-2xl" style="color:var(--secondary)">+18%</p>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Growth</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Sessions -->
+  <div class="px-5">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="font-outfit font-bold text-lg" style="color:var(--secondary)">Upcoming Sessions</h2>
+      <a href="tutor-sessions.html" class="text-xs font-inter font-medium" style="color:var(--primary)">See all</a>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <div class="glass-card p-4 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-outfit font-bold text-white" style="background:linear-gradient(135deg,hsl(340,70%,55%),hsl(340,50%,40%))">AM</div>
+        <div class="flex-1">
+          <h4 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Amara Mensah</h4>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Advanced Maths · 1 hr</p>
+          <p class="font-inter text-xs mt-1 font-medium" style="color:var(--primary)">Tomorrow, 10:00 AM</p>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <button class="w-8 h-8 rounded-xl glass-card flex items-center justify-center">
+            <i data-lucide="message-circle" class="w-4 h-4" style="color:var(--primary)"></i>
+          </button>
+          <button class="w-8 h-8 rounded-xl glass-card flex items-center justify-center">
+            <i data-lucide="video" class="w-4 h-4" style="color:var(--secondary)"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card p-4 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-outfit font-bold text-white" style="background:linear-gradient(135deg,hsl(220,60%,55%),hsl(220,40%,40%))">EJ</div>
+        <div class="flex-1">
+          <h4 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Emeka James</h4>
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Physics · 2 hrs</p>
+          <p class="font-inter text-xs mt-1 font-medium" style="color:var(--primary)">Wed, Apr 9 · 2:00 PM</p>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <button class="w-8 h-8 rounded-xl glass-card flex items-center justify-center">
+            <i data-lucide="message-circle" class="w-4 h-4" style="color:var(--primary)"></i>
+          </button>
+          <button class="w-8 h-8 rounded-xl glass-card flex items-center justify-center">
+            <i data-lucide="map-pin" class="w-4 h-4" style="color:var(--secondary)"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="tutor-dashboard.html" class="nav-item active">
+    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="tutor-students.html" class="nav-item">
+    <i data-lucide="users" class="w-5 h-5"></i>
+    <span>Students</span>
+  </a>
+  <a href="tutor-availability.html" class="nav-item">
+    <i data-lucide="calendar" class="w-5 h-5"></i>
+    <span>Schedule</span>
+  </a>
+  <a href="tutor-earnings.html" class="nav-item">
+    <i data-lucide="wallet" class="w-5 h-5"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="tutor-profile.html" class="nav-item">
+    <i data-lucide="user" class="w-5 h-5"></i>
+    <span>Profile</span>
+  </a>
+</nav>
+
+<script>
+  lucide.createIcons();
+  let avail = true;
+  function toggleAvail() {
+    avail = !avail;
+    const t = document.getElementById('avail-toggle');
+    const k = document.getElementById('avail-knob');
+    t.style.background = avail ? 'var(--primary)' : 'rgba(26,43,68,.25)';
+    k.style.transform = avail ? 'translateX(24px)' : 'translateX(0)';
+  }
+</script>
+</body>
+</html>

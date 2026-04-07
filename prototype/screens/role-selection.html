@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Select Your Role</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+<div class="container-app px-5 flex flex-col items-center justify-center">
+
+  <div class="mb-10 text-center">
+    <img src="../assets/img/logo_a.png" alt="LearnCrib Logo" class="w-20 h-20 mx-auto drop-shadow-xl mb-4" />
+  </div>
+
+  <h1 class="font-outfit font-bold text-3xl text-center mb-2" style="color:var(--secondary)">Join LearnCrib</h1>
+  <p class="font-inter text-sm text-center mb-10 opacity-50 px-8">Tell us how you plan to use the platform so we can tailor your experience.</p>
+
+  <div class="w-full flex flex-col gap-4">
+    
+    <!-- Student Role -->
+    <a href="signup.html?role=student" class="glass-card p-6 flex items-center gap-6 group hover:border-primary transition-all active:scale-[0.98]">
+       <div class="w-16 h-16 rounded-2xl bg-teal-50 flex items-center justify-center group-hover:bg-primary transition-colors">
+          <i data-lucide="book-open" class="w-8 h-8 text-primary group-hover:text-white"></i>
+       </div>
+       <div class="flex-1">
+          <h3 class="font-outfit font-bold text-xl mb-1" style="color:var(--secondary)">I'm a Student</h3>
+          <p class="font-inter text-sm opacity-50">I want to find expert tutors and learn at my own pace.</p>
+       </div>
+    </a>
+
+    <!-- Tutor Role -->
+    <a href="signup.html?role=tutor" class="glass-card p-6 flex items-center gap-6 group hover:border-primary transition-all active:scale-[0.98]">
+       <div class="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center group-hover:bg-primary transition-colors">
+          <i data-lucide="users" class="w-8 h-8 text-orange-500 group-hover:text-white"></i>
+       </div>
+       <div class="flex-1">
+          <h3 class="font-outfit font-bold text-xl mb-1" style="color:var(--secondary)">I'm a Tutor</h3>
+          <p class="font-inter text-sm opacity-50">I want to share my knowledge and earn by teaching.</p>
+       </div>
+    </a>
+
+  </div>
+
+  <p class="mt-10 font-inter text-sm" style="color:var(--secondary)">
+    Already have an account? <a href="login.html" class="font-bold text-primary">Log In</a>
+  </p>
+
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Welcome</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1939D4',
+            secondary: '#0A1444',
+            accent: '#F0B429',
+          },
+          fontFamily: {
+            outfit: ['Plus Jakarta Sans', 'sans-serif'],
+            inter: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app" style="background: linear-gradient(160deg, hsl(175,60%,96%) 0%, white 40%, hsl(220,40%,97%) 100%);">
+
+  <!-- ── Carousel Wrapper ── -->
+  <div id="carousel" class="relative h-screen flex flex-col overflow-hidden">
+
+    <!-- Slides -->
+    <div id="slides" class="flex-1 flex transition-transform duration-500 ease-in-out" style="transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);">
+
+      <!-- Slide 1: Discover Knowledge -->
+      <div class="slide min-w-full flex flex-col items-center justify-center px-8 text-center pt-8">
+        <img src="../assets/img/logo_a.png" alt="LearnCrib Logo" class="h-14 mb-10 object-contain drop-shadow-xl" />
+        <div class="float-anim mb-8 w-72 h-64 flex items-center justify-center">
+          <img src="../../Illustrations/math.svg" alt="Discover Knowledge" class="w-full h-full object-contain" />
+        </div>
+        <span class="badge badge-teal mb-3 text-xs uppercase tracking-widest">For Everyone</span>
+        <h2 class="font-outfit font-bold text-3xl text-secondary leading-tight mb-3">
+          Discover <span style="color:var(--primary)">Knowledge</span>
+        </h2>
+        <p class="font-inter text-base leading-relaxed" style="color:rgba(26,43,68,0.65); max-width:280px">
+          Learn anything, from algebra to astrophysics — all in one place.
+        </p>
+      </div>
+
+      <!-- Slide 2: Perfect Match -->
+      <div class="slide min-w-full flex flex-col items-center justify-center px-8 text-center">
+        <div class="float-anim mb-8 w-72 h-64 flex items-center justify-center" style="animation-delay:0.5s">
+          <img src="../../Illustrations/file-searching.svg" alt="Find Your Tutor" class="w-full h-full object-contain" />
+        </div>
+        <span class="badge badge-teal mb-3 text-xs uppercase tracking-widest">AI-Powered</span>
+        <h2 class="font-outfit font-bold text-3xl text-secondary leading-tight mb-3">
+          The <span style="color:var(--primary)">Perfect</span> Match
+        </h2>
+        <p class="font-inter text-base leading-relaxed" style="color:rgba(26,43,68,0.65); max-width:280px">
+          Our AI finds tutors that fit your learning style, schedule, and budget.
+        </p>
+      </div>
+
+      <!-- Slide 3: Real-Time Connection -->
+      <div class="slide min-w-full flex flex-col items-center justify-center px-8 text-center">
+        <div class="float-anim mb-8 w-72 h-64 flex items-center justify-center" style="animation-delay:1s">
+          <img src="../../Illustrations/message-sent.svg" alt="Real-Time Connection" class="w-full h-full object-contain" />
+        </div>
+        <span class="badge badge-teal mb-3 text-xs uppercase tracking-widest">Instant</span>
+        <h2 class="font-outfit font-bold text-3xl text-secondary leading-tight mb-3">
+          Real-Time <span style="color:var(--primary)">Connection</span>
+        </h2>
+        <p class="font-inter text-base leading-relaxed" style="color:rgba(26,43,68,0.65); max-width:280px">
+          Seamless chat to clarify goals before you book your first session.
+        </p>
+      </div>
+
+      <!-- Slide 4: Ready to Start -->
+      <div class="slide min-w-full flex flex-col items-center justify-center px-8 text-center">
+        <div class="float-anim mb-8 w-72 h-64 flex items-center justify-center" style="animation-delay:1.5s">
+          <img src="../../Illustrations/personal-information.svg" alt="Get Started" class="w-full h-full object-contain" />
+        </div>
+        <span class="badge badge-teal mb-3 text-xs uppercase tracking-widest">Your Crib</span>
+        <h2 class="font-outfit font-bold text-3xl text-secondary leading-tight mb-3">
+          Ready to <span style="color:var(--primary)">Start?</span>
+        </h2>
+        <p class="font-inter text-base leading-relaxed" style="color:rgba(26,43,68,0.65); max-width:280px">
+          Tell us about your goals and we'll help you find your learning home.
+        </p>
+      </div>
+
+    </div><!-- /slides -->
+
+    <!-- ── Bottom Nav: Skip · Dots · Next ── -->
+    <div class="px-8 pb-12 pt-4 flex items-center justify-between">
+
+      <!-- Skip -->
+      <button id="btn-skip" onclick="goToAuth()" class="btn-ghost text-sm flex items-center gap-1" style="padding:0.6rem 1.2rem; border-radius:9999px">
+        Skip
+        <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Dots -->
+      <div id="dots" class="flex gap-2 items-center">
+        <span class="dot w-2.5 h-2.5 rounded-full transition-all duration-300" style="background:var(--primary)"></span>
+        <span class="dot w-2 h-2 rounded-full bg-gray-300 transition-all duration-300"></span>
+        <span class="dot w-2 h-2 rounded-full bg-gray-300 transition-all duration-300"></span>
+        <span class="dot w-2 h-2 rounded-full bg-gray-300 transition-all duration-300"></span>
+      </div>
+
+      <!-- Next / Get Started -->
+      <button id="btn-next" onclick="nextSlide()" class="btn-primary text-sm" style="padding:0.65rem 1.3rem">
+        <span id="btn-label">Next</span>
+        <i data-lucide="arrow-right" class="w-4 h-4" id="btn-icon"></i>
+      </button>
+
+    </div>
+
+  </div><!-- /carousel -->
+
+</div>
+
+<script>
+  lucide.createIcons();
+
+  let current = 0;
+  const total = 4;
+  const slidesEl = document.getElementById('slides');
+  const dots = document.querySelectorAll('.dot');
+  const btnLabel = document.getElementById('btn-label');
+
+  function updateCarousel() {
+    slidesEl.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => {
+      d.style.background = i === current ? 'var(--primary)' : '#D1D5DB';
+      d.style.width = i === current ? '10px' : '8px';
+      d.style.height = i === current ? '10px' : '8px';
+    });
+    if (current === total - 1) {
+      btnLabel.textContent = 'Get Started';
+      document.getElementById('btn-icon').setAttribute('data-lucide', 'home');
+    } else {
+      btnLabel.textContent = 'Next';
+      document.getElementById('btn-icon').setAttribute('data-lucide', 'arrow-right');
+    }
+    lucide.createIcons();
+  }
+
+  function nextSlide() {
+    if (current < total - 1) {
+      current++;
+      updateCarousel();
+    } else {
+      goToAuth();
+    }
+  }
+
+  function goToAuth() {
+    window.location.href = 'role-selection.html';
+  }
+
+  // Swipe support
+  let startX = 0;
+  slidesEl.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  slidesEl.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (diff > 50 && current < total - 1) { current++; updateCarousel(); }
+    if (diff < -50 && current > 0) { current--; updateCarousel(); }
+  });
+</script>
+</body>
+</html>

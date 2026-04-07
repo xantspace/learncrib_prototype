@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app px-6 pt-10 pb-10 flex flex-col min-h-screen">
+
+  <!-- Back -->
+  <button onclick="history.back()" class="flex items-center gap-2 text-sm mb-6" style="color:var(--secondary);opacity:.6">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+  </button>
+
+  <!-- Header -->
+  <div class="mb-6 slide-up">
+    <img src="../assets/img/logo_b.png" alt="LearnCrib Logo" class="h-8 mb-6 object-contain" />
+    <h1 class="font-outfit font-bold text-3xl" style="color:var(--secondary)">Create account</h1>
+    <p class="font-inter text-sm mt-1" style="color:rgba(26,43,68,.55)">Join thousands learning in their crib</p>
+  </div>
+
+  <!-- Role Toggle -->
+  <div class="mb-5 slide-up" style="animation-delay:.05s">
+    <p class="text-xs font-inter font-semibold uppercase tracking-widest mb-2" style="color:rgba(26,43,68,.45)">I am a…</p>
+    <div class="grid grid-cols-2 gap-3">
+      <!-- Student Card -->
+      <div id="card-student" onclick="selectRole('student')" class="glass-card p-4 flex flex-col items-center gap-2 cursor-pointer border-2 transition-all duration-300" style="border-color:var(--primary)">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:var(--primary-light)">
+          <i data-lucide="graduation-cap" class="w-5 h-5" style="color:var(--primary)"></i>
+        </div>
+        <span class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Student</span>
+        <span class="text-xs font-inter text-center" style="color:rgba(26,43,68,.5)">Find & book tutors</span>
+      </div>
+      <!-- Tutor Card -->
+      <div id="card-tutor" onclick="selectRole('tutor')" class="glass-card p-4 flex flex-col items-center gap-2 cursor-pointer border-2 transition-all duration-300" style="border-color:transparent">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(26,43,68,.08)">
+          <i data-lucide="user-check" class="w-5 h-5" style="color:var(--secondary)"></i>
+        </div>
+        <span class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Tutor</span>
+        <span class="text-xs font-inter text-center" style="color:rgba(26,43,68,.5)">Teach & earn</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form action="student-dashboard.html" method="GET" class="flex flex-col gap-4 slide-up" style="animation-delay:.1s">
+
+    <div class="input-wrapper">
+      <i data-lucide="user" class="w-4 h-4 input-icon"></i>
+      <input type="text" placeholder="Full name" class="input-field" required />
+    </div>
+
+    <div class="input-wrapper">
+      <i data-lucide="mail" class="w-4 h-4 input-icon"></i>
+      <input type="email" placeholder="Email address" class="input-field" required />
+    </div>
+
+    <div class="input-wrapper">
+      <i data-lucide="smartphone" class="w-4 h-4 input-icon"></i>
+      <input type="tel" placeholder="Phone number" class="input-field" />
+    </div>
+
+    <div class="input-wrapper">
+      <i data-lucide="lock" class="w-4 h-4 input-icon"></i>
+      <input type="password" placeholder="Create password" class="input-field" required />
+    </div>
+
+    <!-- Location permission -->
+    <button type="button" onclick="showLocationToast()" class="glass-card flex items-center gap-3 px-4 py-3 w-full text-left cursor-pointer">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--primary-light)">
+        <i data-lucide="map-pin" class="w-4 h-4" style="color:var(--primary)"></i>
+      </div>
+      <div>
+        <p class="text-sm font-inter font-medium" style="color:var(--secondary)">Enable location</p>
+        <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Find tutors near you</p>
+      </div>
+      <i data-lucide="chevron-right" class="w-4 h-4 ml-auto" style="color:rgba(26,43,68,.35)"></i>
+    </button>
+
+    <!-- Terms -->
+    <label class="flex items-start gap-3 cursor-pointer mt-1">
+      <div id="terms-box" onclick="toggleTerms()" class="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all" style="border-color:var(--primary)">
+        <i data-lucide="check" class="w-3 h-3 hidden text-white" id="terms-check"></i>
+      </div>
+      <span class="text-xs font-inter leading-relaxed" style="color:rgba(26,43,68,.6)">
+        I agree to LearnCrib's <a href="#" style="color:var(--primary)" class="font-medium">Terms of Service</a> and <a href="#" style="color:var(--primary)" class="font-medium">Privacy Policy</a>
+      </span>
+    </label>
+
+    <button type="submit" class="btn-primary justify-center mt-2">
+      <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      Create Account
+    </button>
+
+    <!-- Divider -->
+    <div class="flex items-center gap-3">
+      <div class="flex-1 h-px bg-gray-200"></div>
+      <span class="text-xs font-inter" style="color:rgba(26,43,68,.4)">or</span>
+      <div class="flex-1 h-px bg-gray-200"></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <button type="button" class="glass-card flex items-center justify-center gap-2 py-3 px-4 text-sm font-inter font-medium" style="color:var(--secondary)">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Google
+      </button>
+      <button type="button" class="glass-card flex items-center justify-center gap-2 py-3 px-4 text-sm font-inter font-medium" style="color:var(--secondary)">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </button>
+    </div>
+
+  </form>
+
+  <p class="mt-6 text-center text-sm font-inter" style="color:rgba(26,43,68,.55)">
+    Already have an account?
+    <a href="login.html" class="font-semibold" style="color:var(--primary)">Log in</a>
+  </p>
+
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass-card px-5 py-3 flex items-center gap-3 text-sm font-inter opacity-0 pointer-events-none transition-opacity duration-300 z-50" style="border-radius:1rem; min-width:280px">
+  <i data-lucide="map-pin" class="w-4 h-4" style="color:var(--primary)"></i>
+  <span style="color:var(--secondary)">Location permission requested</span>
+  <button onclick="hideToast()" style="color:var(--primary);margin-left:auto;font-weight:600">Allow</button>
+</div>
+
+<script>
+  lucide.createIcons();
+  
+  // Set role from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  let role = urlParams.get('role') || 'student';
+  selectRole(role);
+
+  function selectRole(r) {
+    role = r;
+    ['student','tutor'].forEach(x => {
+      const el = document.getElementById('card-'+x);
+      const icon = el.querySelector('[data-lucide]');
+      const iconWrap = icon.parentElement;
+      if (x === r) {
+        el.style.borderColor = 'var(--primary)';
+        iconWrap.style.background = 'var(--primary-light)';
+        icon.style.color = 'var(--primary)';
+      } else {
+        el.style.borderColor = 'transparent';
+        iconWrap.style.background = 'rgba(26,43,68,.08)';
+        icon.style.color = 'var(--secondary)';
+      }
+    });
+  }
+
+  let termsAgreed = false;
+  function toggleTerms() {
+    termsAgreed = !termsAgreed;
+    const box = document.getElementById('terms-box');
+    const chk = document.getElementById('terms-check');
+    box.style.background = termsAgreed ? 'var(--primary)' : 'transparent';
+    chk.classList.toggle('hidden', !termsAgreed);
+    lucide.createIcons();
+  }
+
+  function showLocationToast() {
+    const t = document.getElementById('toast');
+    t.style.opacity = '1';
+    t.style.pointerEvents = 'auto';
+    setTimeout(hideToast, 3500);
+  }
+  function hideToast() {
+    const t = document.getElementById('toast');
+    t.style.opacity = '0';
+    t.style.pointerEvents = 'none';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Messages</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app pb-24">
+
+  <!-- Header -->
+  <div class="sticky top-0 z-40 px-5 pt-12 pb-4" style="background:linear-gradient(to bottom,white 85%,transparent)">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="font-outfit font-bold text-2xl" style="color:var(--secondary)">Messages</h1>
+      <button class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+        <i data-lucide="edit" class="w-5 h-5" style="color:var(--primary)"></i>
+      </button>
+    </div>
+    <div class="input-wrapper">
+      <i data-lucide="search" class="w-4 h-4 input-icon"></i>
+      <input type="text" placeholder="Search conversations…" class="input-field" />
+    </div>
+  </div>
+
+  <!-- Conversation List -->
+  <div class="px-5 flex flex-col gap-1" id="convo-list">
+
+    <!-- Active conversation -->
+    <div onclick="openChat('Kolade Okonkwo','KO','linear-gradient(135deg,var(--primary),hsl(175,80%,25%))')" class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 relative">
+      <div class="relative flex-shrink-0">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,var(--primary),hsl(175,80%,25%))">KO</div>
+        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white" style="background:var(--primary)"></span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-0.5">
+          <h3 class="font-outfit font-semibold text-base" style="color:var(--secondary)">Kolade Okonkwo</h3>
+          <span class="font-inter text-xs" style="color:rgba(26,43,68,.4)">2m ago</span>
+        </div>
+        <p class="font-inter text-sm truncate" style="color:rgba(26,43,68,.55)">Looking forward to our session tomorrow! 📚</p>
+      </div>
+      <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-inter font-bold text-white flex-shrink-0" style="background:var(--primary)">2</span>
+    </div>
+
+    <div onclick="openChat('Fatima Bello','FB','linear-gradient(135deg,hsl(220,60%,50%),hsl(220,40%,30%))')" class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all hover:bg-gray-50">
+      <div class="relative flex-shrink-0">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(220,40%,30%))">FB</div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-0.5">
+          <h3 class="font-outfit font-semibold text-base" style="color:var(--secondary)">Fatima Bello</h3>
+          <span class="font-inter text-xs" style="color:rgba(26,43,68,.4)">1h ago</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <i data-lucide="check-check" class="w-3.5 h-3.5" style="color:var(--primary)"></i>
+          <p class="font-inter text-sm truncate" style="color:rgba(26,43,68,.4)">Sure, I can do Wednesday at 3pm</p>
+        </div>
+      </div>
+    </div>
+
+    <div onclick="openChat('Chidi Abiodun','CA','linear-gradient(135deg,hsl(45,80%,55%),hsl(30,80%,50%))')" class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all hover:bg-gray-50">
+      <div class="relative flex-shrink-0">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(45,80%,55%),hsl(30,80%,50%))">CA</div>
+        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white" style="background:var(--primary)"></span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-0.5">
+          <h3 class="font-outfit font-semibold text-base" style="color:var(--secondary)">Chidi Abiodun</h3>
+          <span class="font-inter text-xs" style="color:rgba(26,43,68,.4)">Yesterday</span>
+        </div>
+        <p class="font-inter text-sm truncate" style="color:rgba(26,43,68,.55)">Great session! You've improved so much 🎉</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Chat Overlay -->
+<div id="chat-overlay" class="fixed inset-0 z-50 flex flex-col hidden" style="background:white;max-width:430px;margin:0 auto">
+  <!-- Chat Header -->
+  <div class="flex items-center gap-4 px-5 pt-12 pb-4 border-b" style="border-color:rgba(26,43,68,.08)">
+    <button onclick="closeChat()" class="w-9 h-9 rounded-xl glass-card flex items-center justify-center flex-shrink-0">
+      <i data-lucide="arrow-left" class="w-4 h-4" style="color:var(--secondary)"></i>
+    </button>
+    <div id="chat-avatar" class="w-10 h-10 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-sm flex-shrink-0"></div>
+    <div class="flex-1">
+      <h3 id="chat-name" class="font-outfit font-semibold text-base" style="color:var(--secondary)"></h3>
+      <p class="font-inter text-xs flex items-center gap-1" style="color:var(--primary)">
+        <span class="w-1.5 h-1.5 rounded-full inline-block" style="background:var(--primary)"></span> Online
+      </p>
+    </div>
+    <button class="w-9 h-9 rounded-xl glass-card flex items-center justify-center">
+      <i data-lucide="phone" class="w-4 h-4" style="color:var(--secondary)"></i>
+    </button>
+    <button class="w-9 h-9 rounded-xl glass-card flex items-center justify-center">
+      <i data-lucide="video" class="w-4 h-4" style="color:var(--secondary)"></i>
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div class="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3" id="chat-messages">
+    <!-- Incoming -->
+    <div class="flex gap-3 max-w-xs">
+      <div id="chat-avatar-sm" class="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center font-outfit font-bold text-white text-xs"></div>
+      <div>
+        <div class="px-4 py-2.5 rounded-2xl rounded-tl-sm" style="background:rgba(26,43,68,.06)">
+          <p class="font-inter text-sm" style="color:var(--secondary)">Hi! Looking forward to our session 📚</p>
+        </div>
+        <p class="font-inter text-xs mt-1 ml-1" style="color:rgba(26,43,68,.35)">10:32 AM</p>
+      </div>
+    </div>
+    <!-- Outgoing -->
+    <div class="flex justify-end">
+      <div class="max-w-xs">
+        <div class="px-4 py-2.5 rounded-2xl rounded-tr-sm" style="background:var(--primary)">
+          <p class="font-inter text-sm text-white">Me too! I have some questions about differentiation 😊</p>
+        </div>
+        <div class="flex items-center justify-end gap-1 mt-1 mr-1">
+          <p class="font-inter text-xs" style="color:rgba(26,43,68,.35)">10:34 AM</p>
+          <i data-lucide="check-check" class="w-3 h-3" style="color:var(--primary)"></i>
+        </div>
+      </div>
+    </div>
+    <!-- Incoming -->
+    <div class="flex gap-3 max-w-xs">
+      <div class="w-8 h-8 flex-shrink-0"></div>
+      <div>
+        <div class="px-4 py-2.5 rounded-2xl rounded-tl-sm" style="background:rgba(26,43,68,.06)">
+          <p class="font-inter text-sm" style="color:var(--secondary)">Perfect! Bring your textbook and we'll work through it step by step 💪</p>
+        </div>
+        <p class="font-inter text-xs mt-1 ml-1" style="color:rgba(26,43,68,.35)">10:35 AM</p>
+      </div>
+    </div>
+    <!-- Typing Indicator -->
+    <div class="flex gap-3 max-w-xs" id="typing">
+      <div class="w-8 h-8 flex-shrink-0"></div>
+      <div class="px-4 py-3 rounded-2xl rounded-tl-sm flex gap-1.5 items-center" style="background:rgba(26,43,68,.06)">
+        <span class="w-2 h-2 rounded-full" style="background:rgba(26,43,68,.4);animation:bounce 1.2s 0s infinite"></span>
+        <span class="w-2 h-2 rounded-full" style="background:rgba(26,43,68,.4);animation:bounce 1.2s 0.2s infinite"></span>
+        <span class="w-2 h-2 rounded-full" style="background:rgba(26,43,68,.4);animation:bounce 1.2s 0.4s infinite"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Bar -->
+  <div class="px-5 py-4 flex items-center gap-3 border-t" style="border-color:rgba(26,43,68,.08);padding-bottom:calc(1rem + env(safe-area-inset-bottom))">
+    <button class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center flex-shrink-0">
+      <i data-lucide="paperclip" class="w-4 h-4" style="color:var(--secondary);opacity:.5"></i>
+    </button>
+    <div class="flex-1 relative">
+      <input id="msg-input" type="text" placeholder="Type a message…" class="input-field" style="padding:.7rem 1rem;border-radius:1rem" onkeypress="if(event.key==='Enter')sendMsg()" />
+    </div>
+    <button onclick="sendMsg()" class="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0" style="background:var(--primary)">
+      <i data-lucide="send" class="w-4 h-4 text-white"></i>
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+</style>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="student-dashboard.html" class="nav-item">
+    <i data-lucide="home" class="w-5 h-5"></i><span>Home</span>
+  </a>
+  <a href="student-sessions.html" class="nav-item">
+    <i data-lucide="calendar" class="w-5 h-5"></i><span>Sessions</span>
+  </a>
+  <a href="messages.html" class="nav-item active">
+    <i data-lucide="message-square" class="w-5 h-5"></i><span>Messages</span>
+  </a>
+  <a href="student-profile.html" class="nav-item">
+    <i data-lucide="user" class="w-5 h-5"></i><span>Profile</span>
+  </a>
+</nav>
+
+<script>
+  lucide.createIcons();
+
+  function openChat(name, initials, gradient) {
+    document.getElementById('chat-overlay').classList.remove('hidden');
+    document.getElementById('chat-name').textContent = name;
+    document.getElementById('chat-avatar').style.background = gradient;
+    document.getElementById('chat-avatar').textContent = initials;
+    document.getElementById('chat-avatar-sm').style.background = gradient;
+    document.getElementById('chat-avatar-sm').textContent = initials;
+    lucide.createIcons();
+  }
+
+  function closeChat() {
+    document.getElementById('chat-overlay').classList.add('hidden');
+  }
+
+  function sendMsg() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if (!text) return;
+    const msgs = document.getElementById('chat-messages');
+    const typing = document.getElementById('typing');
+
+    const div = document.createElement('div');
+    div.className = 'flex justify-end';
+    div.innerHTML = `<div class="max-w-xs">
+      <div class="px-4 py-2.5 rounded-2xl rounded-tr-sm" style="background:var(--primary)">
+        <p class="font-inter text-sm text-white">${text}</p>
+      </div>
+      <div class="flex items-center justify-end gap-1 mt-1 mr-1">
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.35)">Now</p>
+        <i data-lucide="check" class="w-3 h-3" style="color:rgba(26,43,68,.35)"></i>
+      </div>
+    </div>`;
+    msgs.insertBefore(div, typing);
+    input.value = '';
+    msgs.scrollTop = msgs.scrollHeight;
+    lucide.createIcons();
+  }
+</script>
+</body>
+</html>

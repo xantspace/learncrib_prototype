@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Student Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app pb-28">
+
+  <!-- ── Sticky Header ── -->
+  <div class="sticky top-0 z-40 px-5 pt-10 pb-4" style="background:linear-gradient(to bottom,white 85%,transparent)">
+    <div class="flex items-center justify-between mb-4">
+      <img src="../assets/img/logo_b.png" alt="LearnCrib Logo" class="h-6 object-contain" />
+    </div>
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Good morning</p>
+        <h1 class="font-outfit font-bold text-xl" style="color:var(--secondary)">Hello, Amara</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <!-- Notification Bell -->
+        <a href="notifications.html" class="relative w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+          <i data-lucide="bell" class="w-5 h-5" style="color:var(--secondary)"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style="background:var(--accent)"></span>
+        </a>
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-sm" style="background:var(--primary)">AM</div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <a href="search-results.html" class="input-wrapper block cursor-pointer">
+      <i data-lucide="search" class="w-4 h-4 input-icon"></i>
+      <div class="input-field flex items-center justify-between cursor-pointer" style="pointer-events:none">
+        <span style="color:rgba(26,43,68,.4)">Search subjects or tutors…</span>
+        <i data-lucide="sliders-horizontal" class="w-4 h-4" style="color:var(--primary)"></i>
+      </div>
+    </a>
+
+    <!-- Filter Chips -->
+    <div class="flex gap-2 mt-3 overflow-x-auto pb-1 no-scrollbar">
+      <button class="badge badge-teal flex items-center gap-1 whitespace-nowrap px-3 py-1.5 text-xs font-medium">
+        <i data-lucide="check" class="w-3 h-3"></i> All
+      </button>
+      <button class="badge badge-navy flex items-center gap-1 whitespace-nowrap px-3 py-1.5 text-xs">Mathematics</button>
+      <button class="badge badge-navy flex items-center gap-1 whitespace-nowrap px-3 py-1.5 text-xs">Physics</button>
+      <button class="badge badge-navy flex items-center gap-1 whitespace-nowrap px-3 py-1.5 text-xs">Chemistry</button>
+      <button class="badge badge-navy flex items-center gap-1 whitespace-nowrap px-3 py-1.5 text-xs">English</button>
+      <button class="badge badge-navy flex items-center gap-1 whitespace-nowrap px-3 py-1.5 text-xs">Coding</button>
+    </div>
+  </div>
+
+  <!-- ── Content ── -->
+  <div class="px-5 mt-2">
+
+    <!-- Tutors Near You -->
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="font-outfit font-bold text-lg" style="color:var(--secondary)">Tutors Near You</h2>
+      <a href="search.html" class="text-xs font-inter font-medium" style="color:var(--primary)">See all</a>
+    </div>
+
+    <!-- Tutor Cards -->
+    <div class="flex flex-col gap-3 mb-6">
+
+      <!-- Card 1 -->
+      <a href="tutor-profile.html" class="glass-card p-4 flex items-center gap-4 no-underline">
+        <div class="relative flex-shrink-0">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,var(--primary),hsl(175,80%,25%))">KO</div>
+          <span class="pulse-dot absolute -bottom-1 -right-1 border-2 border-white"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-outfit font-semibold text-base leading-tight" style="color:var(--secondary)">Kolade Okonkwo</h3>
+              <p class="font-inter text-xs mt-0.5" style="color:rgba(26,43,68,.5)">Mathematics · Physics</p>
+            </div>
+            <span class="font-outfit font-bold text-sm" style="color:var(--primary)">₦2,500<span class="font-inter font-normal text-xs" style="color:rgba(26,43,68,.4)">/hr</span></span>
+          </div>
+          <div class="flex items-center gap-3 mt-2">
+            <div class="flex items-center gap-1">
+              <i data-lucide="star" class="w-3.5 h-3.5 star fill-current"></i>
+              <span class="font-inter text-xs font-semibold">4.9</span>
+              <span class="text-xs" style="color:rgba(26,43,68,.4)">(128)</span>
+            </div>
+            <div class="flex items-center gap-1" style="color:rgba(26,43,68,.4)">
+              <i data-lucide="map-pin" class="w-3 h-3"></i>
+              <span class="text-xs">0.8 km away</span>
+            </div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 flex-shrink-0" style="color:rgba(26,43,68,.3)"></i>
+      </a>
+
+      <!-- Card 2 -->
+      <a href="tutor-profile.html" class="glass-card p-4 flex items-center gap-4 no-underline">
+        <div class="relative flex-shrink-0">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(220,40%,30%))">FB</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-outfit font-semibold text-base leading-tight" style="color:var(--secondary)">Fatima Bello</h3>
+              <p class="font-inter text-xs mt-0.5" style="color:rgba(26,43,68,.5)">English · Literature</p>
+            </div>
+            <span class="font-outfit font-bold text-sm" style="color:var(--primary)">₦1,800<span class="font-inter font-normal text-xs" style="color:rgba(26,43,68,.4)">/hr</span></span>
+          </div>
+          <div class="flex items-center gap-3 mt-2">
+            <div class="flex items-center gap-1">
+              <i data-lucide="star" class="w-3.5 h-3.5 star fill-current"></i>
+              <span class="font-inter text-xs font-semibold">4.7</span>
+              <span class="text-xs" style="color:rgba(26,43,68,.4)">(89)</span>
+            </div>
+            <div class="flex items-center gap-1" style="color:rgba(26,43,68,.4)">
+              <i data-lucide="map-pin" class="w-3 h-3"></i>
+              <span class="text-xs">1.2 km away</span>
+            </div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 flex-shrink-0" style="color:rgba(26,43,68,.3)"></i>
+      </a>
+
+      <!-- Card 3 -->
+      <a href="tutor-profile.html" class="glass-card p-4 flex items-center gap-4 no-underline">
+        <div class="relative flex-shrink-0">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(45,80%,55%),hsl(30,80%,50%))">CA</div>
+          <span class="pulse-dot absolute -bottom-1 -right-1 border-2 border-white"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-outfit font-semibold text-base leading-tight" style="color:var(--secondary)">Chidi Abiodun</h3>
+              <p class="font-inter text-xs mt-0.5" style="color:rgba(26,43,68,.5)">Chemistry · Biology</p>
+            </div>
+            <span class="font-outfit font-bold text-sm" style="color:var(--primary)">₦3,000<span class="font-inter font-normal text-xs" style="color:rgba(26,43,68,.4)">/hr</span></span>
+          </div>
+          <div class="flex items-center gap-3 mt-2">
+            <div class="flex items-center gap-1">
+              <i data-lucide="star" class="w-3.5 h-3.5 star fill-current"></i>
+              <span class="font-inter text-xs font-semibold">5.0</span>
+              <span class="text-xs" style="color:rgba(26,43,68,.4)">(204)</span>
+            </div>
+            <div class="flex items-center gap-1" style="color:rgba(26,43,68,.4)">
+              <i data-lucide="map-pin" class="w-3 h-3"></i>
+              <span class="text-xs">2.1 km away</span>
+            </div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 flex-shrink-0" style="color:rgba(26,43,68,.3)"></i>
+      </a>
+
+    </div>
+
+    <!-- Upcoming Session -->
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="font-outfit font-bold text-lg" style="color:var(--secondary)">Upcoming Session</h2>
+      <a href="student-sessions.html" class="text-xs font-inter font-medium" style="color:var(--primary)">View all</a>
+    </div>
+    <div class="glass-card p-4 mb-6" style="background:linear-gradient(135deg,var(--primary) 0%,hsl(175,80%,25%) 100%)">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <p class="font-inter text-xs text-white opacity-75">Tomorrow · 10:00 AM</p>
+          <h3 class="font-outfit font-bold text-lg text-white mt-0.5">Advanced Maths</h3>
+          <p class="font-inter text-sm text-white opacity-80">with Kolade Okonkwo</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-white bg-opacity-20 flex items-center justify-center">
+          <i data-lucide="video" class="w-5 h-5 text-white"></i>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="flex-1 bg-white bg-opacity-20 text-white text-xs font-inter font-medium py-2 rounded-xl flex items-center justify-center gap-1.5">
+          <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Chat
+        </button>
+        <button class="flex-1 bg-white text-xs font-outfit font-semibold py-2 rounded-xl flex items-center justify-center gap-1.5" style="color:var(--primary)">
+          <i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> Details
+        </button>
+      </div>
+    </div>
+
+    <!-- Recommended Tutors Carousel -->
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="font-outfit font-bold text-lg" style="color:var(--secondary)">Recommended for You</h2>
+    </div>
+    <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+      <div class="glass-card p-4 flex-shrink-0 w-44 flex flex-col items-center text-center gap-2">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(270,60%,55%),hsl(270,40%,40%))">TN</div>
+        <h4 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Tunde Nwosu</h4>
+        <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Economics</p>
+        <div class="flex items-center gap-1">
+          <i data-lucide="star" class="w-3 h-3 star fill-current"></i>
+          <span class="text-xs font-semibold">4.8</span>
+        </div>
+        <span class="font-outfit font-bold text-sm" style="color:var(--primary)">₦2,000/hr</span>
+      </div>
+      <div class="glass-card p-4 flex-shrink-0 w-44 flex flex-col items-center text-center gap-2">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(340,70%,55%),hsl(340,50%,40%))">ZI</div>
+        <h4 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Zainab Ibrahim</h4>
+        <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Coding · Python</p>
+        <div class="flex items-center gap-1">
+          <i data-lucide="star" class="w-3 h-3 star fill-current"></i>
+          <span class="text-xs font-semibold">4.9</span>
+        </div>
+        <span class="font-outfit font-bold text-sm" style="color:var(--primary)">₦3,500/hr</span>
+      </div>
+      <div class="glass-card p-4 flex-shrink-0 w-44 flex flex-col items-center text-center gap-2">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(150,60%,40%),hsl(150,40%,28%))">RO</div>
+        <h4 class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Remi Oladele</h4>
+        <p class="text-xs font-inter" style="color:rgba(26,43,68,.5)">Biology · Science</p>
+        <div class="flex items-center gap-1">
+          <i data-lucide="star" class="w-3 h-3 star fill-current"></i>
+          <span class="text-xs font-semibold">4.6</span>
+        </div>
+        <span class="font-outfit font-bold text-sm" style="color:var(--primary)">₦2,200/hr</span>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<nav class="bottom-nav">
+  <a href="student-dashboard.html" class="nav-item active">
+    <i data-lucide="home" class="w-5 h-5"></i>
+    <span>Home</span>
+  </a>
+  <a href="student-sessions.html" class="nav-item">
+    <i data-lucide="calendar" class="w-5 h-5"></i>
+    <span>Sessions</span>
+  </a>
+  <a href="messages.html" class="nav-item">
+    <i data-lucide="message-square" class="w-5 h-5"></i>
+    <span>Messages</span>
+  </a>
+  <a href="student-profile.html" class="nav-item">
+    <i data-lucide="user" class="w-5 h-5"></i>
+    <span>Profile</span>
+  </a>
+</nav>
+
+<style>.no-scrollbar::-webkit-scrollbar{display:none;}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}</style>
+<script>lucide.createIcons();</script>
+</body>
+</html>

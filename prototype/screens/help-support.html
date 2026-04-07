@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Help & Support</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-50">
+<div class="container-app px-5 pt-12 pb-10">
+
+  <!-- Header -->
+  <button onclick="history.back()" class="flex items-center gap-2 text-sm mb-6" style="color:var(--secondary);opacity:.6">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+  </button>
+  <h1 class="font-outfit font-bold text-2xl mb-1" style="color:var(--secondary)">Help & Support</h1>
+  <p class="font-inter text-sm mb-8" style="color:rgba(26,43,68,.5)">We're here to help you succeed</p>
+
+  <!-- Search FAQ -->
+  <div class="input-wrapper mb-8">
+     <i data-lucide="search" class="w-4 h-4 input-icon"></i>
+     <input type="text" placeholder="Search for answers…" class="input-field" />
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-2 gap-3 mb-8">
+     <div class="glass-card p-5 flex flex-col items-center gap-3 text-center border-2 border-transparent active:border-primary">
+        <div class="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center">
+           <i data-lucide="message-circle" class="w-6 h-6 text-teal-600"></i>
+        </div>
+        <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Live Chat</p>
+     </div>
+     <div class="glass-card p-5 flex flex-col items-center gap-3 text-center border-2 border-transparent active:border-primary">
+        <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center">
+           <i data-lucide="mail" class="w-6 h-6 text-orange-600"></i>
+        </div>
+        <p class="font-outfit font-semibold text-sm" style="color:var(--secondary)">Email Support</p>
+     </div>
+  </div>
+
+  <!-- FAQ Sections -->
+  <h3 class="font-outfit font-semibold text-lg mb-4" style="color:var(--secondary)">Popular FAQs</h3>
+  <div class="flex flex-col gap-3">
+     
+     <div class="glass-card overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full text-left p-4 flex items-center justify-between">
+           <span class="font-inter font-medium text-sm" style="color:var(--secondary)">How do I book a tutor?</span>
+           <i data-lucide="plus" class="w-4 h-4 text-gray-400 faq-icon"></i>
+        </button>
+        <div class="faq-content hidden px-4 pb-4 font-inter text-xs leading-relaxed" style="color:rgba(26,43,68,.5)">
+           Browse through our verified tutors, filter by subject and price, then click "Book Session" to choose a time that works for you.
+        </div>
+     </div>
+
+     <div class="glass-card overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full text-left p-4 flex items-center justify-between">
+           <span class="font-inter font-medium text-sm" style="color:var(--secondary)">Can I cancel my session?</span>
+           <i data-lucide="plus" class="w-4 h-4 text-gray-400 faq-icon"></i>
+        </button>
+        <div class="faq-content hidden px-4 pb-4 font-inter text-xs leading-relaxed" style="color:rgba(26,43,68,.5)">
+           Yes, you can cancel up to 12 hours before the session start for a full refund to your wallet.
+        </div>
+     </div>
+
+     <div class="glass-card overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full text-left p-4 flex items-center justify-between">
+           <span class="font-inter font-medium text-sm" style="color:var(--secondary)">How do I get verified?</span>
+           <i data-lucide="plus" class="w-4 h-4 text-gray-400 faq-icon"></i>
+        </button>
+        <div class="faq-content hidden px-4 pb-4 font-inter text-xs leading-relaxed" style="color:rgba(26,43,68,.5)">
+           Verification requires uploading valid ID and academic credentials. This usually takes 24-48 hours.
+        </div>
+     </div>
+  </div>
+
+  <!-- Contact Us CTA -->
+  <div class="mt-8 p-6 rounded-3xl bg-gray-50 flex flex-col items-center text-center">
+     <p class="font-inter text-sm mb-4" style="color:rgba(26,43,68,.5)">Didn't find what you need?</p>
+     <button class="btn-ghost flex items-center gap-2">
+        <i data-lucide="headphones" class="w-4 h-4"></i>
+        Contact Support Team
+     </button>
+  </div>
+
+</div>
+
+<script>
+  lucide.createIcons();
+  function toggleFaq(btn) {
+    const parent = btn.parentElement;
+    const content = parent.querySelector('.faq-content');
+    const icon = btn.querySelector('.faq-icon');
+    const isOpen = !content.classList.contains('hidden');
+    
+    // Close all others
+    document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('.faq-icon').forEach(i => {
+       i.dataset.lucide = 'plus';
+       i.style.transform = 'rotate(0deg)';
+    });
+
+    if (!isOpen) { 
+       content.classList.remove('hidden');
+       icon.dataset.lucide = 'minus';
+       icon.style.transform = 'rotate(180deg)';
+    }
+    lucide.createIcons();
+  }
+</script>
+</body>
+</html>
