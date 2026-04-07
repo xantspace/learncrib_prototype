@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Loading...</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Outfit','sans-serif'],inter:['Inter','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+</head>
+<body class="bg-black/40 backdrop-blur-md min-h-screen flex items-center justify-center overflow-hidden">
+
+  <div class="flex flex-col items-center justify-center space-y-6">
+    
+    <!-- Logo with Pause-Ping-Rotate Animation -->
+    <div class="relative">
+      <img src="../assets/img/logo_a.png" alt="LearnCrib Logo" class="w-24 h-24 relative loading-logo" />
+    </div>
+
+    <!-- Minimalist Please Wait -->
+    <div class="text-center slide-up animate-pulse">
+      <p class="font-inter text-[10px] uppercase tracking-[0.2em] text-white/60">Please wait</p>
+    </div>
+
+  </div>
+
+  <script>
+    // Simulate loading for 2.5 seconds then go to the splash/welcome screen
+    // or handle dynamic redirection based on URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const to = urlParams.get('to') || 'welcome.html';
+    
+    setTimeout(() => {
+      window.location.href = to;
+    }, 3000);
+  </script>
+</body>
+</html>
