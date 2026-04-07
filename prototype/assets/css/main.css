@@ -190,9 +190,9 @@ h1, h2, h3, h4, h5 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--
   font-weight: 600;
   font-family: 'Inter', sans-serif;
 }
-.badge-teal   { background: var(--primary-light); color: var(--primary); }
-.badge-navy   { background: rgba(26,43,68,0.1);   color: var(--secondary); }
-.badge-accent { background: hsla(45,100%,50%,0.15); color: hsl(40,100%,35%); }
+.badge-teal   { background: var(--primary); color: #fff; }
+.badge-navy   { background: var(--secondary); color: #fff; }
+.badge-accent { background: var(--accent); color: var(--secondary); }
 
 /* ── Scrollbar ────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; }
