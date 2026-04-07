@@ -48,7 +48,7 @@
   </div>
 
   <!-- Form -->
-  <form action="student-dashboard.html" method="GET" class="flex flex-col gap-4 slide-up" style="animation-delay:.1s">
+  <form id="signup-form" onsubmit="handleSignup(event)" class="flex flex-col gap-4 slide-up" style="animation-delay:.1s">
 
     <div class="input-wrapper">
       <i data-lucide="user" class="w-4 h-4 input-icon"></i>
@@ -173,10 +173,9 @@
     t.style.pointerEvents = 'auto';
     setTimeout(hideToast, 3500);
   }
-  function hideToast() {
-    const t = document.getElementById('toast');
-    t.style.opacity = '0';
-    t.style.pointerEvents = 'none';
+  function handleSignup(e) {
+    e.preventDefault();
+    window.location.href = `onboarding.html?role=${role}`;
   }
 </script>
 </body>

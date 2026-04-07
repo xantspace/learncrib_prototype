@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-50">
+<div class="container-app pb-12">
+
+  <!-- Header -->
+  <div class="px-5 pt-12 pb-6 flex items-center justify-between sticky top-0 bg-white z-40 bg-opacity-90 backdrop-blur-md">
+    <button onclick="history.back()" class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+      <i data-lucide="arrow-left" class="w-4 h-4 text-gray-500"></i>
+    </button>
+    <h1 class="font-outfit font-bold text-xl" style="color:var(--secondary)">Settings</h1>
+    <div class="w-10 h-10"></div>
+  </div>
+
+  <div class="px-5 flex flex-col gap-6">
+
+    <!-- Account Section -->
+    <section>
+      <h3 class="font-outfit font-bold text-xs uppercase tracking-widest mb-3" style="color:rgba(26,43,68,.4)">Account</h3>
+      <div class="glass-card overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-gray-50 cursor-pointer active:bg-gray-50">
+           <div class="flex items-center gap-3">
+              <i data-lucide="user" class="w-4 h-4 text-gray-400"></i>
+              <p class="font-inter text-sm font-medium" style="color:var(--secondary)">Edit Profile</p>
+           </div>
+           <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+        </div>
+        <div class="flex items-center justify-between p-4 cursor-pointer active:bg-gray-50">
+           <div class="flex items-center gap-3">
+              <i data-lucide="bell" class="w-4 h-4 text-gray-400"></i>
+              <p class="font-inter text-sm font-medium" style="color:var(--secondary)">Push Notifications</p>
+           </div>
+           <div class="w-10 h-5 rounded-full bg-primary relative">
+              <span class="absolute top-1 right-1 w-3 h-3 rounded-full bg-white"></span>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preferences -->
+    <section>
+      <h3 class="font-outfit font-bold text-xs uppercase tracking-widest mb-3" style="color:rgba(26,43,68,.4)">Preferences</h3>
+      <div class="glass-card overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-gray-50">
+           <div class="flex items-center gap-3">
+              <i data-lucide="moon" class="w-4 h-4 text-gray-400"></i>
+              <p class="font-inter text-sm font-medium" style="color:var(--secondary)">Dark Mode</p>
+           </div>
+           <div class="w-10 h-5 rounded-full bg-gray-200 relative">
+              <span class="absolute top-1 left-1 w-3 h-3 rounded-full bg-white shadow-sm"></span>
+           </div>
+        </div>
+        <div class="p-4">
+           <div class="flex items-center gap-3 mb-3">
+              <i data-lucide="globe" class="w-4 h-4 text-gray-400"></i>
+              <p class="font-inter text-sm font-medium" style="color:var(--secondary)">Language</p>
+           </div>
+           <div class="flex gap-2">
+              <button class="flex-1 py-2 text-[10px] font-bold rounded-xl border border-primary bg-primary text-white">English</button>
+              <button class="flex-1 py-2 text-[10px] font-bold rounded-xl border border-gray-100 text-gray-400">Hausa</button>
+              <button class="flex-1 py-2 text-[10px] font-bold rounded-xl border border-gray-100 text-gray-400">Yoruba</button>
+              <button class="flex-1 py-2 text-[10px] font-bold rounded-xl border border-gray-100 text-gray-400">Igbo</button>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security & Legal -->
+    <section>
+      <h3 class="font-outfit font-bold text-xs uppercase tracking-widest mb-3" style="color:rgba(26,43,68,.4)">Security</h3>
+      <div class="glass-card overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-gray-50">
+           <div class="flex items-center gap-3">
+              <i data-lucide="shield-check" class="w-4 h-4 text-gray-400"></i>
+              <p class="font-inter text-sm font-medium" style="color:var(--secondary)">Manage Password</p>
+           </div>
+           <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+        </div>
+        <div class="flex items-center justify-between p-4">
+           <div class="flex items-center gap-3">
+              <i data-lucide="file-text" class="w-4 h-4 text-gray-400"></i>
+              <p class="font-inter text-sm font-medium" style="color:var(--secondary)">Terms of Service</p>
+           </div>
+           <i data-lucide="external-link" class="w-4 h-4 text-gray-300"></i>
+        </div>
+      </div>
+    </section>
+
+    <button class="w-full py-4 text-red-500 font-outfit font-bold text-sm bg-red-50 rounded-2xl mt-4">
+      Delete Account
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

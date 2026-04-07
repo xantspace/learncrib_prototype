@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnCrib – My Students</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#1939D4',secondary:'#0A1444',accent:'#F0B429'},fontFamily:{outfit:['Plus Jakarta Sans','sans-serif'],inter:['Plus Jakarta Sans','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="container-app pb-28">
+
+  <!-- Header -->
+  <div class="px-5 pt-12 pb-4">
+    <div class="flex items-center gap-2 text-sm mb-6" style="color:var(--secondary);opacity:.6" onclick="history.back()">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+    </div>
+    <h1 class="font-outfit font-bold text-2xl" style="color:var(--secondary)">My Students</h1>
+    <p class="font-inter text-sm mt-0.5" style="color:rgba(26,43,68,.5)">Manage your student list and progress</p>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="px-5 mb-6">
+    <div class="relative">
+      <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+      <input type="text" placeholder="Search by name or subject..." class="input-field pl-11" />
+    </div>
+  </div>
+
+  <!-- Student List -->
+  <div class="px-5 flex flex-col gap-4">
+    
+    <!-- Student 1 -->
+    <div class="glass-card p-4 flex items-center gap-4">
+      <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(340,70%,55%),hsl(340,50%,40%))">AM</div>
+      <div class="flex-1">
+        <h4 class="font-outfit font-semibold text-base" style="color:var(--secondary)">Amara Mensah</h4>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Advanced Maths · 12 sessions completed</p>
+        <div class="flex items-center gap-2 mt-1.5">
+          <span class="w-2 h-2 rounded-full bg-green-500"></span>
+          <span class="text-[10px] font-inter opacity-60 uppercase tracking-wider">Active</span>
+        </div>
+      </div>
+      <a href="messages.html" class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+        <i data-lucide="message-circle" class="w-5 h-5" style="color:var(--primary)"></i>
+      </a>
+    </div>
+
+    <!-- Student 2 -->
+    <div class="glass-card p-4 flex items-center gap-4">
+      <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(220,60%,55%),hsl(220,40%,40%))">EJ</div>
+      <div class="flex-1">
+        <h4 class="font-outfit font-semibold text-base" style="color:var(--secondary)">Emeka James</h4>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Physics · 8 sessions completed</p>
+        <div class="flex items-center gap-2 mt-1.5">
+          <span class="w-2 h-2 rounded-full bg-green-500"></span>
+          <span class="text-[10px] font-inter opacity-60 uppercase tracking-wider">Active</span>
+        </div>
+      </div>
+      <a href="messages.html" class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+        <i data-lucide="message-circle" class="w-5 h-5" style="color:var(--primary)"></i>
+      </a>
+    </div>
+
+    <!-- Student 3 -->
+    <div class="glass-card p-4 flex items-center gap-4">
+      <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg" style="background:linear-gradient(135deg,hsl(150,60%,45%),hsl(150,40%,30%))">FB</div>
+      <div class="flex-1">
+        <h4 class="font-outfit font-semibold text-base" style="color:var(--secondary)">Fatima Bello</h4>
+        <p class="font-inter text-xs" style="color:rgba(26,43,68,.5)">Literature · 4 sessions completed</p>
+        <div class="flex items-center gap-2 mt-1.5">
+          <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+          <span class="text-[10px] font-inter opacity-60 uppercase tracking-wider">Inactive (2 weeks)</span>
+        </div>
+      </div>
+      <a href="messages.html" class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center">
+        <i data-lucide="message-circle" class="w-5 h-5" style="color:var(--primary)"></i>
+      </a>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="tutor-dashboard.html" class="nav-item">
+    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="tutor-students.html" class="nav-item active">
+    <i data-lucide="users" class="w-5 h-5"></i>
+    <span>Students</span>
+  </a>
+  <a href="tutor-availability.html" class="nav-item">
+    <i data-lucide="calendar" class="w-5 h-5"></i>
+    <span>Schedule</span>
+  </a>
+  <a href="tutor-earnings.html" class="nav-item">
+    <i data-lucide="wallet" class="w-5 h-5"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="tutor-profile.html" class="nav-item">
+    <i data-lucide="user" class="w-5 h-5"></i>
+    <span>Profile</span>
+  </a>
+</nav>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
