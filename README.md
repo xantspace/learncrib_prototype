@@ -24,7 +24,7 @@ LearnCrib is a mobile-first web application that connects students with verified
 
 | Layer       | Technology                          |
 |-------------|-------------------------------------|
-| Frontend    | HTML5, Vanilla CSS, JS              |
+| Frontend    | React (JSX), Vite                   |
 | Backend     | Django 6.x + DRF                    |
 | Database    | PostgreSQL (MVP uses SQLite dev)    |
 | Schema      | OpenAPI 3.0 (drf-spectacular)       |

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'sessions_app', # Renamed from 'sessions' to avoid conflict with django.contrib.sessions
     'payments',
+    'reviews',
     'api',
 ]
 
@@ -129,6 +130,7 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
@@ -143,6 +145,13 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API for LearnCrib tutoring platform',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_PATCH': True,
+    'ENUM_NAME_OVERRIDES': {
+        'PaymentStatusEnum': 'payments.models.Payment.Status',
+        'PayoutStatusEnum': 'payments.models.Payout.Status',
+        'SessionStatusEnum': 'sessions_app.models.Session.Status',
+        'DisputeStatusEnum': 'payments.models.Dispute.Status',
+    },
 }
 
 
