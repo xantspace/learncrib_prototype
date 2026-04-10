@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Brand CSS Variables ─────────────────── */
+:root {
+  --primary:        #1939D4;
+  --primary-light:  #EEF2FF;
+  --primary-dark:   #0F2391;
+  --secondary:      #0A1444;
+  --accent:         #F0B429;
+  --success:        #00A89D;
+  --body-text:      #2D2D2D;
+  --surface:        #F7F7F5;
+  --white:          #FFFFFF;
+  --glass-light:    rgba(255, 255, 255, 0.7);
+  --primary-glow:   rgba(25, 57, 212, 0.3);
+}
+
+/* ── Base Reset ───────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #fff;
+  min-height: 100svh;
+  color: var(--body-text);
+  font-size: 1rem;
+  line-height: 1.625;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* ── App Container (mobile-first) ────────── */
+#root {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100svh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(25,57,212,0.25); border-radius: 4px; }
+
+/* ── No scrollbar utility ─────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Leaflet map fix ──────────────────────── */
+.leaflet-container { font-family: 'Plus Jakarta Sans', sans-serif !important; }
