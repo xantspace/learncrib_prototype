@@ -47,7 +47,8 @@ learncrib/
 │   └── payments/               # Paystack & Payouts
 ├── docs/                       # Project Documentation
 │   ├── backend_flow.md         # Detailed Business Logic
-│   └── database_schema.sql     # Data Model Spec
+│   ├── database_schema.sql     # Data Model Spec
+│   └── ui_guide.md             # UI/UX & Design System
 ├── brand_kit/                  # Branding & Logos
 └── Illustrations/              # SVG illustrations
 ```
