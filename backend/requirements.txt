@@ -1,0 +1,6 @@
+Django>=6.0.0
+djangorestframework
+django-cors-headers
+drf-spectacular
+psycopg2-binary
+python-dotenv
