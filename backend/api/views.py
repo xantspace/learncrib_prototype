@@ -11,7 +11,7 @@ from payments.models import Payment, Payout, Dispute
 from reviews.models import Review
 
 from .serializers import (
-    UserSerializer, RegisterSerializer,
+    UserSerializer, RegisterSerializer, CustomTokenObtainPairSerializer,
     TutorProfileSerializer, ParentProfileSerializer, StudentSerializer,
     SessionSerializer, SessionCreateSerializer, SessionStatusUpdateSerializer,
     PaymentSerializer, PayoutSerializer, DisputeSerializer,
@@ -37,6 +37,10 @@ class RegisterView(generics.CreateAPIView):
         elif user.role == User.Role.TUTOR:
             TutorProfile.objects.create(user=user, hourly_rate=0)
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 # ─── User Views ────────────────────────────────────────────────────────────────
@@ -69,7 +73,19 @@ class TutorViewSet(viewsets.ReadOnlyModelViewSet):
         if subject:
             qs = qs.filter(subjects__icontains=subject)
 
+        max_rate = self.request.query_params.get('max_rate')
+        if max_rate:
+            qs = qs.filter(hourly_rate__lte=max_rate)
+
         return qs
+
+    @action(detail=False, methods=['get'])
+    def nearby(self, request):
+        """GET /api/users/tutors/nearby/ — find tutors within range."""
+        # For now, just return all approved tutors (we can add geo-filtering later)
+        qs = self.get_queryset()
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
 
 # ─── Session Views ─────────────────────────────────────────────────────────────
@@ -110,27 +126,56 @@ class SessionViewSet(viewsets.ModelViewSet):
             actor_type='PARENT',
         )
 
-    @action(detail=True, methods=['patch'], url_path='status')
-    def status(self, request, pk=None):
-        """PATCH /api/sessions/{id}/status/ — tutor accepts/rejects."""
+    @action(detail=True, methods=['post'])
+    def accept(self, request, pk=None):
+        """POST /api/sessions/{id}/accept/"""
         session = self.get_object()
-        
-        # Security: Only the assigned tutor can accept/reject a requested session
-        if request.user.role == User.Role.TUTOR and session.tutor.user != request.user:
-            return Response({'detail': 'You are not the tutor for this session.'}, status=status.HTTP_403_FORBIDDEN)
-        
-        serializer = SessionStatusUpdateSerializer(session, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        new_status = serializer.validated_data['status']
-        session.status = new_status
+        if request.user.role != User.Role.TUTOR or session.tutor.user != request.user:
+            return Response({'detail': 'Only the assigned tutor can accept.'}, status=status.HTTP_403_FORBIDDEN)
+        session.status = Session.Status.ACCEPTED
         session.save()
+        SessionLog.objects.create(session=session, action='ACCEPTED', actor_type='TUTOR')
+        return Response(SessionSerializer(session).data)
 
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        """POST /api/sessions/{id}/reject/"""
+        session = self.get_object()
+        if request.user.role != User.Role.TUTOR or session.tutor.user != request.user:
+            return Response({'detail': 'Only the assigned tutor can reject.'}, status=status.HTTP_403_FORBIDDEN)
+        session.status = Session.Status.REJECTED
+        session.save()
+        SessionLog.objects.create(session=session, action='REJECTED', actor_type='TUTOR')
+        return Response(SessionSerializer(session).data)
+
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        """POST /api/sessions/{id}/complete/"""
+        session = self.get_object()
+        # Usually triggered by tutor after session or auto-job
+        session.status = Session.Status.COMPLETED
+        session.save()
+        SessionLog.objects.create(session=session, action='COMPLETED', actor_type='SYSTEM')
+        return Response(SessionSerializer(session).data)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        """POST /api/sessions/{id}/cancel/"""
+        session = self.get_object()
+        reason = request.data.get('reason', 'No reason provided')
+        session.status = Session.Status.CANCELLED
+        session.notes = f"{session.notes}\nCancellation Reason: {reason}"
+        session.save()
         actor = 'TUTOR' if request.user.role == User.Role.TUTOR else 'PARENT'
-        SessionLog.objects.create(
-            session=session,
-            action=f'STATUS_CHANGED_TO_{new_status}',
-            actor_type=actor,
-        )
+        SessionLog.objects.create(session=session, action='CANCELLED', actor_type=actor)
+        return Response(SessionSerializer(session).data)
+
+    @action(detail=True, methods=['post'])
+    def confirm(self, request, pk=None):
+        """POST /api/sessions/{id}/confirm/"""
+        session = self.get_object()
+        # Parent confirms everything is okay
+        SessionLog.objects.create(session=session, action='CONFIRMED_BY_PARENT', actor_type='PARENT')
         return Response(SessionSerializer(session).data)
 
     @action(detail=True, methods=['post'], url_path='dispute')
@@ -166,6 +211,17 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
         if user.role == User.Role.ADMIN:
             return Payment.objects.all()
         return Payment.objects.filter(parent__user=user)
+
+    @action(detail=False, methods=['post'])
+    def initiate(self, request):
+        """POST /api/payments/initiate/"""
+        # Skeleton for Paystack initiation
+        return Response({"checkout_url": "#", "reference": "placeholder_ref"})
+
+    @action(detail=True, methods=['get'])
+    def verify(self, request, pk=None):
+        """GET /api/payments/verify/{ref}/"""
+        return Response({"status": "success", "message": "Payment verified (Simulation)"})
 
 
 class PayoutViewSet(viewsets.ReadOnlyModelViewSet):

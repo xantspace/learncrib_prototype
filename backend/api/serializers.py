@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from users.models import User, ParentProfile, TutorProfile, Student
 from sessions_app.models import Session, SessionLog
 from payments.models import Payment, Payout, Dispute
@@ -27,8 +28,20 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Cannot register as an administrator via the public API.")
         return value
 
-    def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['user'] = {
+            'id': str(self.user.id),
+            'email': self.user.email,
+            'role': self.user.role,
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
+        }
+        return data
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -40,11 +53,15 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class TutorProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
 
     class Meta:
         model = TutorProfile
         fields = [
-            'id', 'user', 'bio', 'subjects', 'hourly_rate',
+            'id', 'user', 'first_name', 'last_name', 'email', 
+            'bio', 'subjects', 'hourly_rate',
             'latitude', 'longitude', 'is_available',
             'rating', 'total_reviews', 'verification_status',
         ]

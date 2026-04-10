@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     RegisterView,
@@ -10,11 +10,14 @@ from .views import (
     PaymentViewSet,
     PayoutViewSet,
     ReviewViewSet,
+    CustomTokenObtainPairView,
 )
 
 router = DefaultRouter()
+# Register more specific paths FIRST to avoid shadowing
+router.register(r'users/tutors', TutorViewSet, basename='tutor')
 router.register(r'users', UserViewSet, basename='user')
-router.register(r'tutors', TutorViewSet, basename='tutor')
+
 router.register(r'sessions', SessionViewSet, basename='session')
 router.register(r'payments', PaymentViewSet, basename='payment')
 router.register(r'payouts', PayoutViewSet, basename='payout')
@@ -23,8 +26,8 @@ router.register(r'reviews', ReviewViewSet, basename='review')
 urlpatterns = [
     # ── Auth Endpoints ──────────────────────────────
     path('auth/register/', RegisterView.as_view(), name='register'),
-    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # ── API Resources ───────────────────────────────
     path('', include(router.urls)),
