@@ -1,74 +1,48 @@
+import uuid
 from django.db import models
-from users.models import ParentProfile, TutorProfile
+from users.models import User, TutorProfile
 from sessions_app.models import Session
 
 class Payment(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('successful', 'Successful'),
-        ('failed', 'Failed'),
-        ('refunded', 'Refunded'),
-    ]
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        SUCCESSFUL = 'SUCCESSFUL', 'Successful'
+        FAILED = 'FAILED', 'Failed'
+        REFUNDED = 'REFUNDED', 'Refunded'
 
-    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, related_name='payments')
-    parent = models.ForeignKey(ParentProfile, on_delete=models.SET_NULL, null=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    payment_method = models.CharField(max_length=50) # e.g., 'card', 'transfer'
-    provider = models.CharField(max_length=50, default='Paystack')
-    provider_reference = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.OneToOneField(Session, on_delete=models.CASCADE, related_name='payment')
+    parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
     
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    provider = models.CharField(max_length=50, default='paystack')
+    provider_reference = models.CharField(max_length=100, unique=True)
+    
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    
     initiated_at = models.DateTimeField(auto_now_add=True)
-    confirmed_at = models.DateTimeField(null=True, blank=True)
-    
-    refunded_at = models.DateTimeField(null=True, blank=True)
-    refund_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-
-    def __str__(self):
-        return f"Payment: {self.amount} - {self.status}"
+    completed_at = models.DateTimeField(null=True, blank=True)
 
 class Payout(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('held', 'Held'),
-        ('released', 'Released'),
-        ('paid', 'Paid'),
-        ('withheld', 'Withheld'),
-    ]
+    class Status(models.TextChoices):
+        SCHEDULED = 'SCHEDULED', 'Scheduled'
+        PROCESSED = 'PROCESSED', 'Processed'
+        FAILED = 'FAILED', 'Failed'
 
-    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, related_name='payouts')
-    tutor = models.ForeignKey(TutorProfile, on_delete=models.SET_NULL, null=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tutor = models.ForeignKey(TutorProfile, on_delete=models.CASCADE, related_name='payouts')
+    session = models.OneToOneField(Session, on_delete=models.CASCADE, related_name='payout')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.SCHEDULED)
     scheduled_date = models.DateField(null=True, blank=True)
-    released_at = models.DateTimeField(null=True, blank=True)
-    paid_at = models.DateTimeField(null=True, blank=True)
-    bank_reference = models.CharField(max_length=255, blank=True)
-
-    def __str__(self):
-        return f"Payout: {self.amount} - {self.status}"
+    processed_at = models.DateTimeField(null=True, blank=True)
 
 class Dispute(models.Model):
-    STATUS_CHOICES = [
-        ('open', 'Open'),
-        ('resolved', 'Resolved'),
-    ]
-    
-    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='disputes')
-    raised_by_type = models.CharField(max_length=10) # 'parent' or 'tutor'
-    raised_by_id = models.UUIDField()
-    
-    reason = models.CharField(max_length=255)
-    description = models.TextField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
-    
-    resolution_details = models.TextField(blank=True)
-    parent_refund_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    tutor_payment_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.OneToOneField(Session, on_delete=models.CASCADE, related_name='dispute')
+    raised_by_type = models.CharField(max_length=50) # PARENT, TUTOR
+    reason = models.TextField()
+    status = models.CharField(max_length=20, default='OPEN') # OPEN, RESOLVED, CLOSED
     
     created_at = models.DateTimeField(auto_now_add=True)
-    resolved_at = models.DateTimeField(null=True, blank=True)
-
-    def __str__(self):
-        return f"Dispute: {self.reason} - {self.status}"

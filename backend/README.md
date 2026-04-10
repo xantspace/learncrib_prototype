@@ -32,7 +32,31 @@ Welcome to the LearnCrib backend! This project is built exploring modern Django 
    - **Redoc:** [http://127.0.0.1:8000/api/redoc/](http://127.0.0.1:8000/api/redoc/)
 
 ## Project Structure
-- `users/`: Handles Authentication, Parent/Tutor roles, and Student profiles.
-- `sessions_app/`: Core marketplace logic for bookings and session management.
-- `payments/`: Paystack integration, Escrow handling, and Disputes.
-- `api/`: REST endpoints and Serializers.
+- `users/`: Custom User model, Roles (Parent, Tutor), and Student profiles.
+- `sessions_app/`: Core marketplace logic. Handles `Session` states: `pending_approval`, `awaiting_payment`, `scheduled`, `completed`, `cancelled`.
+- `payments/`: Paystack gateway integration, Escrow logic, and Tutor Payout tracking.
+- `api/`: REST endpoints, Serializers, and OpenAPI schema configuration.
+- `core/`: Base settings and project configuration.
+
+## Core Business Logic (MVP)
+
+As per `docs/backend_flow.md`, the system implements the following:
+
+- **Escrow System:**
+    1. Parent pays full amount to Platform.
+    2. Platform holds funds and calculates **15% fee**.
+    3. Session status becomes `scheduled`.
+    4. Funds are released to Tutor **48 hours** after session completion (unless disputed).
+
+- **Payout Schedule:**
+    - Tutors are paid in batches every **Friday at 10:00 AM**.
+    - Payout status moves: `pending` -> `held` -> `released` -> `paid`.
+
+- **Cancellation Rules:**
+    - **Early (>24h):** Parent gets 100% refund. Tutor gets ₦0.
+    - **Late (<24h):** Parent gets 50% refund. Tutor gets 50% (minus 15% platform fee).
+    - **No-Show (Tutor):** Full refund to parent. Tutor penalty applies.
+    - **No-Show (Student):** No refund. Tutor gets 100%.
+
+- **Verification:**
+    - Tutors must be manually verified (`verification_status`) by an admin before their profile is public.

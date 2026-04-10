@@ -24,10 +24,10 @@ LearnCrib is a mobile-first web application that connects students with verified
 
 | Layer       | Technology                          |
 |-------------|-------------------------------------|
-| Frontend    | HTML5, Tailwind CSS, JS             |
-| Backend     | Python / FastAPI (In progress)      |
-| Database    | PostgreSQL                          |
-| Deployment  | Vercel                              |
+| Frontend    | HTML5, Vanilla CSS, JS              |
+| Backend     | Django 6.x + DRF                    |
+| Database    | PostgreSQL (MVP uses SQLite dev)    |
+| Schema      | OpenAPI 3.0 (drf-spectacular)       |
 
 ---
 
@@ -39,26 +39,43 @@ learncrib/
 │   ├── index.html
 │   ├── assets/
 │   └── screens/                # Parent/Tutor/Shared folders
-├── backend/                    # Logic & API (Me)
-│   ├── main.py
-│   └── requirements.txt
+├── backend/                    # Logic & API (Django 6)
+│   ├── core/                   # Project settings
+│   ├── api/                    # REST Router & Specs
+│   ├── users/                  # Auth & Profiles
+│   ├── sessions_app/           # Core Logic & Escrow
+│   └── payments/               # Paystack & Payouts
 ├── docs/                       # Project Documentation
-│   ├── backend_flow.md
-│   └── database_schema.sql
+│   ├── backend_flow.md         # Detailed Business Logic
+│   └── database_schema.sql     # Data Model Spec
 ├── brand_kit/                  # Branding & Logos
 └── Illustrations/              # SVG illustrations
 ```
 
 ---
 
+## ⚖️ Core Business Decisions
+
+Based on the [Backend logic Specification](file:///c:/dev/learncrib/docs/backend_flow.md), the following rules apply:
+
+- **Commission:** 15% platform fee on all sessions.
+- **Payouts:** Weekly tutor payouts processed every **Friday at 10:00 AM**.
+- **Escrow:** Funds held until 48 hours post-session (Confirmation Window).
+- **Cancellations:**
+    - > 24h: Full refund to parent.
+    - < 24h: 50% refund to parent, 50% to tutor (minus fees).
+- **Disputes:** Manual admin resolution required for any flagged sessions.
+
+---
+
 ## 🚀 Collaboration Workflow
 
-To ensure a smooth workflow between **Frontend** and **Backend**:
+To ensure a smooth workflow:
 
 1. **Directories**:
    - `/frontend`: All UI work goes here.
-   - `/backend`: All API and Database logic goes here.
-2. **API Contract**: We use `/docs/database_schema.sql` as our unified data model.
+   - `/backend`: All Django/API logic goes here.
+2. **API Contract**: We use `/docs/backend_flow.md` and `/docs/database_schema.sql` as our unified source of truth.
 3. **Branches**: Work on individual feature branches (e.g., `feature/tutor-auth`) and merge to `main`.
 
 ---

@@ -146,6 +146,14 @@ SPECTACULAR_SETTINGS = {
 }
 
 
+# Business Logic Constants (MVP)
+PLATFORM_FEE_PERCENTAGE = 15
+CONFIRMATION_WINDOW_HOURS = 48
+PAYOUT_DAY_OF_WEEK = 4  # Friday (0=Mon, 4=Fri)
+PAYOUT_TIME = "10:00"
+CANCELLATION_WINDOW_HOURS = 24
+LATE_CANCELLATION_REFUND_PERCENTAGE = 50
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
