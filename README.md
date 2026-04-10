@@ -24,12 +24,10 @@ LearnCrib is a mobile-first web application that connects students with verified
 
 | Layer       | Technology                          |
 |-------------|-------------------------------------|
-| Markup      | HTML5                               |
-| Styling     | Tailwind CSS (CDN)                  |
-| Typography  | Outfit, Inter (Google Fonts)        |
-| Icons       | Lucide Icons                        |
+| Frontend    | HTML5, Tailwind CSS, JS             |
+| Backend     | Python / FastAPI (In progress)      |
+| Database    | PostgreSQL                          |
 | Deployment  | Vercel                              |
-| PWA         | Web App Manifest                    |
 
 ---
 
@@ -37,73 +35,31 @@ LearnCrib is a mobile-first web application that connects students with verified
 
 ```
 learncrib/
-├── prototype/
-│   ├── index.html              # Entry point (redirects to splash)
-│   ├── manifest.json           # PWA manifest
-│   ├── vercel.json             # Vercel deployment config
+├── frontend/                   # Visuals & PWA (Collab)
+│   ├── index.html
 │   ├── assets/
-│   │   ├── css/                # Stylesheets
-│   │   └── img/                # Images, icons, logos
-│   └── screens/
-│       ├── splash.html         # Splash screen
-│       ├── welcome.html        # Onboarding welcome
-│       ├── onboarding.html     # Onboarding flow
-│       ├── role-selection.html # Student / Tutor selection
-│       ├── login.html          # Login
-│       ├── signup.html         # Registration
-│       ├── student-dashboard.html
-│       ├── tutor-dashboard.html
-│       ├── search-results.html
-│       ├── tutor-profile.html
-│       ├── book-session.html
-│       ├── payment.html
-│       ├── booking-confirmation.html
-│       ├── messages.html
-│       ├── notifications.html
-│       ├── settings.html
-│       ├── student-profile.html
-│       ├── student-sessions.html
-│       ├── tutor-availability.html
-│       ├── tutor-earnings.html
-│       ├── tutor-profile-edit.html
-│       ├── tutor-students.html
-│       └── help-support.html
-├── brand_kit/                  # Brand guidelines & logos
-├── Illustrations/              # SVG illustrations
-└── .gitignore
+│   └── screens/                # Parent/Tutor/Shared folders
+├── backend/                    # Logic & API (Me)
+│   ├── main.py
+│   └── requirements.txt
+├── docs/                       # Project Documentation
+│   ├── backend_flow.md
+│   └── database_schema.sql
+├── brand_kit/                  # Branding & Logos
+└── Illustrations/              # SVG illustrations
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Collaboration Workflow
 
-### Prerequisites
+To ensure a smooth workflow between **Frontend** and **Backend**:
 
-- A modern web browser (Chrome, Safari, Firefox, Edge)
-
-### Run Locally
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/learncrib.git
-   cd learncrib
-   ```
-
-2. **Open the prototype**
-   Open `prototype/index.html` in your browser, or use a local server:
-   ```bash
-   npx serve prototype
-   ```
-
-3. **View on mobile**
-   Use your browser's device toolbar (F12 → Toggle Device) for the best mobile experience.
-
-### Deploy to Vercel
-
-```bash
-cd prototype
-npx vercel --prod
-```
+1. **Directories**:
+   - `/frontend`: All UI work goes here.
+   - `/backend`: All API and Database logic goes here.
+2. **API Contract**: We use `/docs/database_schema.sql` as our unified data model.
+3. **Branches**: Work on individual feature branches (e.g., `feature/tutor-auth`) and merge to `main`.
 
 ---
 
@@ -123,9 +79,3 @@ npx vercel --prod
 ## 📄 License
 
 This project is proprietary. All rights reserved.
-
----
-
-## 🤝 Contributing
-
-This is currently a private prototype. For collaboration inquiries, please reach out to the project maintainer.
