@@ -9,14 +9,14 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('payments', '0001_initial'),
+        ('reviews', '0001_initial'),
         ('sessions_app', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='dispute',
-            name='session',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='dispute', to='sessions_app.session'),
+            model_name='review',
+            name='booking',
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='review', to='sessions_app.session'),
         ),
     ]
