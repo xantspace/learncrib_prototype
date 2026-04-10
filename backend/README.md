@@ -16,7 +16,12 @@ Welcome to the LearnCrib backend! This project is built exploring modern Django 
    venv\Scripts\activate
    ```
 
-2. **Run Server:**
+2. **Setup Environment Variables:**
+   - The project uses `.env` for secrets.
+   - Look for `.env` in the `backend/` directory.
+   - Key variables like `SECRET_KEY`, `DEBUG`, and `DATABASE_URL` are managed here.
+
+3. **Run Server:**
    ```bash
    cd backend
    python manage.py runserver

@@ -111,9 +111,14 @@ class SessionViewSet(viewsets.ModelViewSet):
         )
 
     @action(detail=True, methods=['patch'], url_path='status')
-    def update_status(self, request, pk=None):
+    def status(self, request, pk=None):
         """PATCH /api/sessions/{id}/status/ — tutor accepts/rejects."""
         session = self.get_object()
+        
+        # Security: Only the assigned tutor can accept/reject a requested session
+        if request.user.role == User.Role.TUTOR and session.tutor.user != request.user:
+            return Response({'detail': 'You are not the tutor for this session.'}, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = SessionStatusUpdateSerializer(session, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         new_status = serializer.validated_data['status']
@@ -129,11 +134,16 @@ class SessionViewSet(viewsets.ModelViewSet):
         return Response(SessionSerializer(session).data)
 
     @action(detail=True, methods=['post'], url_path='dispute')
-    def raise_dispute(self, request, pk=None):
+    def dispute(self, request, pk=None):
         """POST /api/sessions/{id}/dispute/ — raise a dispute."""
         session = self.get_object()
+        
+        # Security: Only participants can raise a dispute
+        if session.parent.user != request.user and session.tutor.user != request.user:
+            return Response({'detail': 'You are not a participant in this session.'}, status=status.HTTP_403_FORBIDDEN)
+
         if hasattr(session, 'dispute'):
-            return Response({'detail': 'A dispute already exists for this session.'}, status=400)
+            return Response({'detail': 'A dispute already exists for this session.'}, status=status.HTTP_400_BAD_REQUEST)
         actor = 'PARENT' if hasattr(request.user, 'parent_profile') else 'TUTOR'
         dispute = Dispute.objects.create(
             session=session,
@@ -155,7 +165,7 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if user.role == User.Role.ADMIN:
             return Payment.objects.all()
-        return Payment.objects.filter(parent=user)
+        return Payment.objects.filter(parent__user=user)
 
 
 class PayoutViewSet(viewsets.ReadOnlyModelViewSet):
@@ -185,4 +195,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
         Review.objects.all()
 
     def perform_create(self, serializer):
+        # Security check: Session must be completed to leave a review
+        booking = serializer.validated_data['booking']
+        if booking.status != Session.Status.COMPLETED:
+            from rest_framework import serializers
+            raise serializers.ValidationError("Reviews can only be left for completed sessions.")
+        
+        # Security check: Only the parent who booked the session can review
+        if booking.parent.user != self.request.user:
+            from rest_framework import serializers
+            raise serializers.ValidationError("You can only review sessions you booked.")
+
         serializer.save(student=self.request.user)

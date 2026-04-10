@@ -22,6 +22,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'password', 'first_name', 'last_name', 'phone', 'role']
 
+    def validate_role(self, value):
+        if value == User.Role.ADMIN:
+            raise serializers.ValidationError("Cannot register as an administrator via the public API.")
+        return value
+
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
