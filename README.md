@@ -1,6 +1,6 @@
 # 📚 LearnCrib
 
-**Where Learning Feels Like Home**
+**Book a Tutor! Build a Future!**
 
 LearnCrib is a mobile-first web application that connects students with verified expert tutors across Nigeria. Whether you need help with JAMB, WAEC, or university prep, LearnCrib makes it easy to find, book, and learn from qualified tutors — online or at home.
 
