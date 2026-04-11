@@ -2,23 +2,26 @@ import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, BookOpen, CreditCard,
-  AlertTriangle, LogOut, Menu, X, GraduationCap,
+  AlertTriangle, LogOut, Menu, X, GraduationCap, BadgeCheck,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
+import { useVerificationStore } from '@/store/verificationStore'
 
 const NAV = [
-  { to: '/admin',          icon: LayoutDashboard, label: 'Overview',  exact: true },
-  { to: '/admin/users',    icon: Users,           label: 'Users'             },
-  { to: '/admin/tutors',   icon: GraduationCap,   label: 'Tutors'            },
-  { to: '/admin/sessions', icon: BookOpen,        label: 'Sessions'          },
-  { to: '/admin/payments', icon: CreditCard,      label: 'Payments'          },
-  { to: '/admin/issues',   icon: AlertTriangle,   label: 'Issues'            },
+  { to: '/admin',                icon: LayoutDashboard, label: 'Overview',      exact: true },
+  { to: '/admin/users',          icon: Users,           label: 'Users'                      },
+  { to: '/admin/tutors',         icon: GraduationCap,   label: 'Tutors'                     },
+  { to: '/admin/verifications',  icon: BadgeCheck,      label: 'Verifications', badge: true  },
+  { to: '/admin/sessions',       icon: BookOpen,        label: 'Sessions'                   },
+  { to: '/admin/payments',       icon: CreditCard,      label: 'Payments'                   },
+  { to: '/admin/issues',         icon: AlertTriangle,   label: 'Issues'                     },
 ]
 
 export default function AdminShell({ children }) {
-  const { user, logout } = useAuthStore()
-  const navigate = useNavigate()
-  const [open, setOpen] = useState(false)
+  const { user, logout }  = useAuthStore()
+  const navigate          = useNavigate()
+  const [open, setOpen]   = useState(false)
+  const pendingCount      = useVerificationStore(s => s.pending().length)
 
   // Break out of the 430px mobile container
   useEffect(() => {
@@ -40,11 +43,11 @@ export default function AdminShell({ children }) {
         )}
 
         <aside className={`
-          fixed top-0 left-0 h-full w-56 z-40 flex flex-col flex-shrink-0
+          fixed top-0 left-0 h-screen w-56 z-40 flex flex-col flex-shrink-0
           bg-secondary text-white
           transition-transform duration-300
           ${open ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:z-auto
+          lg:translate-x-0
         `}>
           {/* Logo */}
           <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
@@ -60,7 +63,7 @@ export default function AdminShell({ children }) {
 
           {/* Nav */}
           <nav className="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto">
-            {NAV.map(({ to, icon: Icon, label, exact }) => (
+            {NAV.map(({ to, icon: Icon, label, exact, badge }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -74,7 +77,12 @@ export default function AdminShell({ children }) {
                 `}
               >
                 <Icon size={17} />
-                {label}
+                <span className="flex-1">{label}</span>
+                {badge && pendingCount > 0 && (
+                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center">
+                    {pendingCount}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>

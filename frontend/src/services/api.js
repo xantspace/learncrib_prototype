@@ -83,3 +83,15 @@ export const reviewsAPI = {
   submit: (sessionId, data) => api.post('/api/reviews/', { session: sessionId, ...data }),
   list:   (tutorId)         => api.get('/api/reviews/', { params: { tutor: tutorId } }),
 }
+
+/* ── Admin ─────────────────────────────────── */
+export const adminAPI = {
+  getTutors:    ()              => api.get('/api/admin/tutors/'),
+  getUsers:     ()              => api.get('/api/admin/users/'),
+  approve:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/approve/`),
+  reject:       (tutorId, data) => api.post(`/api/admin/tutors/${tutorId}/reject/`, data),
+  disable:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/disable/`),
+  enable:       (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/enable/`),
+  suspendUser:  (userId)        => api.post(`/api/admin/users/${userId}/suspend/`),
+  activateUser: (userId)        => api.post(`/api/admin/users/${userId}/activate/`),
+}

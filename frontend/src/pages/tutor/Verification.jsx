@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input'
 import GlassCard from '@/components/ui/GlassCard'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
+import { useVerificationStore } from '@/store/verificationStore'
 import { usersAPI } from '@/services/api'
 
 const SUBJECTS = ['Mathematics','Physics','Chemistry','English','Biology','Economics','Coding','Design','Further Maths','Literature','Government','Commerce']
@@ -24,6 +25,8 @@ export default function TutorVerification() {
   const navigate = useNavigate()
   const { user, setUser } = useAuthStore()
   const { showToast }     = useUIStore()
+
+  const vStore = useVerificationStore()
 
   const [step, setStep]       = useState(1)
   const [submitting, setSub]  = useState(false)
@@ -70,9 +73,23 @@ export default function TutorVerification() {
 
   const handleSubmit = async () => {
     setSub(true)
+
+    // Write to shared verification store — admin sees this immediately
+    vStore.submit(user?.email, {
+      name:     fullName,
+      email:    user?.email,
+      idType,
+      edu:      eduLevel,
+      subjects,
+      selfie:   !!selfie,
+    })
+
+    // Update tutor's own auth profile
+    setUser({ ...user, verification_status: 'PENDING' })
+
     // Best-effort API call — silently ignored if backend is offline
     await usersAPI.updateProfile({ verification_status: 'PENDING' }).catch(() => {})
-    setUser({ ...user, verification_status: 'PENDING' })
+
     showToast('Verification submitted! We\'ll review within 2–3 business days.', 'success')
     setSub(false)
     navigate('/tutor/dashboard', { replace: true })

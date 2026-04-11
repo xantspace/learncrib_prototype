@@ -51,7 +51,8 @@ const AdminUsers    = lazy(() => import('@/pages/admin/Users'))
 const AdminTutors   = lazy(() => import('@/pages/admin/Tutors'))
 const AdminSessions = lazy(() => import('@/pages/admin/Sessions'))
 const AdminPayments = lazy(() => import('@/pages/admin/Payments'))
-const AdminIssues   = lazy(() => import('@/pages/admin/Issues'))
+const AdminIssues         = lazy(() => import('@/pages/admin/Issues'))
+const AdminVerifications  = lazy(() => import('@/pages/admin/Verifications'))
 
 // Settings sub-pages
 const PersonalInfo     = lazy(() => import('@/pages/settings/PersonalInfo'))
@@ -240,7 +241,8 @@ export default function App() {
         <Route path="/admin/tutors"   element={<RequireAdmin><AdminShell><AdminTutors /></AdminShell></RequireAdmin>} />
         <Route path="/admin/sessions" element={<RequireAdmin><AdminShell><AdminSessions /></AdminShell></RequireAdmin>} />
         <Route path="/admin/payments" element={<RequireAdmin><AdminShell><AdminPayments /></AdminShell></RequireAdmin>} />
-        <Route path="/admin/issues"   element={<RequireAdmin><AdminShell><AdminIssues /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/issues"         element={<RequireAdmin><AdminShell><AdminIssues /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/verifications"  element={<RequireAdmin><AdminShell><AdminVerifications /></AdminShell></RequireAdmin>} />
 
         {/* ── Fallback ── */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -5,15 +5,17 @@ import GlassCard from '@/components/ui/GlassCard'
 import VerificationBanner from '@/components/shared/VerificationBanner'
 import { sessionsAPI, payoutsAPI } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
+import { useVerificationStore } from '@/store/verificationStore'
 import api from '@/services/api'
 
 export default function TutorDashboard() {
   const navigate = useNavigate()
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
+  const vStore   = useVerificationStore()
 
   const [sessions,  setSessions]  = useState([])
   const [earnings,  setEarnings]  = useState(null)
-  const [available, setAvailable] = useState(true)
+  const [available, setAvailable] = useState(user?.is_available ?? true)
   const [loading,   setLoading]   = useState(true)
 
   const initials = `${user?.first_name?.[0] || ''}${user?.last_name?.[0] || ''}`.toUpperCase()
@@ -28,8 +30,18 @@ export default function TutorDashboard() {
     }).finally(() => setLoading(false))
   }, [])
 
-  const verificationStatus = user?.verification_status || 'UNVERIFIED'
+  // Verification status: verificationStore is authoritative (updated by admin actions);
+  // fall back to authStore for users with no store record yet.
+  const storeRecord      = vStore.getRecord(user?.email)
+  const verificationStatus = storeRecord?.status ?? user?.verification_status ?? 'UNVERIFIED'
   const isVerified = verificationStatus === 'APPROVED'
+
+  // Sync store status back into authStore so downstream components stay consistent
+  useEffect(() => {
+    if (storeRecord?.status && storeRecord.status !== user?.verification_status) {
+      setUser({ ...user, verification_status: storeRecord.status, rejection_reason: storeRecord.rejectionReason })
+    }
+  }, [storeRecord?.status])
 
   const toggleAvailability = async () => {
     if (!isVerified) return  // block if not verified
@@ -77,7 +89,7 @@ export default function TutorDashboard() {
       {/* Verification banner — hidden when approved */}
       <VerificationBanner
         status={verificationStatus}
-        rejectionReason={user?.rejection_reason}
+        rejectionReason={storeRecord?.rejectionReason ?? user?.rejection_reason}
       />
 
       {/* Availability toggle */}
