@@ -43,6 +43,15 @@ const HelpSupport   = lazy(() => import('@/pages/shared/HelpSupport'))
 const PaymentVerify    = lazy(() => import('@/pages/student/PaymentVerify'))
 const ReviewSession    = lazy(() => import('@/pages/student/ReviewSession'))
 
+// Admin
+const AdminShell    = lazy(() => import('@/pages/admin/layout/AdminShell'))
+const AdminOverview = lazy(() => import('@/pages/admin/Overview'))
+const AdminUsers    = lazy(() => import('@/pages/admin/Users'))
+const AdminTutors   = lazy(() => import('@/pages/admin/Tutors'))
+const AdminSessions = lazy(() => import('@/pages/admin/Sessions'))
+const AdminPayments = lazy(() => import('@/pages/admin/Payments'))
+const AdminIssues   = lazy(() => import('@/pages/admin/Issues'))
+
 // Settings sub-pages
 const PersonalInfo     = lazy(() => import('@/pages/settings/PersonalInfo'))
 const Security         = lazy(() => import('@/pages/settings/Security'))
@@ -65,6 +74,13 @@ function RequireRole({ role, children }) {
     const dest = user.role === 'TUTOR' ? '/tutor/dashboard' : '/student/dashboard'
     return <Navigate to={dest} replace />
   }
+  return children
+}
+
+function RequireAdmin({ children }) {
+  const { user, accessToken } = useAuthStore()
+  if (!accessToken) return <Navigate to="/login" replace />
+  if (user?.role !== 'ADMIN') return <Navigate to="/" replace />
   return children
 }
 
@@ -211,6 +227,14 @@ export default function App() {
         <Route path="/settings/preferences"   element={<RequireAuth><AppShell showNav={false}><Preferences /></AppShell></RequireAuth>} />
         <Route path="/settings/payment"       element={<RequireAuth><AppShell showNav={false}><PaymentMethods /></AppShell></RequireAuth>} />
         <Route path="/settings/bank"          element={<RequireAuth><AppShell showNav={false}><BankAccount /></AppShell></RequireAuth>} />
+
+        {/* ── Admin ── */}
+        <Route path="/admin" element={<RequireAdmin><AdminShell><AdminOverview /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/users"    element={<RequireAdmin><AdminShell><AdminUsers /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/tutors"   element={<RequireAdmin><AdminShell><AdminTutors /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/sessions" element={<RequireAdmin><AdminShell><AdminSessions /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/payments" element={<RequireAdmin><AdminShell><AdminPayments /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/issues"   element={<RequireAdmin><AdminShell><AdminIssues /></AdminShell></RequireAdmin>} />
 
         {/* ── Fallback ── */}
         <Route path="*" element={<Navigate to="/" replace />} />

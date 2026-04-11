@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, LogIn, GraduationCap, UserCheck, Zap } from 'lucide-react'
+import { Mail, LogIn, GraduationCap, UserCheck, Zap, ShieldCheck } from 'lucide-react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { authAPI } from '@/services/api'
@@ -9,6 +9,13 @@ import { useUIStore } from '@/store/uiStore'
 
 // ── Dev bypass — only shown in development ────────────────────────────────────
 const DEV_USERS = {
+  ADMIN: {
+    id: 'dev-admin-001',
+    first_name: 'Admin',
+    last_name: 'LearnCrib',
+    email: 'admin@dev.local',
+    role: 'ADMIN',
+  },
   STUDENT: {
     id: 'dev-student-001',
     first_name: 'Temi',
@@ -45,7 +52,8 @@ function DevBypass() {
       access:  'dev-access-token',
       refresh: 'dev-refresh-token',
     })
-    navigate(role === 'TUTOR' ? '/tutor/dashboard' : '/student/dashboard', { replace: true })
+    const dest = role === 'TUTOR' ? '/tutor/dashboard' : role === 'ADMIN' ? '/admin' : '/student/dashboard'
+    navigate(dest, { replace: true })
   }
 
   return (
@@ -54,22 +62,30 @@ function DevBypass() {
         <Zap size={13} className="text-yellow-500" />
         <span className="text-xs font-outfit font-semibold text-yellow-700 uppercase tracking-widest">Dev Bypass</span>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => login('STUDENT')}
-          className="flex flex-col items-center gap-1.5 py-3 px-3 bg-white border border-primary/20 rounded-xl hover:border-primary hover:bg-primary-light transition-all"
+          className="flex flex-col items-center gap-1.5 py-3 px-2 bg-white border border-primary/20 rounded-xl hover:border-primary hover:bg-primary-light transition-all"
         >
-          <GraduationCap size={20} className="text-primary" />
+          <GraduationCap size={18} className="text-primary" />
           <span className="text-xs font-outfit font-semibold text-secondary">Student</span>
-          <span className="text-[10px] font-inter text-secondary/45">Temi Adeyemi</span>
+          <span className="text-[10px] font-inter text-secondary/45">Temi</span>
         </button>
         <button
           onClick={() => login('TUTOR')}
-          className="flex flex-col items-center gap-1.5 py-3 px-3 bg-white border border-primary/20 rounded-xl hover:border-primary hover:bg-primary-light transition-all"
+          className="flex flex-col items-center gap-1.5 py-3 px-2 bg-white border border-primary/20 rounded-xl hover:border-primary hover:bg-primary-light transition-all"
         >
-          <UserCheck size={20} className="text-primary" />
+          <UserCheck size={18} className="text-primary" />
           <span className="text-xs font-outfit font-semibold text-secondary">Tutor</span>
-          <span className="text-[10px] font-inter text-secondary/45">Kolade Okonkwo</span>
+          <span className="text-[10px] font-inter text-secondary/45">Kolade</span>
+        </button>
+        <button
+          onClick={() => login('ADMIN')}
+          className="flex flex-col items-center gap-1.5 py-3 px-2 bg-white border border-secondary/20 rounded-xl hover:border-secondary hover:bg-gray-50 transition-all"
+        >
+          <ShieldCheck size={18} className="text-secondary" />
+          <span className="text-xs font-outfit font-semibold text-secondary">Admin</span>
+          <span className="text-[10px] font-inter text-secondary/45">Ops</span>
         </button>
       </div>
     </div>
