@@ -31,6 +31,16 @@ export default function Onboarding() {
   const [location, setLocation] = useState('Lagos, Nigeria')
   const [education, setEducation] = useState('')
   const [rate, setRate] = useState('')
+  const [photo, setPhoto] = useState(null)  // base64 preview
+  const fileRef = React.useRef(null)
+
+  const handlePhoto = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => setPhoto(ev.target.result)
+    reader.readAsDataURL(file)
+  }
 
   const toggleSubject = (label) => {
     setSelectedSubjects(s =>
@@ -130,15 +140,24 @@ export default function Onboarding() {
           <h1 className="font-outfit font-bold text-3xl text-secondary mb-1">Final Touch</h1>
           <p className="font-inter text-sm text-secondary/50 mb-12">Let's set up your identity and alerts.</p>
           <div className="flex flex-col items-center gap-8 flex-1">
-            {/* Avatar placeholder */}
+            {/* Avatar with upload */}
             <div className="relative">
-              <div className="w-32 h-32 rounded-[40px] bg-gray-100 flex items-center justify-center border-4 border-white shadow-xl">
-                <Camera size={36} className="text-gray-300" />
-              </div>
-              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg border-2 border-white">
-                <span className="text-lg font-bold">+</span>
-              </div>
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+              <button onClick={() => fileRef.current?.click()} className="block">
+                <div className="w-32 h-32 rounded-[40px] bg-gray-100 flex items-center justify-center border-4 border-white shadow-xl overflow-hidden">
+                  {photo
+                    ? <img src={photo} alt="Profile" className="w-full h-full object-cover" />
+                    : <Camera size={36} className="text-gray-300" />
+                  }
+                </div>
+                <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg border-2 border-white">
+                  <Camera size={16} />
+                </div>
+              </button>
             </div>
+            {!photo && (
+              <p className="font-inter text-xs text-secondary/40 -mt-4">Tap to add a profile photo</p>
+            )}
             {/* Notifications */}
             <GlassCard className="p-5 w-full flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">

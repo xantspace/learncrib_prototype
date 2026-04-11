@@ -7,18 +7,18 @@ import {
 import { useAuthStore } from '@/store/authStore'
 
 const studentNav = [
-  { to: '/student/dashboard',  icon: Home,           label: 'Home' },
-  { to: '/student/sessions',   icon: Calendar,       label: 'Sessions' },
-  { to: '/messages',           icon: MessageSquare,  label: 'Messages' },
-  { to: '/student/profile',    icon: User,           label: 'Profile' },
+  { to: '/student/dashboard',  icon: Home,           label: 'Home',     badge: false },
+  { to: '/student/sessions',   icon: Calendar,       label: 'Sessions', badge: false },
+  { to: '/messages',           icon: MessageSquare,  label: 'Messages', badge: true  },
+  { to: '/student/profile',    icon: User,           label: 'Profile',  badge: false },
 ]
 
 const tutorNav = [
-  { to: '/tutor/dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/tutor/sessions',     icon: ClipboardList,   label: 'Sessions' },
-  { to: '/tutor/availability', icon: Calendar,        label: 'Schedule' },
-  { to: '/tutor/earnings',     icon: Wallet,          label: 'Earnings' },
-  { to: '/tutor/profile',      icon: User,            label: 'Profile' },
+  { to: '/tutor/dashboard',    icon: LayoutDashboard, label: 'Dashboard', badge: false },
+  { to: '/tutor/sessions',     icon: ClipboardList,   label: 'Sessions',  badge: true  },
+  { to: '/tutor/availability', icon: Calendar,        label: 'Schedule',  badge: false },
+  { to: '/tutor/earnings',     icon: Wallet,          label: 'Earnings',  badge: false },
+  { to: '/tutor/profile',      icon: User,            label: 'Profile',   badge: false },
 ]
 
 export default function BottomNav() {
@@ -29,7 +29,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50
       bg-white border-t border-secondary/10
       flex justify-around items-center px-4 pb-5 pt-3">
-      {items.map(({ to, icon: Icon, label }) => (
+      {items.map(({ to, icon: Icon, label, badge }) => (
         <NavLink
           key={to}
           to={to}
@@ -41,7 +41,12 @@ export default function BottomNav() {
         >
           {({ isActive }) => (
             <>
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+              <span className="relative">
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                {badge && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent border border-white" />
+                )}
+              </span>
               <span>{label}</span>
             </>
           )}
