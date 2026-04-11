@@ -80,10 +80,18 @@ function RequireGuest({ children }) {
 // ── Page loader ───────────────────────────────
 function PageLoader() {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/40 backdrop-blur-md">
-      <img src="/assets/img/logo_a.png" alt="LearnCrib" className="w-20 h-20 animate-logo-spin" style={{ filter: 'brightness(0) invert(1)' }} />
-      <p className="mt-6 font-inter text-[10px] uppercase tracking-[0.2em] text-white/60 animate-pulse">
-        Please wait
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+      style={{ background: 'linear-gradient(160deg, #0A1444 0%, #1939D4 50%, #2B6CB0 100%)' }}
+    >
+      {/* Glow ring */}
+      <div className="w-28 h-28 rounded-[36px] flex items-center justify-center mb-6"
+        style={{ boxShadow: '0 0 40px hsla(220,80%,60%,0.5)', background: 'rgba(255,255,255,0.08)' }}>
+        <img src="/assets/img/logo_icon.png" alt="LearnCrib" className="w-20 h-20 rounded-[28px] animate-logo-spin" />
+      </div>
+      <p className="font-outfit font-bold text-white text-xl tracking-wide mb-1">LearnCrib</p>
+      <p className="font-inter text-[0.7rem] uppercase tracking-[0.25em] text-white/50 animate-pulse">
+        Loading…
       </p>
     </div>
   )
