@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import PageHeader from '@/components/shared/PageHeader'
 import { usersAPI } from '@/services/api'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
 
 export default function TutorProfile() {
   const { id } = useParams()
@@ -51,6 +52,9 @@ export default function TutorProfile() {
           )}
         </div>
         <h1 className="font-outfit font-bold text-2xl text-secondary">{name}</h1>
+        {tutor.verification_status === 'APPROVED' && (
+          <VerifiedBadge size="md" className="mt-2" />
+        )}
         {tutor.rating > 0 && (
           <div className="flex items-center gap-1 mt-1">
             {[1,2,3,4,5].map(i => (
@@ -81,8 +85,8 @@ export default function TutorProfile() {
             <p className="font-outfit font-bold text-2xl text-primary">₦{Number(tutor.hourly_rate).toLocaleString()}</p>
           </div>
           <div className="text-right">
-            <p className="font-inter text-xs text-secondary/50">Verified</p>
-            <p className="font-inter text-sm font-semibold text-success">{tutor.verification_status === 'APPROVED' ? '✓ Yes' : 'Pending'}</p>
+            <p className="font-inter text-xs text-secondary/50">Sessions</p>
+            <p className="font-inter text-sm font-semibold text-secondary">{tutor.total_reviews || 0} completed</p>
           </div>
         </GlassCard>
 

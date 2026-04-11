@@ -5,6 +5,7 @@ import GlassCard from '@/components/ui/GlassCard'
 import PageHeader from '@/components/shared/PageHeader'
 import { TutorCardSkeleton } from '@/components/ui/Skeleton'
 import { usersAPI } from '@/services/api'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
 
 export default function SearchResults() {
   const navigate = useNavigate()
@@ -106,7 +107,10 @@ export default function SearchResults() {
                         <span className="font-outfit font-bold text-sm text-primary ml-2">₦{Number(tutor.hourly_rate).toLocaleString()}/hr</span>
                       </div>
                       <p className="font-inter text-xs text-secondary/50 mt-0.5">{(tutor.subjects || []).join(' · ')}</p>
-                      <div className="flex items-center gap-3 mt-2">
+                      <div className="flex items-center gap-3 mt-2 flex-wrap">
+                        {tutor.verification_status === 'APPROVED' && (
+                          <VerifiedBadge size="sm" />
+                        )}
                         {tutor.rating > 0 && (
                           <div className="flex items-center gap-1">
                             <Star size={12} className="text-accent fill-current" />

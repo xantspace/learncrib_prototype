@@ -31,6 +31,7 @@ const TutorStudents     = lazy(() => import('@/pages/tutor/Students'))
 const TutorSessions     = lazy(() => import('@/pages/tutor/Sessions'))
 const TutorProfileEdit  = lazy(() => import('@/pages/tutor/ProfileEdit'))
 const TutorProfileView  = lazy(() => import('@/pages/tutor/Profile'))
+const TutorVerification = lazy(() => import('@/pages/tutor/Verification'))
 
 // Shared
 const MessagesInbox = lazy(() => import('@/pages/shared/MessagesInbox'))
@@ -210,6 +211,11 @@ export default function App() {
         <Route path="/tutor/profile/edit" element={
           <RequireRole role="TUTOR">
             <AppShell showNav={false}><TutorProfileEdit /></AppShell>
+          </RequireRole>
+        } />
+        <Route path="/tutor/verify" element={
+          <RequireRole role="TUTOR">
+            <AppShell showNav={false}><TutorVerification /></AppShell>
           </RequireRole>
         } />
 

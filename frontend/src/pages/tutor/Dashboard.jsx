@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bell, Users, Star, CheckCircle, TrendingUp, MessageCircle, MapPin, Video } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
+import VerificationBanner from '@/components/shared/VerificationBanner'
 import { sessionsAPI, payoutsAPI } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import api from '@/services/api'
@@ -27,13 +28,17 @@ export default function TutorDashboard() {
     }).finally(() => setLoading(false))
   }, [])
 
+  const verificationStatus = user?.verification_status || 'UNVERIFIED'
+  const isVerified = verificationStatus === 'APPROVED'
+
   const toggleAvailability = async () => {
+    if (!isVerified) return  // block if not verified
     const next = !available
     setAvailable(next)
     try {
       await api.patch('/api/users/me/', { is_available: next })
     } catch {
-      setAvailable(!next) // revert on fail
+      setAvailable(!next)
     }
   }
 
@@ -69,27 +74,36 @@ export default function TutorDashboard() {
         </div>
       </div>
 
+      {/* Verification banner — hidden when approved */}
+      <VerificationBanner
+        status={verificationStatus}
+        rejectionReason={user?.rejection_reason}
+      />
+
       {/* Availability toggle */}
       <div className="px-5 mb-5">
         <GlassCard className="p-4 flex items-center justify-between" hover={false}>
           <div className="flex items-center gap-3">
-            <span className={`w-2.5 h-2.5 rounded-full ${available ? 'bg-success animate-pulse-ring' : 'bg-gray-300'}`} />
+            <span className={`w-2.5 h-2.5 rounded-full ${available && isVerified ? 'bg-success animate-pulse-ring' : 'bg-gray-300'}`} />
             <div>
               <p className="font-outfit font-semibold text-sm text-secondary">
-                {available ? 'Available for sessions' : 'Currently offline'}
+                {!isVerified ? 'Verification required' : available ? 'Available for sessions' : 'Currently offline'}
               </p>
               <p className="font-inter text-xs text-secondary/50">
-                {available ? 'Students can book you now' : 'Toggle to go online'}
+                {!isVerified ? 'Get verified to go online' : available ? 'Students can book you now' : 'Toggle to go online'}
               </p>
             </div>
           </div>
           <div
             onClick={toggleAvailability}
-            className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${available ? 'bg-primary' : 'bg-secondary/25'}`}
+            className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${
+              !isVerified ? 'opacity-40 cursor-not-allowed bg-secondary/25' :
+              available ? 'bg-primary cursor-pointer' : 'bg-secondary/25 cursor-pointer'
+            }`}
           >
             <span
               className="absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-300"
-              style={{ transform: available ? 'translateX(26px)' : 'translateX(2px)' }}
+              style={{ transform: available && isVerified ? 'translateX(26px)' : 'translateX(2px)' }}
             />
           </div>
         </GlassCard>
