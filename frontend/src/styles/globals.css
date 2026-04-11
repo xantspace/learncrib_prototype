@@ -41,6 +41,12 @@ body {
   overflow-x: hidden;
 }
 
+/* ── Admin overrides mobile container ─────── */
+#root.admin-layout {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 /* ── Scrollbar ────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }

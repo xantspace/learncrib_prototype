@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, BookOpen, CreditCard,
@@ -20,10 +20,17 @@ export default function AdminShell({ children }) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
+  // Break out of the 430px mobile container
+  useEffect(() => {
+    const root = document.getElementById('root')
+    root?.classList.add('admin-layout')
+    return () => root?.classList.remove('admin-layout')
+  }, [])
+
   const handleLogout = () => { logout(); navigate('/login', { replace: true }) }
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-inter">
+    <div className="flex min-h-screen bg-gray-50 font-inter" style={{ minWidth: 0 }}>
 
       {/* ── Sidebar (desktop) / Drawer (mobile) ── */}
       <>
@@ -33,11 +40,11 @@ export default function AdminShell({ children }) {
         )}
 
         <aside className={`
-          fixed top-0 left-0 h-full w-60 z-40 flex flex-col
+          fixed top-0 left-0 h-full w-56 z-40 flex flex-col flex-shrink-0
           bg-secondary text-white
           transition-transform duration-300
           ${open ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:static lg:z-auto
+          lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:z-auto
         `}>
           {/* Logo */}
           <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
@@ -89,16 +96,16 @@ export default function AdminShell({ children }) {
       </>
 
       {/* ── Main content ── */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-56">
         {/* Top bar (mobile) */}
-        <header className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200">
+        <header className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-20">
           <button onClick={() => setOpen(true)} className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
             <Menu size={18} className="text-secondary" />
           </button>
           <p className="font-outfit font-bold text-secondary">Admin Panel</p>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-5 lg:p-7">
+        <main className="flex-1 p-5 lg:p-8 overflow-y-auto">
           {children}
         </main>
       </div>

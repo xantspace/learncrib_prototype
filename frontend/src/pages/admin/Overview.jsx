@@ -35,7 +35,7 @@ export default function AdminOverview() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
         {STATS.map(s => {
           const Icon = s.icon
           return (
