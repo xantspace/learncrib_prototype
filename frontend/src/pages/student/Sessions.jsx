@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, Clock, CheckCircle, XCircle, AlertTriangle, ChevronRight } from 'lucide-react'
+import { Calendar, Clock, CheckCircle, XCircle, X } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
-import Badge from '@/components/ui/Badge'
 import PageHeader from '@/components/shared/PageHeader'
 import { sessionsAPI } from '@/services/api'
+import { useUIStore } from '@/store/uiStore'
 
 const STATUS_META = {
   PENDING:    { label: 'Pending',          color: 'bg-yellow-100 text-yellow-700',  icon: Clock },
@@ -19,16 +19,31 @@ const TABS = ['Upcoming', 'Completed', 'All']
 
 export default function Sessions() {
   const navigate = useNavigate()
-  const [sessions, setSessions] = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [tab,      setTab]      = useState('Upcoming')
+  const { showToast } = useUIStore()
+  const [sessions,    setSessions]    = useState([])
+  const [loading,     setLoading]     = useState(true)
+  const [tab,         setTab]         = useState('Upcoming')
+  const [disputeId,   setDisputeId]   = useState(null)   // session id for dispute modal
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true)
     sessionsAPI.list()
       .then(r => setSessions(Array.isArray(r.data) ? r.data : r.data?.results || []))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { load() }, [])
+
+  const handleConfirm = async (sessionId) => {
+    try {
+      await sessionsAPI.confirm(sessionId)
+      showToast('Session confirmed!', 'success')
+      navigate(`/student/review/${sessionId}`)
+    } catch {
+      showToast('Could not confirm session', 'error')
+    }
+  }
 
   const filtered = sessions.filter(s => {
     if (tab === 'Upcoming')  return ['PENDING','ACCEPTED','SCHEDULED'].includes(s.status)
@@ -59,15 +74,33 @@ export default function Sessions() {
         {loading
           ? [1,2,3].map(i => <SkeletonCard key={i} />)
           : filtered.length > 0
-            ? filtered.map(s => <SessionItem key={s.id} session={s} navigate={navigate} />)
+            ? filtered.map(s => (
+                <SessionItem
+                  key={s.id}
+                  session={s}
+                  navigate={navigate}
+                  onConfirm={handleConfirm}
+                  onDispute={setDisputeId}
+                />
+              ))
             : <EmptyState tab={tab} />
         }
       </div>
+
+      {/* Dispute Modal */}
+      {disputeId && (
+        <DisputeModal
+          sessionId={disputeId}
+          onClose={() => setDisputeId(null)}
+          onSuccess={() => { setDisputeId(null); load() }}
+          showToast={showToast}
+        />
+      )}
     </div>
   )
 }
 
-function SessionItem({ session, navigate }) {
+function SessionItem({ session, navigate, onConfirm, onDispute }) {
   const meta = STATUS_META[session.status] || STATUS_META.PENDING
   const Icon = meta.icon
   const tutorName = `${session.tutor_first_name || ''} ${session.tutor_last_name || ''}`.trim() || 'Tutor'
@@ -110,12 +143,12 @@ function SessionItem({ session, navigate }) {
           </ActionButton>
         )}
         {canConfirm && (
-          <ActionButton color="success" onClick={() => sessionsAPI.confirm(session.id)}>
+          <ActionButton color="success" onClick={() => onConfirm(session.id)}>
             ✅ Confirm Completion
           </ActionButton>
         )}
         {canDispute && (
-          <ActionButton color="danger" onClick={() => {}}>
+          <ActionButton color="danger" onClick={() => onDispute(session.id)}>
             🚨 Report Issue
           </ActionButton>
         )}
@@ -204,6 +237,86 @@ function SkeletonCard() {
       <div className="h-4 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 rounded animate-shimmer w-1/2" />
       <div className="h-3 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 rounded animate-shimmer w-1/3" />
       <div className="h-3 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 rounded animate-shimmer w-1/4" />
+    </div>
+  )
+}
+
+const DISPUTE_REASONS = [
+  'Tutor did not show up',
+  'Session ended early',
+  'Content was not as described',
+  'Technical issues (tutor side)',
+  'Unprofessional behaviour',
+  'Other',
+]
+
+function DisputeModal({ sessionId, onClose, onSuccess, showToast }) {
+  const [reason,      setReason]      = useState('')
+  const [description, setDescription] = useState('')
+  const [submitting,  setSubmitting]  = useState(false)
+
+  const handleSubmit = async () => {
+    if (!reason) { showToast('Please select a reason', 'error'); return }
+    setSubmitting(true)
+    try {
+      await sessionsAPI.raiseDispute(sessionId, { reason, description: description.trim() })
+      showToast('Dispute submitted. Our team will review within 24 hours.', 'success')
+      onSuccess()
+    } catch {
+      showToast('Could not submit dispute. Please try again.', 'error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm px-4 pb-4">
+      <div className="bg-white rounded-3xl p-6 w-full max-w-sm animate-slide-up">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-outfit font-bold text-base text-secondary">Report an Issue</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center">
+            <X size={15} className="text-secondary/60" />
+          </button>
+        </div>
+
+        <p className="font-inter text-xs text-secondary/50 mb-4">
+          What went wrong? Our support team will review your report within 24 hours.
+        </p>
+
+        {/* Reason selector */}
+        <div className="flex flex-col gap-2 mb-4">
+          {DISPUTE_REASONS.map(r => (
+            <button
+              key={r}
+              onClick={() => setReason(r)}
+              className={`text-left px-4 py-2.5 rounded-xl text-xs font-inter transition-all border ${
+                reason === r
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-gray-50 text-secondary/70 border-secondary/10 hover:border-secondary/20'
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+
+        {/* Description */}
+        <textarea
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="Additional details (optional)…"
+          rows={3}
+          className="w-full border border-secondary/15 rounded-2xl px-4 py-3 font-inter text-sm text-secondary bg-gray-50 outline-none focus:border-primary resize-none placeholder:text-secondary/40 mb-4"
+        />
+
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="w-full py-3 rounded-2xl bg-red-500 text-white font-inter font-semibold text-sm disabled:opacity-50 transition-opacity hover:opacity-90"
+        >
+          {submitting ? 'Submitting…' : 'Submit Report'}
+        </button>
+      </div>
     </div>
   )
 }

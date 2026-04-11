@@ -43,9 +43,9 @@ export default function TutorDashboard() {
   return (
     <div>
       {/* Header */}
-      <div className="px-5 pt-10 pb-4">
+      <div className="sticky top-0 z-40 px-5 pt-10 pb-4 sticky-header-fade">
         <div className="flex items-center justify-between mb-4">
-          <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-6 object-contain" />
+          <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-6 object-contain logo-adaptive" />
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -54,7 +54,7 @@ export default function TutorDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/notifications')}
-              className="relative w-10 h-10 rounded-2xl bg-white/70 backdrop-blur-glass border border-white/45 shadow-glass flex items-center justify-center">
+              className="relative w-10 h-10 rounded-2xl bg-gray-100 border border-secondary/10 flex items-center justify-center">
               <Bell size={18} className="text-secondary" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent" />
             </button>
@@ -99,7 +99,7 @@ export default function TutorDashboard() {
       <div className="px-5 mb-5">
         <button
           onClick={() => navigate('/tutor/earnings')}
-          className="block w-full rounded-3xl p-5 text-left"
+          className="earnings-banner block w-full rounded-3xl p-5 text-left"
           style={{ background: 'linear-gradient(135deg, #0A1444 0%, hsl(220,50%,25%) 100%)' }}
         >
           <p className="font-inter text-xs text-white/60 mb-1">Total Earnings This Month</p>

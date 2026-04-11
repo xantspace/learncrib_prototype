@@ -52,3 +52,46 @@ body {
 
 /* ── Leaflet map fix ──────────────────────── */
 .leaflet-container { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+
+/* Dark Mode */
+.dark body { background-color: #111827; color: #E2E8F0; }
+.dark #root { background-color: #111827; }
+.dark .bg-white\/70, .dark .bg-white\/80, .dark .bg-white\/90 { background-color: rgba(30,37,53,0.9) !important; }
+.dark .bg-white { background-color: #1E2535 !important; }
+.dark .bg-gray-50 { background-color: #252d3d !important; }
+.dark .bg-gray-100 { background-color: #2d3748 !important; }
+.dark .bg-primary-light { background-color: #1a2560 !important; }
+.dark .border-white\/45, .dark .border-white\/50 { border-color: rgba(255,255,255,0.08) !important; }
+.dark .border-secondary\/15 { border-color: rgba(226,232,240,0.15) !important; }
+.dark .border-secondary\/10 { border-color: rgba(226,232,240,0.1) !important; }
+.dark .text-secondary { color: #E2E8F0 !important; }
+.dark .text-secondary\/60 { color: rgba(226,232,240,0.6) !important; }
+.dark .text-secondary\/55 { color: rgba(226,232,240,0.55) !important; }
+.dark .text-secondary\/50 { color: rgba(226,232,240,0.5) !important; }
+.dark .text-secondary\/45 { color: rgba(226,232,240,0.45) !important; }
+.dark .text-secondary\/40 { color: rgba(226,232,240,0.4) !important; }
+.dark .text-secondary\/30 { color: rgba(226,232,240,0.3) !important; }
+.dark input, .dark textarea, .dark select { background-color: #252d3d !important; color: #E2E8F0 !important; border-color: rgba(226,232,240,0.15) !important; }
+.dark input::placeholder, .dark textarea::placeholder { color: rgba(226,232,240,0.3) !important; }
+
+/* Sticky header fade — adapts to dark mode */
+.sticky-header-fade {
+  background: linear-gradient(to bottom, white 85%, transparent);
+}
+.dark .sticky-header-fade {
+  background: linear-gradient(to bottom, #111827 85%, transparent);
+}
+
+/* Earnings banner — readable in dark mode */
+.dark .earnings-banner {
+  background: linear-gradient(135deg, #1E2B5E 0%, #1939D4 100%) !important;
+}
+
+/* Adaptive logo — white bg disappears on light, inverts on dark */
+.logo-adaptive {
+  mix-blend-mode: multiply;
+}
+.dark .logo-adaptive {
+  mix-blend-mode: normal;
+  filter: invert(1) hue-rotate(180deg);
+}

@@ -28,14 +28,28 @@ const TutorDashboard    = lazy(() => import('@/pages/tutor/Dashboard'))
 const TutorAvailability = lazy(() => import('@/pages/tutor/Availability'))
 const TutorEarnings     = lazy(() => import('@/pages/tutor/Earnings'))
 const TutorStudents     = lazy(() => import('@/pages/tutor/Students'))
+const TutorSessions     = lazy(() => import('@/pages/tutor/Sessions'))
 const TutorProfileEdit  = lazy(() => import('@/pages/tutor/ProfileEdit'))
 const TutorProfileView  = lazy(() => import('@/pages/tutor/Profile'))
 
 // Shared
+const MessagesInbox = lazy(() => import('@/pages/shared/MessagesInbox'))
 const Messages      = lazy(() => import('@/pages/shared/Messages'))
 const Notifications = lazy(() => import('@/pages/shared/Notifications'))
 const Settings      = lazy(() => import('@/pages/shared/Settings'))
 const HelpSupport   = lazy(() => import('@/pages/shared/HelpSupport'))
+
+// Payment / Review
+const PaymentVerify    = lazy(() => import('@/pages/student/PaymentVerify'))
+const ReviewSession    = lazy(() => import('@/pages/student/ReviewSession'))
+
+// Settings sub-pages
+const PersonalInfo     = lazy(() => import('@/pages/settings/PersonalInfo'))
+const Security         = lazy(() => import('@/pages/settings/Security'))
+const NotificationPrefs= lazy(() => import('@/pages/settings/NotificationPrefs'))
+const Preferences      = lazy(() => import('@/pages/settings/Preferences'))
+const PaymentMethods   = lazy(() => import('@/pages/settings/PaymentMethods'))
+const BankAccount      = lazy(() => import('@/pages/settings/BankAccount'))
 
 // ── Route guards ─────────────────────────────
 function RequireAuth({ children }) {
@@ -67,7 +81,7 @@ function RequireGuest({ children }) {
 function PageLoader() {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/40 backdrop-blur-md">
-      <img src="/assets/img/logo_a.png" alt="LearnCrib" className="w-20 h-20 animate-logo-spin" />
+      <img src="/assets/img/logo_a.png" alt="LearnCrib" className="w-20 h-20 animate-logo-spin" style={{ filter: 'brightness(0) invert(1)' }} />
       <p className="mt-6 font-inter text-[10px] uppercase tracking-[0.2em] text-white/60 animate-pulse">
         Please wait
       </p>
@@ -131,11 +145,24 @@ export default function App() {
             <AppShell><StudentProfile /></AppShell>
           </RequireRole>
         } />
+        <Route path="/student/review/:sessionId" element={
+          <RequireRole role="STUDENT">
+            <AppShell showNav={false}><ReviewSession /></AppShell>
+          </RequireRole>
+        } />
+        <Route path="/payment/verify" element={
+          <RequireAuth><AppShell showNav={false}><PaymentVerify /></AppShell></RequireAuth>
+        } />
 
         {/* ── Tutor ── */}
         <Route path="/tutor/dashboard" element={
           <RequireRole role="TUTOR">
             <AppShell><TutorDashboard /></AppShell>
+          </RequireRole>
+        } />
+        <Route path="/tutor/sessions" element={
+          <RequireRole role="TUTOR">
+            <AppShell><TutorSessions /></AppShell>
           </RequireRole>
         } />
         <Route path="/tutor/students" element={
@@ -165,10 +192,19 @@ export default function App() {
         } />
 
         {/* ── Shared ── */}
-        <Route path="/messages"     element={<RequireAuth><AppShell><Messages /></AppShell></RequireAuth>} />
+        <Route path="/messages"      element={<RequireAuth><AppShell><MessagesInbox /></AppShell></RequireAuth>} />
+        <Route path="/messages/:id"  element={<RequireAuth><AppShell showNav={false}><Messages /></AppShell></RequireAuth>} />
         <Route path="/notifications" element={<RequireAuth><AppShell showNav={false}><Notifications /></AppShell></RequireAuth>} />
-        <Route path="/settings"     element={<RequireAuth><AppShell showNav={false}><Settings /></AppShell></RequireAuth>} />
-        <Route path="/help"         element={<RequireAuth><AppShell showNav={false}><HelpSupport /></AppShell></RequireAuth>} />
+        <Route path="/settings"      element={<RequireAuth><AppShell showNav={false}><Settings /></AppShell></RequireAuth>} />
+        <Route path="/help"          element={<RequireAuth><AppShell showNav={false}><HelpSupport /></AppShell></RequireAuth>} />
+
+        {/* ── Settings sub-pages ── */}
+        <Route path="/settings/profile"       element={<RequireAuth><AppShell showNav={false}><PersonalInfo /></AppShell></RequireAuth>} />
+        <Route path="/settings/security"      element={<RequireAuth><AppShell showNav={false}><Security /></AppShell></RequireAuth>} />
+        <Route path="/settings/notifications" element={<RequireAuth><AppShell showNav={false}><NotificationPrefs /></AppShell></RequireAuth>} />
+        <Route path="/settings/preferences"   element={<RequireAuth><AppShell showNav={false}><Preferences /></AppShell></RequireAuth>} />
+        <Route path="/settings/payment"       element={<RequireAuth><AppShell showNav={false}><PaymentMethods /></AppShell></RequireAuth>} />
+        <Route path="/settings/bank"          element={<RequireAuth><AppShell showNav={false}><BankAccount /></AppShell></RequireAuth>} />
 
         {/* ── Fallback ── */}
         <Route path="*" element={<Navigate to="/" replace />} />

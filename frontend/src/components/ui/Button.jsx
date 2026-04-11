@@ -9,10 +9,10 @@ const variants = {
     disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none
   `,
   ghost: `
-    bg-transparent text-secondary rounded-full font-outfit font-medium text-sm
+    bg-gray-50 text-secondary rounded-full font-outfit font-medium text-sm
     border border-secondary/20 cursor-pointer inline-flex items-center gap-1.5
     transition-all duration-200
-    hover:border-primary hover:text-primary active:scale-[0.98]
+    hover:border-primary hover:text-primary hover:bg-primary-light active:scale-[0.98]
     disabled:opacity-50 disabled:cursor-not-allowed
   `,
   danger: `
