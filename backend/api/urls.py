@@ -14,10 +14,12 @@ from .views import (
     ActionTokenView,
     AuthMeView,
     ChangePasswordView,
+    AdminViewSet,
 )
 
 router = DefaultRouter()
 # Register more specific paths FIRST to avoid shadowing
+router.register(r'admin', AdminViewSet, basename='admin')
 router.register(r'users/tutors', TutorViewSet, basename='tutor')
 router.register(r'users', UserViewSet, basename='user')
 

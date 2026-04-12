@@ -419,3 +419,90 @@ class ReviewViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError("You can only review sessions you booked.")
 
         serializer.save(student=self.request.user)
+
+
+# ─── Admin Views ──────────────────────────────────────────────────────────────
+
+class AdminViewSet(viewsets.ViewSet):
+    """
+    Administrative actions for managing tutors and users.
+    Accessible only by staff/admins.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def _check_admin(self, request):
+        if request.user.role != User.Role.ADMIN and not request.user.is_staff:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Administrative access required.")
+
+    def _get_tutor(self, pk):
+        # Support lookup by ID or Email
+        if '@' in str(pk):
+            return TutorProfile.objects.get(user__email=pk)
+        return TutorProfile.objects.get(pk=pk)
+
+    @action(detail=False, methods=['get'])
+    def tutors(self, request):
+        """GET /api/admin/tutors/"""
+        self._check_admin(request)
+        status_filter = request.query_params.get('status')
+        qs = TutorProfile.objects.all().select_related('user')
+        if status_filter:
+            qs = qs.filter(verification_status=status_filter)
+        
+        serializer = TutorProfileSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def users(self, request):
+        """GET /api/admin/users/"""
+        self._check_admin(request)
+        qs = User.objects.all()
+        serializer = UserSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/approve/"""
+        self._check_admin(request)
+        try:
+            tutor = self._get_tutor(pk)
+            tutor.verification_status = TutorProfile.VerificationStatus.APPROVED
+            tutor.is_approved = True
+            tutor.save()
+            return Response({"status": "success", "message": f"Tutor {tutor.user.email} approved."})
+        except TutorProfile.DoesNotExist:
+            return Response({"detail": "Tutor not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/reject/"""
+        self._check_admin(request)
+        reason = request.data.get('reason', 'No reason provided.')
+        try:
+            tutor = self._get_tutor(pk)
+            tutor.verification_status = TutorProfile.VerificationStatus.REJECTED
+            tutor.is_approved = False
+            tutor.save()
+            # In a real app, send email with 'reason'
+            return Response({"status": "success", "message": f"Tutor {tutor.user.email} rejected. Reason: {reason}"})
+        except TutorProfile.DoesNotExist:
+            return Response({"detail": "Tutor not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'])
+    def disable(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/disable/"""
+        self._check_admin(request)
+        tutor = self._get_tutor(pk)
+        tutor.is_available = False
+        tutor.save()
+        return Response({"status": "disabled"})
+
+    @action(detail=True, methods=['post'])
+    def enable(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/enable/"""
+        self._check_admin(request)
+        tutor = self._get_tutor(pk)
+        tutor.is_available = True
+        tutor.save()
+        return Response({"status": "enabled"})
