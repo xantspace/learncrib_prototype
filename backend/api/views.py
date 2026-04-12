@@ -4,7 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.views import APIView
 
+from .security import generate_action_token, require_action_token
 from users.models import User, TutorProfile, ParentProfile, Student
 from sessions_app.models import Session, SessionLog
 from payments.models import Payment, Payout, Dispute
@@ -15,7 +17,7 @@ from .serializers import (
     TutorProfileSerializer, ParentProfileSerializer, StudentSerializer,
     SessionSerializer, SessionCreateSerializer, SessionStatusUpdateSerializer,
     PaymentSerializer, PayoutSerializer, DisputeSerializer,
-    ReviewSerializer,
+    ReviewSerializer, ChangePasswordSerializer
 )
 
 
@@ -42,6 +44,42 @@ class RegisterView(generics.CreateAPIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+class ActionTokenView(APIView):
+    """GET /api/auth/action-token/?action_name=initiate_payment"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        action_name = request.query_params.get('action_name')
+        if not action_name:
+            return Response({'error': 'action_name query parameter is required'}, status=400)
+        
+        # In a real system, you might validate that action_name is recognized
+        token = generate_action_token(request.user, action_name)
+        return Response({'action_token': token})
+
+
+class AuthMeView(APIView):
+    """GET /api/auth/me/"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+
+class ChangePasswordView(APIView):
+    """POST /api/auth/change-password/"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        if not user.check_password(serializer.validated_data.get("old_password")):
+            return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(serializer.validated_data.get("new_password"))
+        user.save()
+        return Response({"status": "success", "message": "Password updated successfully"})
 
 # ─── User Views ────────────────────────────────────────────────────────────────
 
@@ -55,6 +93,26 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.request.user.role == User.Role.ADMIN:
             return User.objects.all()
         return User.objects.filter(pk=self.request.user.pk)
+
+    @action(detail=False, methods=['patch'])
+    def me(self, request):
+        """PATCH /api/users/me/"""
+        serializer = self.get_serializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='payment-methods')
+    def payment_methods(self, request):
+        """GET /api/users/payment-methods/"""
+        # Placeholder for payment methods list
+        return Response([])
+
+    @action(detail=False, methods=['get'], url_path='bank-account')
+    def bank_account(self, request):
+        """GET /api/users/bank-account/"""
+        # Placeholder for bank account object
+        return Response(None)
 
 
 class TutorViewSet(viewsets.ReadOnlyModelViewSet):
@@ -159,6 +217,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         return Response(SessionSerializer(session).data)
 
     @action(detail=True, methods=['post'])
+    @require_action_token('cancel_session')
     def cancel(self, request, pk=None):
         """POST /api/sessions/{id}/cancel/"""
         session = self.get_object()
@@ -213,6 +272,7 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
         return Payment.objects.filter(parent__user=user)
 
     @action(detail=False, methods=['post'])
+    @require_action_token('initiate_payment')
     def initiate(self, request):
         """POST /api/payments/initiate/"""
         # Skeleton for Paystack initiation
@@ -235,6 +295,16 @@ class PayoutViewSet(viewsets.ReadOnlyModelViewSet):
         if user.role == User.Role.ADMIN:
             return Payout.objects.all()
         return Payout.objects.filter(tutor__user=user)
+
+    @action(detail=False, methods=['get'])
+    def earnings(self, request):
+        """GET /api/payouts/earnings/"""
+        # Placeholder for tutor earnings summary
+        return Response({
+            "total_earnings": 0,
+            "pending_payouts": 0,
+            "available_balance": 0
+        })
 
 
 # ─── Review Views ──────────────────────────────────────────────────────────────

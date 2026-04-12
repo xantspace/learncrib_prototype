@@ -9,10 +9,19 @@ const api = axios.create({
   timeout: 15000,
 })
 
-// Attach JWT on every request
+// Attach JWT on every request and add Bot fingerprint
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken
   if (token) config.headers.Authorization = `Bearer ${token}`
+
+  // Layer 1: Anti-Bot Signature Generation
+  const width = window.innerWidth || 1024
+  const height = window.innerHeight || 768
+  const lang = window.navigator.language || 'en-US'
+  const rawFingerprint = `${width}x${height}-lc2026-${lang}`
+  
+  config.headers['X-Client-Fingerprint'] = btoa(rawFingerprint)
+
   return config
 })
 
