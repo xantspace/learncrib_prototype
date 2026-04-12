@@ -4,7 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.views import APIView
 
+from .security import generate_action_token, require_action_token
 from users.models import User, TutorProfile, ParentProfile, Student
 from sessions_app.models import Session, SessionLog
 from payments.models import Payment, Payout, Dispute
@@ -15,7 +17,7 @@ from .serializers import (
     TutorProfileSerializer, ParentProfileSerializer, StudentSerializer,
     SessionSerializer, SessionCreateSerializer, SessionStatusUpdateSerializer,
     PaymentSerializer, PayoutSerializer, DisputeSerializer,
-    ReviewSerializer,
+    ReviewSerializer, ChangePasswordSerializer
 )
 from .utils import deobfuscate_id
 
@@ -43,6 +45,42 @@ class RegisterView(generics.CreateAPIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+class ActionTokenView(APIView):
+    """GET /api/auth/action-token/?action_name=initiate_payment"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        action_name = request.query_params.get('action_name')
+        if not action_name:
+            return Response({'error': 'action_name query parameter is required'}, status=400)
+        
+        # In a real system, you might validate that action_name is recognized
+        token = generate_action_token(request.user, action_name)
+        return Response({'action_token': token})
+
+
+class AuthMeView(APIView):
+    """GET /api/auth/me/"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+
+class ChangePasswordView(APIView):
+    """POST /api/auth/change-password/"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        if not user.check_password(serializer.validated_data.get("old_password")):
+            return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(serializer.validated_data.get("new_password"))
+        user.save()
+        return Response({"status": "success", "message": "Password updated successfully"})
 
 class AuthMeView(generics.RetrieveUpdateAPIView):
     """GET /api/auth/me/ and PATCH /api/users/me/ equivalent"""
@@ -97,12 +135,14 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='payment-methods')
     def payment_methods(self, request):
         """GET /api/users/payment-methods/"""
+        # Placeholder for payment methods list
         return Response([])
 
     @action(detail=False, methods=['get'], url_path='bank-account')
     def bank_account(self, request):
         """GET /api/users/bank-account/"""
-        return Response({})
+        # Placeholder for bank account object
+        return Response(None)
 
 
 class TutorViewSet(viewsets.ReadOnlyModelViewSet):
@@ -217,6 +257,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         return Response(SessionSerializer(session).data)
 
     @action(detail=True, methods=['post'])
+    @require_action_token('cancel_session')
     def cancel(self, request, pk=None):
         """POST /api/sessions/{id}/cancel/"""
         session = self.get_object()
@@ -271,6 +312,7 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
         return Payment.objects.filter(parent__user=user)
 
     @action(detail=False, methods=['post'])
+    @require_action_token('initiate_payment')
     def initiate(self, request):
         """POST /api/payments/initiate/"""
         session_id = request.data.get('session_id')
@@ -377,3 +419,90 @@ class ReviewViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError("You can only review sessions you booked.")
 
         serializer.save(student=self.request.user)
+
+
+# ─── Admin Views ──────────────────────────────────────────────────────────────
+
+class AdminViewSet(viewsets.ViewSet):
+    """
+    Administrative actions for managing tutors and users.
+    Accessible only by staff/admins.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def _check_admin(self, request):
+        if request.user.role != User.Role.ADMIN and not request.user.is_staff:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Administrative access required.")
+
+    def _get_tutor(self, pk):
+        # Support lookup by ID or Email
+        if '@' in str(pk):
+            return TutorProfile.objects.get(user__email=pk)
+        return TutorProfile.objects.get(pk=pk)
+
+    @action(detail=False, methods=['get'])
+    def tutors(self, request):
+        """GET /api/admin/tutors/"""
+        self._check_admin(request)
+        status_filter = request.query_params.get('status')
+        qs = TutorProfile.objects.all().select_related('user')
+        if status_filter:
+            qs = qs.filter(verification_status=status_filter)
+        
+        serializer = TutorProfileSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def users(self, request):
+        """GET /api/admin/users/"""
+        self._check_admin(request)
+        qs = User.objects.all()
+        serializer = UserSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/approve/"""
+        self._check_admin(request)
+        try:
+            tutor = self._get_tutor(pk)
+            tutor.verification_status = TutorProfile.VerificationStatus.APPROVED
+            tutor.is_approved = True
+            tutor.save()
+            return Response({"status": "success", "message": f"Tutor {tutor.user.email} approved."})
+        except TutorProfile.DoesNotExist:
+            return Response({"detail": "Tutor not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/reject/"""
+        self._check_admin(request)
+        reason = request.data.get('reason', 'No reason provided.')
+        try:
+            tutor = self._get_tutor(pk)
+            tutor.verification_status = TutorProfile.VerificationStatus.REJECTED
+            tutor.is_approved = False
+            tutor.save()
+            # In a real app, send email with 'reason'
+            return Response({"status": "success", "message": f"Tutor {tutor.user.email} rejected. Reason: {reason}"})
+        except TutorProfile.DoesNotExist:
+            return Response({"detail": "Tutor not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'])
+    def disable(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/disable/"""
+        self._check_admin(request)
+        tutor = self._get_tutor(pk)
+        tutor.is_available = False
+        tutor.save()
+        return Response({"status": "disabled"})
+
+    @action(detail=True, methods=['post'])
+    def enable(self, request, pk=None):
+        """POST /api/admin/tutors/{id_or_email}/enable/"""
+        self._check_admin(request)
+        tutor = self._get_tutor(pk)
+        tutor.is_available = True
+        tutor.save()
+        return Response({"status": "enabled"})

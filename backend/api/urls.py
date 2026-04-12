@@ -11,12 +11,15 @@ from .views import (
     PayoutViewSet,
     ReviewViewSet,
     CustomTokenObtainPairView,
+    ActionTokenView,
     AuthMeView,
     ChangePasswordView,
+    AdminViewSet,
 )
 
 router = DefaultRouter()
 # Register more specific paths FIRST to avoid shadowing
+router.register(r'admin', AdminViewSet, basename='admin')
 router.register(r'users/tutors', TutorViewSet, basename='tutor')
 router.register(r'users', UserViewSet, basename='user')
 
@@ -30,6 +33,7 @@ urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/action-token/', ActionTokenView.as_view(), name='action_token'),
     path('auth/me/', AuthMeView.as_view(), name='auth_me'),
     path('auth/change-password/', ChangePasswordView.as_view(), name='change_password'),
 

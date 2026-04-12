@@ -9,7 +9,7 @@ const api = axios.create({
   timeout: 15000,
 })
 
-// Simple browser fingerprint utility
+// Simple browser fingerprint utility for identity verification
 const getDeviceId = () => {
   let id = localStorage.getItem('lc_dev_id')
   if (!id) {
@@ -19,14 +19,21 @@ const getDeviceId = () => {
   return id
 }
 
-// Attach JWT and Fingerprint on every request
+// Attach JWT and Security Fingerprints on every request
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken
   if (token) config.headers.Authorization = `Bearer ${token}`
-  
-  // Security fingerprint (X-Device-Id)
+
+  // Layer 1: Anti-Bot Signature Generation (Screen metrics)
+  const width = window.innerWidth || 1024
+  const height = window.innerHeight || 768
+  const lang = window.navigator.language || 'en-US'
+  const rawFingerprint = `${width}x${height}-lc2026-${lang}`
+  config.headers['X-Client-Fingerprint'] = btoa(rawFingerprint)
+
+  // Layer 2: Identity Fingerprint (LocalStorage ID)
   config.headers['X-Device-Id'] = getDeviceId()
-  
+
   return config
 })
 

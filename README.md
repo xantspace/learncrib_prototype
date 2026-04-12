@@ -55,9 +55,46 @@ learncrib/
 
 ---
 
-## ⚖️ Core Business Decisions
+## 🚀 Getting Started (Docker)
 
-Based on the [Backend logic Specification](file:///c:/dev/learncrib/docs/backend_flow.md), the following rules apply:
+The fastest way to get the project running is using **Docker**. This sets up the database, backend, and frontend automatically.
+
+1.  **Clone & Pull** the latest changes.
+2.  **Start Docker**: Ensure Docker Desktop is running.
+3.  **Run the Stack**:
+    ```bash
+    docker compose up --build
+    ```
+4.  **Access the App**:
+    - **Frontend**: `http://localhost:5173`
+    - **API Docs**: `http://localhost:8000/api/schema/swagger-ui/`
+
+### 🔑 Test Credentials (via `seed_db`)
+- **Admin**: `admin@learncrib.com` / `adminpass123`
+- **Tutor**: `tutor1@example.com` / `password123`
+- **Parent**: `parent1@example.com` / `password123`
+
+---
+
+## 🛠️ Manual Setup (Optional)
+
+If you prefer to run things manually:
+
+**Backend:**
+1. `cd backend`
+2. `pip install -r requirements.txt`
+3. `python manage.py migrate`
+4. `python manage.py seed_db`
+5. `python manage.py runserver`
+
+**Frontend:**
+1. `cd frontend`
+2. `npm install`
+3. `npm run dev`
+
+---
+
+## ⚖️ Core Business Decisions
 
 - **Commission:** 15% platform fee on all sessions.
 - **Payouts:** Weekly tutor payouts processed every **Friday at 10:00 AM**.
