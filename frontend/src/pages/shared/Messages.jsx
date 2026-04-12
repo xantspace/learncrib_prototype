@@ -1,22 +1,49 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Phone, Video, ArrowLeft } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 
-// Placeholder UI — WebSocket/real messages to be connected in Phase 2
-const MOCK_MESSAGES = [
-  { id: 1, from: 'tutor', text: 'Hello! I\'m looking forward to our session tomorrow.', time: '10:02 AM' },
-  { id: 2, from: 'me',    text: 'Hi! Me too. Can we go through differentiation?', time: '10:05 AM' },
-  { id: 3, from: 'tutor', text: 'Absolutely! I\'ll prepare some practice problems for you.', time: '10:06 AM' },
-  { id: 4, from: 'me',    text: 'Perfect, thank you!', time: '10:07 AM' },
-]
+// Placeholder conversation data — Phase 2: real WebSocket + API
+const CONVERSATIONS = {
+  '1': { name: 'Kolade Okonkwo', initials: 'KO', subject: 'Mathematics', online: true },
+  '2': { name: 'Amaka Eze',      initials: 'AE', subject: 'Chemistry',   online: false },
+  '3': { name: 'Babatunde Osei', initials: 'BO', subject: 'Physics',     online: false },
+}
+
+const SEED_MESSAGES = {
+  '1': [
+    { id: 1, from: 'tutor', text: 'Hello! I\'m looking forward to our session tomorrow.', time: '10:02 AM' },
+    { id: 2, from: 'me',    text: 'Hi! Me too. Can we go through differentiation?', time: '10:05 AM' },
+    { id: 3, from: 'tutor', text: 'Absolutely! I\'ll prepare some practice problems for you.', time: '10:06 AM' },
+    { id: 4, from: 'me',    text: 'Perfect, thank you!', time: '10:07 AM' },
+  ],
+  '2': [
+    { id: 1, from: 'tutor', text: 'Hi! Ready for our chemistry session?', time: '3:00 PM' },
+    { id: 2, from: 'me',    text: 'Yes! Can we cover organic reactions?', time: '3:02 PM' },
+    { id: 3, from: 'tutor', text: 'See you Thursday at 4 PM!', time: '3:05 PM' },
+  ],
+  '3': [
+    { id: 1, from: 'tutor', text: 'Great session today, keep it up!', time: '2:45 PM' },
+  ],
+}
 
 export default function Messages() {
-  const navigate  = useNavigate()
-  const { user }  = useAuthStore()
-  const [input,   setInput]    = useState('')
-  const [messages, setMessages] = useState(MOCK_MESSAGES)
-  const bottomRef = useRef(null)
+  const navigate   = useNavigate()
+  const { id }     = useParams()
+  const { user }   = useAuthStore()
+
+  const conv       = CONVERSATIONS[id] || CONVERSATIONS['1']
+  const seedMsgs   = SEED_MESSAGES[id]  || SEED_MESSAGES['1']
+
+  const [input,    setInput]    = useState('')
+  const [messages, setMessages] = useState(seedMsgs)
+  const bottomRef  = useRef(null)
+
+  // Reset when conversation changes
+  useEffect(() => {
+    setMessages(SEED_MESSAGES[id] || SEED_MESSAGES['1'])
+    setInput('')
+  }, [id])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -34,19 +61,21 @@ export default function Messages() {
   }
 
   return (
-    <div className="flex flex-col h-svh">
+    <div className="flex flex-col" style={{ height: '100svh' }}>
       {/* Header */}
       <div className="px-5 pt-12 pb-4 flex items-center gap-4 border-b border-secondary/10">
-        <button onClick={() => navigate(-1)}
+        <button onClick={() => navigate('/messages')}
           className="w-9 h-9 rounded-2xl bg-white/80 border border-secondary/10 flex items-center justify-center">
           <ArrowLeft size={16} className="text-secondary/60" />
         </button>
         <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center font-outfit font-bold text-white text-sm">
-          KO
+          {conv.initials}
         </div>
         <div className="flex-1">
-          <p className="font-outfit font-semibold text-sm text-secondary">Kolade Okonkwo</p>
-          <p className="font-inter text-xs text-success">Online</p>
+          <p className="font-outfit font-semibold text-sm text-secondary">{conv.name}</p>
+          <p className={`font-inter text-xs ${conv.online ? 'text-success' : 'text-secondary/40'}`}>
+            {conv.online ? 'Online' : conv.subject}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button className="w-9 h-9 rounded-2xl bg-gray-100 flex items-center justify-center">
@@ -78,7 +107,7 @@ export default function Messages() {
       </div>
 
       {/* Input */}
-      <div className="px-4 pb-8 pt-3 border-t border-secondary/10 flex items-center gap-3">
+      <div className="px-4 pb-24 pt-3 border-t border-secondary/10 flex items-center gap-3">
         <input
           type="text"
           placeholder="Type a message…"

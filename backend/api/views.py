@@ -19,6 +19,7 @@ from .serializers import (
     PaymentSerializer, PayoutSerializer, DisputeSerializer,
     ReviewSerializer, ChangePasswordSerializer
 )
+from .utils import deobfuscate_id
 
 
 # ─── Auth Views ────────────────────────────────────────────────────────────────
@@ -81,6 +82,35 @@ class ChangePasswordView(APIView):
         user.save()
         return Response({"status": "success", "message": "Password updated successfully"})
 
+class AuthMeView(generics.RetrieveUpdateAPIView):
+    """GET /api/auth/me/ and PATCH /api/users/me/ equivalent"""
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+class ChangePasswordView(generics.GenericAPIView):
+    """POST /api/auth/change-password/"""
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
+        
+        if not old_password or not new_password:
+            return Response({"detail": "old_password and new_password are required."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if not user.check_password(old_password):
+            return Response({"detail": "Incorrect old password."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.set_password(new_password)
+        user.save()
+        return Response({"detail": "Password updated successfully."})
+
+
+
 # ─── User Views ────────────────────────────────────────────────────────────────
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -120,6 +150,11 @@ class TutorViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TutorProfileSerializer
     permission_classes = [AllowAny]
 
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        resolved_id = deobfuscate_id(pk) or pk
+        return TutorProfile.objects.get(pk=resolved_id)
+
     def get_queryset(self):
         qs = TutorProfile.objects.filter(
             verification_status=TutorProfile.VerificationStatus.APPROVED,
@@ -157,6 +192,11 @@ class SessionViewSet(viewsets.ModelViewSet):
     """
     queryset = Session.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        resolved_id = deobfuscate_id(pk) or pk
+        return Session.objects.get(pk=resolved_id)
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -275,13 +315,45 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     @require_action_token('initiate_payment')
     def initiate(self, request):
         """POST /api/payments/initiate/"""
-        # Skeleton for Paystack initiation
-        return Response({"checkout_url": "#", "reference": "placeholder_ref"})
+        session_id = request.data.get('session_id')
+        amount = request.data.get('amount', 5000) # Default mock fallback
+        
+        if not session_id:
+            return Response({"detail": "session_id required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            from sessions_app.models import Session
+            booking = Session.objects.get(id=session_id)
+        except Exception:
+            return Response({"detail": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
+            
+        import uuid
+        reference = f"PS_{uuid.uuid4().hex[:10]}"
+        
+        Payment.objects.create(
+            session=booking,
+            parent=request.user,
+            amount=amount,
+            provider='paystack',
+            provider_reference=reference,
+            status=Payment.Status.PENDING
+        )
+        
+        return Response({
+            "checkout_url": f"https://checkout.paystack.com/{reference}", 
+            "reference": reference
+        })
 
-    @action(detail=True, methods=['get'])
-    def verify(self, request, pk=None):
-        """GET /api/payments/verify/{ref}/"""
-        return Response({"status": "success", "message": "Payment verified (Simulation)"})
+    @action(detail=False, methods=['get'], url_path='verify/(?P<ref>[^/.]+)')
+    def verify(self, request, ref=None):
+        """GET /api/payments/verify/:ref/"""
+        try:
+            payment = Payment.objects.get(provider_reference=ref)
+            payment.status = Payment.Status.SUCCESSFUL
+            payment.save()
+            return Response({"status": "success", "message": f"Payment verified (ref: {ref})", "payment_id": payment.id})
+        except Payment.DoesNotExist:
+            return Response({"status": "failed", "detail": "Invalid payment reference"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PayoutViewSet(viewsets.ReadOnlyModelViewSet):
@@ -299,11 +371,25 @@ class PayoutViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def earnings(self, request):
         """GET /api/payouts/earnings/"""
-        # Placeholder for tutor earnings summary
+        user = request.user
+        if user.role != User.Role.TUTOR:
+            return Response({"detail": "Only tutors can view earnings."}, status=status.HTTP_403_FORBIDDEN)
+            
+        from django.db.models import Sum
+        tutor_profile = user.tutor_profile
+        
+        total_e = Payout.objects.filter(
+            tutor=tutor_profile, status=Payout.Status.PROCESSED
+        ).aggregate(Sum('amount'))['amount__sum'] or 0.00
+        
+        pending_p = Payout.objects.filter(
+            tutor=tutor_profile, status=Payout.Status.SCHEDULED
+        ).aggregate(Sum('amount'))['amount__sum'] or 0.00
+        
         return Response({
-            "total_earnings": 0,
-            "pending_payouts": 0,
-            "available_balance": 0
+            "total_earnings": str(total_e),
+            "pending_payouts": str(pending_p),
+            "available_balance": str(pending_p)
         })
 
 

@@ -5,12 +5,16 @@ import GlassCard from '@/components/ui/GlassCard'
 import PageHeader from '@/components/shared/PageHeader'
 import { TutorCardSkeleton } from '@/components/ui/Skeleton'
 import { usersAPI } from '@/services/api'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import { rankTutors, scoreLabel } from '@/utils/tutorRanking'
+import { useVerificationStore } from '@/store/verificationStore'
 
 export default function SearchResults() {
   const navigate = useNavigate()
+  const vStore   = useVerificationStore()
   const [params] = useSearchParams()
   const [query,    setQuery]    = useState(params.get('q') || '')
-  const [tutors,   setTutors]   = useState([])
+  const [rawTutors, setRawTutors] = useState([])
   const [loading,  setLoading]  = useState(false)
   const [showFilter, setShowFilter] = useState(false)
   const [maxDist,  setMaxDist]  = useState(10)
@@ -20,15 +24,18 @@ export default function SearchResults() {
     setLoading(true)
     try {
       const res = await usersAPI.getTutors({ q: query, max_distance: maxDist, max_rate: maxRate })
-      setTutors(Array.isArray(res.data) ? res.data : res.data?.results || [])
+      setRawTutors(Array.isArray(res.data) ? res.data : res.data?.results || [])
     } catch {
-      setTutors([])
+      setRawTutors([])
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => { search() }, [])
+
+  // Apply ranking (verifiedOnly false — backend filter handles it server-side)
+  const tutors = rankTutors(rawTutors, { verifiedOnly: false, verificationStore: vStore })
 
   const name = (t) => `${t.first_name} ${t.last_name}`
   const initials = (t) => `${t.first_name?.[0]}${t.last_name?.[0]}`.toUpperCase()
@@ -94,7 +101,7 @@ export default function SearchResults() {
                   <GlassCard
                     key={tutor.id}
                     className="p-4 flex items-center gap-4"
-                    onClick={() => navigate(`/student/tutor/${tutor.id}`)}
+                    onClick={() => navigate(`/student/tutor/${tutor.slug || tutor.id}`)}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg flex-shrink-0"
                       style={{ background: 'linear-gradient(135deg, #1939D4, #0F2391)' }}>
@@ -106,7 +113,10 @@ export default function SearchResults() {
                         <span className="font-outfit font-bold text-sm text-primary ml-2">₦{Number(tutor.hourly_rate).toLocaleString()}/hr</span>
                       </div>
                       <p className="font-inter text-xs text-secondary/50 mt-0.5">{(tutor.subjects || []).join(' · ')}</p>
-                      <div className="flex items-center gap-3 mt-2">
+                      <div className="flex items-center gap-3 mt-2 flex-wrap">
+                        {tutor.verification_status === 'APPROVED' && (
+                          <VerifiedBadge size="sm" />
+                        )}
                         {tutor.rating > 0 && (
                           <div className="flex items-center gap-1">
                             <Star size={12} className="text-accent fill-current" />

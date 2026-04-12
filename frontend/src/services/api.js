@@ -9,18 +9,30 @@ const api = axios.create({
   timeout: 15000,
 })
 
-// Attach JWT on every request and add Bot fingerprint
+// Simple browser fingerprint utility for identity verification
+const getDeviceId = () => {
+  let id = localStorage.getItem('lc_dev_id')
+  if (!id) {
+    id = 'lc_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    localStorage.setItem('lc_dev_id', id)
+  }
+  return id
+}
+
+// Attach JWT and Security Fingerprints on every request
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken
   if (token) config.headers.Authorization = `Bearer ${token}`
 
-  // Layer 1: Anti-Bot Signature Generation
+  // Layer 1: Anti-Bot Signature Generation (Screen metrics)
   const width = window.innerWidth || 1024
   const height = window.innerHeight || 768
   const lang = window.navigator.language || 'en-US'
   const rawFingerprint = `${width}x${height}-lc2026-${lang}`
-  
   config.headers['X-Client-Fingerprint'] = btoa(rawFingerprint)
+
+  // Layer 2: Identity Fingerprint (LocalStorage ID)
+  config.headers['X-Device-Id'] = getDeviceId()
 
   return config
 })
@@ -41,18 +53,24 @@ export default api
 
 /* ── Auth ──────────────────────────────────── */
 export const authAPI = {
-  register: (data)       => api.post('/api/auth/register/', data),
-  login:    (data)       => api.post('/api/auth/login/', data),
-  refresh:  (refresh)    => api.post('/api/auth/token/refresh/', { refresh }),
-  me:       ()           => api.get('/api/auth/me/'),
+  register:       (data)     => api.post('/api/auth/register/', data),
+  login:          (data)     => api.post('/api/auth/login/', data),
+  refresh:        (refresh)  => api.post('/api/auth/token/refresh/', { refresh }),
+  me:             ()         => api.get('/api/auth/me/'),
+  changePassword: (data)     => api.post('/api/auth/change-password/', data),
 }
 
 /* ── Users / Profiles ──────────────────────── */
 export const usersAPI = {
-  updateProfile:  (data) => api.patch('/api/users/me/', data),
-  getTutors:      (params) => api.get('/api/users/tutors/', { params }),
-  getTutorById:   (id)   => api.get(`/api/users/tutors/${id}/`),
-  getNearbyTutors:(params) => api.get('/api/users/tutors/nearby/', { params }),
+  updateProfile:     (data)   => api.patch('/api/users/me/', data),
+  getTutors:         (params) => api.get('/api/users/tutors/', { params }),
+  getTutorById:      (id)     => api.get(`/api/users/tutors/${id}/`),
+  getNearbyTutors:   (params) => api.get('/api/users/tutors/nearby/', { params }),
+  getPaymentMethods: ()       => api.get('/api/users/payment-methods/'),
+  savePaymentMethod: (data)   => api.post('/api/users/payment-methods/', data),
+  removePaymentMethod:(id)    => api.delete(`/api/users/payment-methods/${id}/`),
+  getBankAccount:    ()       => api.get('/api/users/bank-account/'),
+  saveBankAccount:   (data)   => api.post('/api/users/bank-account/', data),
 }
 
 /* ── Sessions ──────────────────────────────── */
@@ -79,4 +97,22 @@ export const paymentsAPI = {
 export const payoutsAPI = {
   list:           ()     => api.get('/api/payouts/'),
   getEarnings:    ()     => api.get('/api/payouts/earnings/'),
+}
+
+/* ── Reviews ───────────────────────────────── */
+export const reviewsAPI = {
+  submit: (sessionId, data) => api.post('/api/reviews/', { session: sessionId, ...data }),
+  list:   (tutorId)         => api.get('/api/reviews/', { params: { tutor: tutorId } }),
+}
+
+/* ── Admin ─────────────────────────────────── */
+export const adminAPI = {
+  getTutors:    ()              => api.get('/api/admin/tutors/'),
+  getUsers:     ()              => api.get('/api/admin/users/'),
+  approve:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/approve/`),
+  reject:       (tutorId, data) => api.post(`/api/admin/tutors/${tutorId}/reject/`, data),
+  disable:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/disable/`),
+  enable:       (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/enable/`),
+  suspendUser:  (userId)        => api.post(`/api/admin/users/${userId}/suspend/`),
+  activateUser: (userId)        => api.post(`/api/admin/users/${userId}/activate/`),
 }

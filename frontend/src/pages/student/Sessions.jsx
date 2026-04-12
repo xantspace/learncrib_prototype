@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, Clock, CheckCircle, XCircle, AlertTriangle, ChevronRight } from 'lucide-react'
+import { Calendar, Clock, CheckCircle, XCircle, X, AlertTriangle, ShieldCheck, Lock } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
-import Badge from '@/components/ui/Badge'
 import PageHeader from '@/components/shared/PageHeader'
 import { sessionsAPI } from '@/services/api'
+import { useUIStore } from '@/store/uiStore'
+import { useEscrowStore, ESCROW_STATUS } from '@/store/escrowStore'
+
+// Returns hours remaining from now to a future date
+function hoursUntil(dateStr) {
+  if (!dateStr) return null
+  const diff = new Date(dateStr) - Date.now()
+  return diff > 0 ? Math.floor(diff / 36e5) : 0
+}
+
+// Returns hours since a past date
+function hoursSince(dateStr) {
+  if (!dateStr) return null
+  const diff = Date.now() - new Date(dateStr)
+  return diff > 0 ? Math.floor(diff / 36e5) : 0
+}
 
 const STATUS_META = {
   PENDING:    { label: 'Pending',          color: 'bg-yellow-100 text-yellow-700',  icon: Clock },
@@ -19,16 +34,31 @@ const TABS = ['Upcoming', 'Completed', 'All']
 
 export default function Sessions() {
   const navigate = useNavigate()
-  const [sessions, setSessions] = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [tab,      setTab]      = useState('Upcoming')
+  const { showToast } = useUIStore()
+  const [sessions,    setSessions]    = useState([])
+  const [loading,     setLoading]     = useState(true)
+  const [tab,         setTab]         = useState('Upcoming')
+  const [disputeId,   setDisputeId]   = useState(null)   // session id for dispute modal
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true)
     sessionsAPI.list()
       .then(r => setSessions(Array.isArray(r.data) ? r.data : r.data?.results || []))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { load() }, [])
+
+  const handleConfirm = async (sessionId) => {
+    try {
+      await sessionsAPI.confirm(sessionId)
+      showToast('Session confirmed!', 'success')
+      navigate(`/student/review/${sessionId}`)
+    } catch {
+      showToast('Could not confirm session', 'error')
+    }
+  }
 
   const filtered = sessions.filter(s => {
     if (tab === 'Upcoming')  return ['PENDING','ACCEPTED','SCHEDULED'].includes(s.status)
@@ -59,15 +89,37 @@ export default function Sessions() {
         {loading
           ? [1,2,3].map(i => <SkeletonCard key={i} />)
           : filtered.length > 0
-            ? filtered.map(s => <SessionItem key={s.id} session={s} navigate={navigate} />)
+            ? filtered.map(s => (
+                <SessionItem
+                  key={s.id}
+                  session={s}
+                  navigate={navigate}
+                  onConfirm={handleConfirm}
+                  onDispute={setDisputeId}
+                />
+              ))
             : <EmptyState tab={tab} />
         }
       </div>
+
+      {/* Dispute Modal */}
+      {disputeId && (
+        <DisputeModal
+          sessionId={disputeId}
+          onClose={() => setDisputeId(null)}
+          onSuccess={() => { setDisputeId(null); load() }}
+          showToast={showToast}
+        />
+      )}
     </div>
   )
 }
 
-function SessionItem({ session, navigate }) {
+function SessionItem({ session, navigate, onConfirm, onDispute }) {
+  const escrowStore = useEscrowStore()
+  const escrowRecord = escrowStore.getBySessionId(session.id)
+  const escrowSC     = escrowRecord ? ESCROW_STATUS[escrowRecord.status] : null
+
   const meta = STATUS_META[session.status] || STATUS_META.PENDING
   const Icon = meta.icon
   const tutorName = `${session.tutor_first_name || ''} ${session.tutor_last_name || ''}`.trim() || 'Tutor'
@@ -95,14 +147,21 @@ function SessionItem({ session, navigate }) {
       </div>
 
       {/* Status-specific actions */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap items-center">
         {session.status === 'PENDING' && (
           <StatusNote icon="⏳" text="Waiting for tutor to accept" />
         )}
         {session.status === 'ACCEPTED' && (
-          <ActionButton color="primary" onClick={() => navigate(`/student/payment/${session.id}`)}>
-            💳 Pay Now
-          </ActionButton>
+          <div className="flex items-center gap-2 flex-wrap w-full">
+            <ActionButton color="primary" onClick={() => navigate(`/student/payment/${session.id}`)}>
+              💳 Pay Now
+            </ActionButton>
+            {session.payment_deadline && (
+              <span className="font-inter text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded-lg">
+                ⏰ Pay within {hoursUntil(session.payment_deadline)}h
+              </span>
+            )}
+          </div>
         )}
         {session.status === 'SCHEDULED' && (
           <ActionButton color="success" onClick={() => {}}>
@@ -110,26 +169,41 @@ function SessionItem({ session, navigate }) {
           </ActionButton>
         )}
         {canConfirm && (
-          <ActionButton color="success" onClick={() => sessionsAPI.confirm(session.id)}>
-            ✅ Confirm Completion
-          </ActionButton>
+          <div className="flex flex-col gap-1 w-full">
+            <ActionButton color="success" onClick={() => onConfirm(session.id)}>
+              ✅ Confirm Completion
+            </ActionButton>
+            {session.completed_at && (
+              <p className="font-inter text-[0.65rem] text-secondary/40">
+                Auto-confirms in {Math.max(0, 48 - hoursSince(session.completed_at))}h if not confirmed
+              </p>
+            )}
+          </div>
         )}
         {canDispute && (
-          <ActionButton color="danger" onClick={() => {}}>
+          <ActionButton color="danger" onClick={() => onDispute(session.id)}>
             🚨 Report Issue
           </ActionButton>
         )}
         {canCancel && (
-          <CancelButton sessionId={session.id} />
+          <CancelButton sessionId={session.id} scheduledAt={session.scheduled_at} />
         )}
       </div>
 
-      {/* Escrow status for completed */}
-      {session.status === 'COMPLETED' && session.payout_status && (
-        <div className="mt-3 pt-3 border-t border-secondary/10">
-          <p className="font-inter text-xs text-secondary/50">
-            💰 Payout status: <span className="font-semibold text-secondary">{session.payout_status}</span>
-          </p>
+      {/* Escrow status strip */}
+      {escrowRecord && (
+        <div className="mt-3 pt-3 border-t border-secondary/10 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            {escrowRecord.status === 'ESCROW' || escrowRecord.status === 'IN_SESSION'
+              ? <Lock size={11} className="text-blue-500" />
+              : <ShieldCheck size={11} className="text-green-500" />}
+            <span className={`text-[0.7rem] font-semibold px-2 py-0.5 rounded-full ${escrowSC?.color}`}>
+              {escrowSC?.label}
+            </span>
+          </div>
+          <span className="font-inter text-[0.65rem] text-secondary/40">
+            {escrowSC?.desc}
+          </span>
         </div>
       )}
     </GlassCard>
@@ -152,31 +226,89 @@ function ActionButton({ children, color, onClick }) {
   )
 }
 
-function CancelButton({ sessionId }) {
+function CancelButton({ sessionId, scheduledAt }) {
+  const [showModal,  setShowModal]  = useState(false)
   const [cancelling, setCancelling] = useState(false)
-  const now = new Date()
+  const { showToast } = useUIStore()
+
+  // Hours until scheduled session
+  const hoursLeft = hoursUntil(scheduledAt)
+  const isLateCancellation = hoursLeft !== null && hoursLeft < 24
 
   const handleCancel = async () => {
-    if (!window.confirm('Are you sure you want to cancel this session?')) return
     setCancelling(true)
     try {
       await sessionsAPI.cancel(sessionId, 'Cancelled by student')
+      showToast('Session cancelled successfully', 'info')
       window.location.reload()
     } catch {
-      alert('Failed to cancel. Please try again.')
+      showToast('Failed to cancel. Please try again.', 'error')
     } finally {
       setCancelling(false)
+      setShowModal(false)
     }
   }
 
   return (
-    <button
-      onClick={handleCancel}
-      disabled={cancelling}
-      className="px-3 py-1.5 rounded-xl text-xs font-inter font-semibold bg-red-50 text-red-500 transition-opacity hover:opacity-80 disabled:opacity-50"
-    >
-      {cancelling ? '…' : '✗ Cancel'}
-    </button>
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="px-3 py-1.5 rounded-xl text-xs font-inter font-semibold bg-red-50 text-red-500 transition-opacity hover:opacity-80"
+      >
+        ✗ Cancel
+      </button>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm px-4 pb-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-outfit font-bold text-base text-secondary">Cancel Session?</h3>
+              <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center">
+                <X size={15} className="text-secondary/60" />
+              </button>
+            </div>
+
+            {/* Refund policy based on timing */}
+            <div className={`rounded-2xl p-4 mb-5 flex items-start gap-3 ${isLateCancellation ? 'bg-red-50' : 'bg-green-50'}`}>
+              <AlertTriangle size={18} className={`flex-shrink-0 mt-0.5 ${isLateCancellation ? 'text-red-500' : 'text-green-600'}`} />
+              <div>
+                {isLateCancellation ? (
+                  <>
+                    <p className="font-outfit font-bold text-sm text-red-600">Late Cancellation Penalty</p>
+                    <p className="font-inter text-xs text-red-500 mt-0.5 leading-relaxed">
+                      Your session is in less than 24 hours. You will receive a <strong>50% refund</strong> only. The tutor keeps the other 50%.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-outfit font-bold text-sm text-green-700">Full Refund</p>
+                    <p className="font-inter text-xs text-green-600 mt-0.5 leading-relaxed">
+                      More than 24 hours notice — you will receive a <strong>100% refund</strong> to your original payment method.
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 py-3 rounded-2xl bg-gray-100 text-secondary/70 font-inter font-semibold text-sm"
+              >
+                Keep Session
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="flex-1 py-3 rounded-2xl bg-red-500 text-white font-inter font-semibold text-sm disabled:opacity-50"
+              >
+                {cancelling ? 'Cancelling…' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
@@ -204,6 +336,86 @@ function SkeletonCard() {
       <div className="h-4 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 rounded animate-shimmer w-1/2" />
       <div className="h-3 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 rounded animate-shimmer w-1/3" />
       <div className="h-3 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 rounded animate-shimmer w-1/4" />
+    </div>
+  )
+}
+
+const DISPUTE_REASONS = [
+  'Tutor did not show up',
+  'Session ended early',
+  'Content was not as described',
+  'Technical issues (tutor side)',
+  'Unprofessional behaviour',
+  'Other',
+]
+
+function DisputeModal({ sessionId, onClose, onSuccess, showToast }) {
+  const [reason,      setReason]      = useState('')
+  const [description, setDescription] = useState('')
+  const [submitting,  setSubmitting]  = useState(false)
+
+  const handleSubmit = async () => {
+    if (!reason) { showToast('Please select a reason', 'error'); return }
+    setSubmitting(true)
+    try {
+      await sessionsAPI.raiseDispute(sessionId, { reason, description: description.trim() })
+      showToast('Dispute submitted. Our team will review within 24 hours.', 'success')
+      onSuccess()
+    } catch {
+      showToast('Could not submit dispute. Please try again.', 'error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm px-4 pb-4">
+      <div className="bg-white rounded-3xl p-6 w-full max-w-sm animate-slide-up">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-outfit font-bold text-base text-secondary">Report an Issue</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center">
+            <X size={15} className="text-secondary/60" />
+          </button>
+        </div>
+
+        <p className="font-inter text-xs text-secondary/50 mb-4">
+          What went wrong? Our support team will review your report within 24 hours.
+        </p>
+
+        {/* Reason selector */}
+        <div className="flex flex-col gap-2 mb-4">
+          {DISPUTE_REASONS.map(r => (
+            <button
+              key={r}
+              onClick={() => setReason(r)}
+              className={`text-left px-4 py-2.5 rounded-xl text-xs font-inter transition-all border ${
+                reason === r
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-gray-50 text-secondary/70 border-secondary/10 hover:border-secondary/20'
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+
+        {/* Description */}
+        <textarea
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="Additional details (optional)…"
+          rows={3}
+          className="w-full border border-secondary/15 rounded-2xl px-4 py-3 font-inter text-sm text-secondary bg-gray-50 outline-none focus:border-primary resize-none placeholder:text-secondary/40 mb-4"
+        />
+
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="w-full py-3 rounded-2xl bg-red-500 text-white font-inter font-semibold text-sm disabled:opacity-50 transition-opacity hover:opacity-90"
+        >
+          {submitting ? 'Submitting…' : 'Submit Report'}
+        </button>
+      </div>
     </div>
   )
 }

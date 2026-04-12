@@ -22,20 +22,46 @@ const BookingConfirm    = lazy(() => import('@/pages/student/BookingConfirmation
 const StudentSessions   = lazy(() => import('@/pages/student/Sessions'))
 const StudentProfile    = lazy(() => import('@/pages/student/Profile'))
 const MapView           = lazy(() => import('@/pages/student/MapView'))
+const FindTutor         = lazy(() => import('@/pages/student/FindTutor'))
 
 // Tutor
 const TutorDashboard    = lazy(() => import('@/pages/tutor/Dashboard'))
 const TutorAvailability = lazy(() => import('@/pages/tutor/Availability'))
 const TutorEarnings     = lazy(() => import('@/pages/tutor/Earnings'))
 const TutorStudents     = lazy(() => import('@/pages/tutor/Students'))
+const TutorSessions     = lazy(() => import('@/pages/tutor/Sessions'))
 const TutorProfileEdit  = lazy(() => import('@/pages/tutor/ProfileEdit'))
 const TutorProfileView  = lazy(() => import('@/pages/tutor/Profile'))
+const TutorVerification = lazy(() => import('@/pages/tutor/Verification'))
 
 // Shared
+const MessagesInbox = lazy(() => import('@/pages/shared/MessagesInbox'))
 const Messages      = lazy(() => import('@/pages/shared/Messages'))
 const Notifications = lazy(() => import('@/pages/shared/Notifications'))
 const Settings      = lazy(() => import('@/pages/shared/Settings'))
 const HelpSupport   = lazy(() => import('@/pages/shared/HelpSupport'))
+
+// Payment / Review
+const PaymentVerify    = lazy(() => import('@/pages/student/PaymentVerify'))
+const ReviewSession    = lazy(() => import('@/pages/student/ReviewSession'))
+
+// Admin
+const AdminShell    = lazy(() => import('@/pages/admin/layout/AdminShell'))
+const AdminOverview = lazy(() => import('@/pages/admin/Overview'))
+const AdminUsers    = lazy(() => import('@/pages/admin/Users'))
+const AdminTutors   = lazy(() => import('@/pages/admin/Tutors'))
+const AdminSessions = lazy(() => import('@/pages/admin/Sessions'))
+const AdminPayments = lazy(() => import('@/pages/admin/Payments'))
+const AdminIssues         = lazy(() => import('@/pages/admin/Issues'))
+const AdminVerifications  = lazy(() => import('@/pages/admin/Verifications'))
+
+// Settings sub-pages
+const PersonalInfo     = lazy(() => import('@/pages/settings/PersonalInfo'))
+const Security         = lazy(() => import('@/pages/settings/Security'))
+const NotificationPrefs= lazy(() => import('@/pages/settings/NotificationPrefs'))
+const Preferences      = lazy(() => import('@/pages/settings/Preferences'))
+const PaymentMethods   = lazy(() => import('@/pages/settings/PaymentMethods'))
+const BankAccount      = lazy(() => import('@/pages/settings/BankAccount'))
 
 // ── Route guards ─────────────────────────────
 function RequireAuth({ children }) {
@@ -54,6 +80,13 @@ function RequireRole({ role, children }) {
   return children
 }
 
+function RequireAdmin({ children }) {
+  const { user, accessToken } = useAuthStore()
+  if (!accessToken) return <Navigate to="/login" replace />
+  if (user?.role !== 'ADMIN') return <Navigate to="/" replace />
+  return children
+}
+
 function RequireGuest({ children }) {
   const { accessToken, user } = useAuthStore()
   if (accessToken && user) {
@@ -66,10 +99,16 @@ function RequireGuest({ children }) {
 // ── Page loader ───────────────────────────────
 function PageLoader() {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/40 backdrop-blur-md">
-      <img src="/assets/img/logo_a.png" alt="LearnCrib" className="w-20 h-20 animate-logo-spin" />
-      <p className="mt-6 font-inter text-[10px] uppercase tracking-[0.2em] text-white/60 animate-pulse">
-        Please wait
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white"
+    >
+      <div className="w-28 h-28 rounded-[36px] flex items-center justify-center mb-6"
+        style={{ boxShadow: '0 0 30px hsla(220,80%,60%,0.15)' }}>
+        <img src="/assets/img/logo_icon.png" alt="LearnCrib" className="w-20 h-20 rounded-[28px] animate-logo-spin" />
+      </div>
+      <p className="font-outfit font-bold text-secondary text-xl tracking-wide mb-1">LearnCrib</p>
+      <p className="font-inter text-[0.7rem] uppercase tracking-[0.25em] text-secondary/40 animate-pulse">
+        Loading…
       </p>
     </div>
   )
@@ -96,6 +135,11 @@ export default function App() {
         <Route path="/student/search" element={
           <RequireRole role="STUDENT">
             <AppShell><SearchResults /></AppShell>
+          </RequireRole>
+        } />
+        <Route path="/student/find" element={
+          <RequireRole role="STUDENT">
+            <AppShell showNav={false}><FindTutor /></AppShell>
           </RequireRole>
         } />
         <Route path="/student/map" element={
@@ -131,11 +175,24 @@ export default function App() {
             <AppShell><StudentProfile /></AppShell>
           </RequireRole>
         } />
+        <Route path="/student/review/:sessionId" element={
+          <RequireRole role="STUDENT">
+            <AppShell showNav={false}><ReviewSession /></AppShell>
+          </RequireRole>
+        } />
+        <Route path="/payment/verify" element={
+          <RequireAuth><AppShell showNav={false}><PaymentVerify /></AppShell></RequireAuth>
+        } />
 
         {/* ── Tutor ── */}
         <Route path="/tutor/dashboard" element={
           <RequireRole role="TUTOR">
             <AppShell><TutorDashboard /></AppShell>
+          </RequireRole>
+        } />
+        <Route path="/tutor/sessions" element={
+          <RequireRole role="TUTOR">
+            <AppShell><TutorSessions /></AppShell>
           </RequireRole>
         } />
         <Route path="/tutor/students" element={
@@ -163,12 +220,35 @@ export default function App() {
             <AppShell showNav={false}><TutorProfileEdit /></AppShell>
           </RequireRole>
         } />
+        <Route path="/tutor/verify" element={
+          <RequireRole role="TUTOR">
+            <AppShell showNav={false}><TutorVerification /></AppShell>
+          </RequireRole>
+        } />
 
         {/* ── Shared ── */}
-        <Route path="/messages"     element={<RequireAuth><AppShell><Messages /></AppShell></RequireAuth>} />
+        <Route path="/messages"      element={<RequireAuth><AppShell><MessagesInbox /></AppShell></RequireAuth>} />
+        <Route path="/messages/:id"  element={<RequireAuth><AppShell showNav={false}><Messages /></AppShell></RequireAuth>} />
         <Route path="/notifications" element={<RequireAuth><AppShell showNav={false}><Notifications /></AppShell></RequireAuth>} />
-        <Route path="/settings"     element={<RequireAuth><AppShell showNav={false}><Settings /></AppShell></RequireAuth>} />
-        <Route path="/help"         element={<RequireAuth><AppShell showNav={false}><HelpSupport /></AppShell></RequireAuth>} />
+        <Route path="/settings"      element={<RequireAuth><AppShell showNav={false}><Settings /></AppShell></RequireAuth>} />
+        <Route path="/help"          element={<RequireAuth><AppShell showNav={false}><HelpSupport /></AppShell></RequireAuth>} />
+
+        {/* ── Settings sub-pages ── */}
+        <Route path="/settings/profile"       element={<RequireAuth><AppShell showNav={false}><PersonalInfo /></AppShell></RequireAuth>} />
+        <Route path="/settings/security"      element={<RequireAuth><AppShell showNav={false}><Security /></AppShell></RequireAuth>} />
+        <Route path="/settings/notifications" element={<RequireAuth><AppShell showNav={false}><NotificationPrefs /></AppShell></RequireAuth>} />
+        <Route path="/settings/preferences"   element={<RequireAuth><AppShell showNav={false}><Preferences /></AppShell></RequireAuth>} />
+        <Route path="/settings/payment"       element={<RequireAuth><AppShell showNav={false}><PaymentMethods /></AppShell></RequireAuth>} />
+        <Route path="/settings/bank"          element={<RequireAuth><AppShell showNav={false}><BankAccount /></AppShell></RequireAuth>} />
+
+        {/* ── Admin ── */}
+        <Route path="/admin" element={<RequireAdmin><AdminShell><AdminOverview /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/users"    element={<RequireAdmin><AdminShell><AdminUsers /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/tutors"   element={<RequireAdmin><AdminShell><AdminTutors /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/sessions" element={<RequireAdmin><AdminShell><AdminSessions /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/payments" element={<RequireAdmin><AdminShell><AdminPayments /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/issues"         element={<RequireAdmin><AdminShell><AdminIssues /></AdminShell></RequireAdmin>} />
+        <Route path="/admin/verifications"  element={<RequireAdmin><AdminShell><AdminVerifications /></AdminShell></RequireAdmin>} />
 
         {/* ── Fallback ── */}
         <Route path="*" element={<Navigate to="/" replace />} />

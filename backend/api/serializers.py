@@ -4,6 +4,7 @@ from users.models import User, ParentProfile, TutorProfile, Student
 from sessions_app.models import Session, SessionLog
 from payments.models import Payment, Payout, Dispute
 from reviews.models import Review
+from .utils import obfuscate_id
 
 
 # ─── User & Profile Serializers ───────────────────────────────────────────────
@@ -28,12 +29,42 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Cannot register as an administrator via the public API.")
         return value
 
+    def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims for verification
+        # The fingerprint string is reconstructed in the middleware
+        return token
+
     def validate(self, attrs):
         data = super().validate(attrs)
+        
+        # Capture fingerprint from request
+        request = self.context.get('request')
+        if request:
+            import hashlib
+            ua = request.headers.get('User-Agent', 'unknown')
+            lang = request.headers.get('Accept-Language', 'unknown')
+            device_id = request.headers.get('X-Device-Id', 'unknown')
+            
+            fp_string = f"{ua}|{lang}|{device_id}"
+            fp_hash = hashlib.sha256(fp_string.encode()).hexdigest()
+            
+            # Inject fingerprint hash into the access token
+            data['access'] = str(self.get_token(self.user))
+            # Note: SimpleJWT naturally puts get_token results into the token.
+            # However, we need to ensure the claim is actually there for the middleware.
+            # The standard way is to modify the token instance.
+            refresh = self.get_token(self.user)
+            refresh['fp_hash'] = fp_hash
+            data['refresh'] = str(refresh)
+            data['access'] = str(refresh.access_token)
+
         data['user'] = {
             'id': str(self.user.id),
             'email': self.user.email,
@@ -57,15 +88,20 @@ class TutorProfileSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     email = serializers.CharField(source='user.email', read_only=True)
 
+    slug = serializers.SerializerMethodField()
+
     class Meta:
         model = TutorProfile
         fields = [
-            'id', 'user', 'first_name', 'last_name', 'email', 
+            'id', 'slug', 'user', 'first_name', 'last_name', 'email', 
             'bio', 'subjects', 'hourly_rate',
             'latitude', 'longitude', 'is_available',
             'rating', 'total_reviews', 'verification_status',
         ]
-        read_only_fields = ['id', 'rating', 'total_reviews', 'verification_status']
+        read_only_fields = ['id', 'slug', 'rating', 'total_reviews', 'verification_status']
+
+    def get_slug(self, obj):
+        return obfuscate_id(obj.id)
 
 
 class ParentProfileSerializer(serializers.ModelSerializer):
@@ -92,14 +128,19 @@ class SessionSerializer(serializers.ModelSerializer):
     tutor = TutorProfileSerializer(read_only=True)
     logs = SessionLogSerializer(many=True, read_only=True)
 
+    slug = serializers.SerializerMethodField()
+
     class Meta:
         model = Session
         fields = [
-            'id', 'parent', 'student', 'tutor',
+            'id', 'slug', 'parent', 'student', 'tutor',
             'subject', 'status', 'scheduled_at', 'notes',
             'created_at', 'updated_at', 'logs',
         ]
-        read_only_fields = ['id', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'slug', 'status', 'created_at', 'updated_at']
+
+    def get_slug(self, obj):
+        return obfuscate_id(obj.id)
 
 
 class SessionCreateSerializer(serializers.ModelSerializer):
