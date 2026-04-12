@@ -1,96 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, LogIn, GraduationCap, UserCheck, Zap, ShieldCheck } from 'lucide-react'
+import { Mail, LogIn } from 'lucide-react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { authAPI } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/uiStore'
-
-// ── Dev bypass — only shown in development ────────────────────────────────────
-const DEV_USERS = {
-  ADMIN: {
-    id: 'dev-admin-001',
-    first_name: 'Admin',
-    last_name: 'LearnCrib',
-    email: 'admin@dev.local',
-    role: 'ADMIN',
-  },
-  STUDENT: {
-    id: 'dev-student-001',
-    first_name: 'Temi',
-    last_name: 'Adeyemi',
-    email: 'student@dev.local',
-    role: 'STUDENT',
-    phone: '08012345678',
-    subjects: ['Mathematics', 'Physics'],
-    is_available: true,
-  },
-  TUTOR: {
-    id: 'dev-tutor-001',
-    first_name: 'Kolade',
-    last_name: 'Okonkwo',
-    email: 'tutor@dev.local',
-    role: 'TUTOR',
-    phone: '08087654321',
-    subjects: ['Mathematics', 'Further Maths', 'Physics'],
-    hourly_rate: 3500,
-    rating: '4.8',
-    total_reviews: 47,
-    is_available: true,
-    bio: 'Top-rated Lagos tutor with 5 years of experience.',
-  },
-}
-
-function DevBypass() {
-  const { setAuth } = useAuthStore()
-  const navigate    = useNavigate()
-
-  const login = (role) => {
-    setAuth({
-      user:    DEV_USERS[role],
-      access:  'dev-access-token',
-      refresh: 'dev-refresh-token',
-    })
-    const dest = role === 'TUTOR' ? '/tutor/dashboard' : role === 'ADMIN' ? '/admin' : '/student/dashboard'
-    navigate(dest, { replace: true })
-  }
-
-  return (
-    <div className="mt-6 border border-dashed border-yellow-400/60 rounded-2xl p-4 bg-yellow-50/60">
-      <div className="flex items-center gap-2 mb-3">
-        <Zap size={13} className="text-yellow-500" />
-        <span className="text-xs font-outfit font-semibold text-yellow-700 uppercase tracking-widest">Dev Bypass</span>
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        <button
-          onClick={() => login('STUDENT')}
-          className="flex flex-col items-center gap-1.5 py-3 px-2 bg-white border border-primary/20 rounded-xl hover:border-primary hover:bg-primary-light transition-all"
-        >
-          <GraduationCap size={18} className="text-primary" />
-          <span className="text-xs font-outfit font-semibold text-secondary">Student</span>
-          <span className="text-[10px] font-inter text-secondary/45">Temi</span>
-        </button>
-        <button
-          onClick={() => login('TUTOR')}
-          className="flex flex-col items-center gap-1.5 py-3 px-2 bg-white border border-primary/20 rounded-xl hover:border-primary hover:bg-primary-light transition-all"
-        >
-          <UserCheck size={18} className="text-primary" />
-          <span className="text-xs font-outfit font-semibold text-secondary">Tutor</span>
-          <span className="text-[10px] font-inter text-secondary/45">Kolade</span>
-        </button>
-        <button
-          onClick={() => login('ADMIN')}
-          className="flex flex-col items-center gap-1.5 py-3 px-2 bg-white border border-secondary/20 rounded-xl hover:border-secondary hover:bg-gray-50 transition-all"
-        >
-          <ShieldCheck size={18} className="text-secondary" />
-          <span className="text-xs font-outfit font-semibold text-secondary">Admin</span>
-          <span className="text-[10px] font-inter text-secondary/45">Ops</span>
-        </button>
-      </div>
-    </div>
-  )
-}
 
 export default function Login() {
   const navigate = useNavigate()
@@ -116,7 +31,8 @@ export default function Login() {
     try {
       const res = await authAPI.login(form)
       setAuth({ user: res.data.user, access: res.data.access, refresh: res.data.refresh })
-      const dest = res.data.user.role === 'TUTOR' ? '/tutor/dashboard' : '/student/dashboard'
+      const { role } = res.data.user
+      const dest = role === 'TUTOR' ? '/tutor/dashboard' : role === 'ADMIN' ? '/admin' : '/student/dashboard'
       navigate(dest, { replace: true })
     } catch (err) {
       const msg = err.response?.data?.detail || 'Invalid email or password.'
@@ -197,8 +113,6 @@ export default function Login() {
           </button>
         </div>
       </form>
-
-      {import.meta.env.DEV && <DevBypass />}
 
       <p className="mt-auto text-center text-sm font-inter text-secondary/55 pt-8">
         Don't have an account?{' '}

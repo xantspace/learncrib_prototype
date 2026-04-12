@@ -36,23 +36,12 @@ export default function Payment() {
   useEffect(() => {
     sessionsAPI.getById(sessionId)
       .then(r => setSession(r.data))
-      .catch(() => {
-        // Dev fallback — create a minimal session shape
-        setSession({
-          id:                  sessionId,
-          subject:             'Mathematics',
-          tutor_first_name:    'Kolade',
-          tutor_last_name:     'Okonkwo',
-          tutor_hourly_rate:   3500,
-          scheduled_at:        new Date(Date.now() + 86400000 * 2).toISOString(),
-          duration_minutes:    60,
-          session_type:        'Online',
-        })
-      })
+      .catch(() => setSession(null))
       .finally(() => setLoading(false))
   }, [sessionId])
 
-  const sessionAmount = Number(session?.tutor_hourly_rate || 0)
+  // Backend returns session.tutor as a nested TutorProfileSerializer object
+  const sessionAmount = Number(session?.tutor?.hourly_rate || 0)
   const platformFee   = Math.round(sessionAmount * PLATFORM_FEE_RATE)
   const total         = sessionAmount + platformFee
 
@@ -70,18 +59,19 @@ export default function Payment() {
         amount:     total,
         method,
       })
+      // Paystack returns authorization_url for redirect checkout
       if (res.data.authorization_url) {
         window.location.href = res.data.authorization_url
+      } else if (res.data.checkout_url) {
+        window.location.href = res.data.checkout_url
       } else {
-        // API returned success without redirect — write to escrow store
+        // Payment confirmed without redirect — record in escrow store and proceed
         _writeEscrow()
         navigate(`/student/booking-confirmation/${sessionId}`)
       }
-    } catch {
-      // API unavailable (dev mode) — simulate payment
-      _writeEscrow()
-      showToast('Payment secured in escrow!', 'success')
-      navigate(`/student/booking-confirmation/${sessionId}`)
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'Payment failed. Please try again.'
+      showToast(msg, 'error')
     } finally {
       setPaying(false)
     }
@@ -91,8 +81,8 @@ export default function Payment() {
     escrowStore.createPayment({
       sessionId,
       studentName:   `${user?.first_name ?? 'Student'} ${user?.last_name ?? ''}`.trim(),
-      tutorName:     `${session?.tutor_first_name ?? ''} ${session?.tutor_last_name ?? ''}`.trim(),
-      tutorEmail:    session?.tutor_email ?? '',
+      tutorName:     `${session?.tutor?.first_name ?? ''} ${session?.tutor?.last_name ?? ''}`.trim(),
+      tutorEmail:    session?.tutor?.email ?? '',
       subject:       session?.subject ?? '',
       sessionAmount,
       scheduledAt:   session?.scheduled_at ?? null,
@@ -105,6 +95,14 @@ export default function Payment() {
   if (loading) return (
     <div className="flex items-center justify-center h-svh">
       <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+    </div>
+  )
+
+  if (!session) return (
+    <div className="flex flex-col items-center justify-center h-svh gap-3 px-5 text-center">
+      <p className="font-outfit font-semibold text-secondary">Session not found</p>
+      <p className="font-inter text-sm text-secondary/50">This session may have been cancelled or doesn't exist.</p>
+      <button onClick={() => navigate(-1)} className="text-sm font-inter font-semibold text-primary">Go back</button>
     </div>
   )
 
