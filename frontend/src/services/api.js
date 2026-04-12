@@ -9,10 +9,24 @@ const api = axios.create({
   timeout: 15000,
 })
 
-// Attach JWT on every request
+// Simple browser fingerprint utility
+const getDeviceId = () => {
+  let id = localStorage.getItem('lc_dev_id')
+  if (!id) {
+    id = 'lc_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    localStorage.setItem('lc_dev_id', id)
+  }
+  return id
+}
+
+// Attach JWT and Fingerprint on every request
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken
   if (token) config.headers.Authorization = `Bearer ${token}`
+  
+  // Security fingerprint (X-Device-Id)
+  config.headers['X-Device-Id'] = getDeviceId()
+  
   return config
 })
 

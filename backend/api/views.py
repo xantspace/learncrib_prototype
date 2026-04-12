@@ -17,6 +17,7 @@ from .serializers import (
     PaymentSerializer, PayoutSerializer, DisputeSerializer,
     ReviewSerializer,
 )
+from .utils import deobfuscate_id
 
 
 # ─── Auth Views ────────────────────────────────────────────────────────────────
@@ -109,6 +110,11 @@ class TutorViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TutorProfileSerializer
     permission_classes = [AllowAny]
 
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        resolved_id = deobfuscate_id(pk) or pk
+        return TutorProfile.objects.get(pk=resolved_id)
+
     def get_queryset(self):
         qs = TutorProfile.objects.filter(
             verification_status=TutorProfile.VerificationStatus.APPROVED,
@@ -146,6 +152,11 @@ class SessionViewSet(viewsets.ModelViewSet):
     """
     queryset = Session.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        resolved_id = deobfuscate_id(pk) or pk
+        return Session.objects.get(pk=resolved_id)
 
     def get_serializer_class(self):
         if self.action == 'create':

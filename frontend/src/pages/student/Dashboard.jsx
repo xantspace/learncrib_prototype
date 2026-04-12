@@ -185,7 +185,7 @@ function TutorCard({ tutor }) {
   const subjects = Array.isArray(tutor.subjects) ? tutor.subjects.slice(0, 2).join(' · ') : ''
 
   return (
-    <GlassCard className="p-4 flex items-center gap-4" onClick={() => navigate(`/student/tutor/${tutor.id}`)}>
+    <GlassCard className="p-4 flex items-center gap-4" onClick={() => navigate(`/student/tutor/${tutor.slug || tutor.id}`)}>
       <div className="relative flex-shrink-0">
         <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg"
           style={{ background: 'linear-gradient(135deg, #1939D4, #0F2391)' }}>
@@ -231,7 +231,7 @@ function MiniTutorCard({ tutor }) {
   const name = `${tutor.first_name} ${tutor.last_name}`
   const initials = `${tutor.first_name?.[0]}${tutor.last_name?.[0]}`.toUpperCase()
   return (
-    <GlassCard className="p-4 flex-shrink-0 w-44 flex flex-col items-center text-center gap-2" onClick={() => navigate(`/student/tutor/${tutor.id}`)}>
+    <GlassCard className="p-4 flex-shrink-0 w-44 flex flex-col items-center text-center gap-2" onClick={() => navigate(`/student/tutor/${tutor.slug || tutor.id}`)}>
       <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg"
         style={{ background: 'linear-gradient(135deg,hsl(270,60%,55%),hsl(270,40%,40%))' }}>
         {initials}

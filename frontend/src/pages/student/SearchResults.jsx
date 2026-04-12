@@ -101,7 +101,7 @@ export default function SearchResults() {
                   <GlassCard
                     key={tutor.id}
                     className="p-4 flex items-center gap-4"
-                    onClick={() => navigate(`/student/tutor/${tutor.id}`)}
+                    onClick={() => navigate(`/student/tutor/${tutor.slug || tutor.id}`)}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-outfit font-bold text-white text-lg flex-shrink-0"
                       style={{ background: 'linear-gradient(135deg, #1939D4, #0F2391)' }}>
