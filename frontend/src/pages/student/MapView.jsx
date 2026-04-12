@@ -3,22 +3,35 @@ import { useNavigate } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { X, Navigation, Search, ChevronRight, Star } from 'lucide-react'
+import { X, Navigation, Star, BadgeCheck } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import Button from '@/components/ui/Button'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
 import { usersAPI } from '@/services/api'
+import { useVerificationStore } from '@/store/verificationStore'
+import { rankTutors, scoreLabel } from '@/utils/tutorRanking'
 
-// Custom marker icons
-function createTutorMarker(isOnline, initials) {
+// ── Marker factories ─────────────────────────────────────────────────────────
+
+function createTutorMarker(tutor, rank) {
+  const isOnline  = tutor.is_available
+  const isTopPick = rank === 0   // highest-ranked tutor gets gold ring
+  const initials  = `${tutor.first_name?.[0] ?? ''}${tutor.last_name?.[0] ?? ''}`.toUpperCase()
+  const bg        = isTopPick ? '#F59E0B' : isOnline ? '#1939D4' : '#9CA3AF'
+  const ring      = isTopPick ? '3px solid #FDE68A' : '3px solid white'
+
   const html = renderToStaticMarkup(
     <div style={{
       width: 44, height: 44, borderRadius: '50%',
-      background: isOnline ? '#1939D4' : '#9CA3AF',
-      border: '3px solid white',
-      boxShadow: '0 4px 12px rgba(25,57,212,0.35)',
+      background: bg,
+      border: ring,
+      boxShadow: isTopPick
+        ? '0 4px 16px rgba(245,158,11,0.5)'
+        : '0 4px 12px rgba(25,57,212,0.35)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       color: 'white', fontWeight: 700, fontSize: 14,
       fontFamily: 'Plus Jakarta Sans, sans-serif',
+      position: 'relative',
     }}>
       {initials}
     </div>
@@ -46,17 +59,21 @@ function FlyToUser({ coords }) {
   return null
 }
 
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function MapView() {
-  const navigate  = useNavigate()
+  const navigate      = useNavigate()
+  const vStore        = useVerificationStore()
+
   const [userCoords, setUserCoords] = useState(null)
-  const [tutors,     setTutors]     = useState([])
+  const [rawTutors,  setRawTutors]  = useState([])
   const [selected,   setSelected]   = useState(null)
   const [locating,   setLocating]   = useState(true)
+  const mapRef = useRef(null)
 
   // Get user location
   useEffect(() => {
     if (!navigator.geolocation) {
-      // Fallback: Lagos coordinates
       setUserCoords([6.5244, 3.3792])
       setLocating(false)
       return
@@ -67,27 +84,33 @@ export default function MapView() {
         setLocating(false)
       },
       () => {
-        setUserCoords([6.5244, 3.3792]) // Lagos fallback
+        setUserCoords([6.5244, 3.3792])
         setLocating(false)
       },
       { timeout: 8000 }
     )
   }, [])
 
-  // Load nearby tutors when coords known
+  // Load nearby tutors when coords are known
   useEffect(() => {
     if (!userCoords) return
     usersAPI.getNearbyTutors({
       lat: userCoords[0],
       lng: userCoords[1],
       radius: 10,
-    }).then(r => {
-      setTutors(Array.isArray(r.data) ? r.data : r.data?.results || [])
-    }).catch(() => {
-      // Use mock data while API is not ready
-      setTutors(MOCK_TUTORS(userCoords))
     })
+      .then(r => setRawTutors(Array.isArray(r.data) ? r.data : r.data?.results || []))
+      .catch(() => setRawTutors(mockTutors(userCoords)))
   }, [userCoords])
+
+  // Rank tutors: filter verified → score → sort
+  // verifiedOnly=false for mock/dev where we don't have real verification data
+  const tutors = rankTutors(rawTutors, {
+    studentLat: userCoords?.[0],
+    studentLng: userCoords?.[1],
+    verifiedOnly: false,   // flip to true when backend populates verification_status
+    verificationStore: vStore,
+  })
 
   if (locating) return (
     <div className="fixed inset-0 bg-white flex flex-col items-center justify-center gap-4">
@@ -95,6 +118,9 @@ export default function MapView() {
       <p className="font-inter text-sm text-secondary/60">Finding your location…</p>
     </div>
   )
+
+  const topPick    = tutors[0] ?? null
+  const sl         = selected ? scoreLabel(selected._score ?? 0) : null
 
   return (
     <div className="fixed inset-0">
@@ -106,7 +132,7 @@ export default function MapView() {
         <X size={18} className="text-secondary" />
       </button>
 
-      {/* Title */}
+      {/* Title pill */}
       <div className="absolute top-12 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-glass rounded-2xl px-4 py-2 shadow-glass">
         <p className="font-outfit font-semibold text-sm text-secondary">
           {tutors.length} Tutors Nearby
@@ -120,6 +146,7 @@ export default function MapView() {
         style={{ width: '100%', height: '100%' }}
         zoomControl={false}
         attributionControl={false}
+        ref={mapRef}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -140,22 +167,57 @@ export default function MapView() {
           </>
         )}
 
-        {/* Tutor markers */}
-        {tutors.map(tutor => {
+        {/* Tutor markers — ranked order */}
+        {tutors.map((tutor, index) => {
           if (!tutor.latitude || !tutor.longitude) return null
-          const initials = `${tutor.first_name?.[0]}${tutor.last_name?.[0]}`.toUpperCase()
           return (
             <Marker
               key={tutor.id}
               position={[tutor.latitude, tutor.longitude]}
-              icon={createTutorMarker(tutor.is_available, initials)}
+              icon={createTutorMarker(tutor, index)}
               eventHandlers={{ click: () => setSelected(tutor) }}
             />
           )
         })}
       </MapContainer>
 
-      {/* Tutor bottom sheet */}
+      {/* Top pick banner — shown when no tutor selected */}
+      {!selected && topPick && topPick.is_available && (
+        <div className="absolute bottom-32 left-4 right-4 z-[1000] animate-slide-up">
+          <button
+            onClick={() => setSelected(topPick)}
+            className="w-full flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-glass border border-yellow-200"
+          >
+            <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-outfit font-bold text-white text-sm"
+              style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+              {`${topPick.first_name?.[0]}${topPick.last_name?.[0]}`.toUpperCase()}
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-outfit font-semibold text-sm text-secondary">
+                  {topPick.first_name} {topPick.last_name}
+                </span>
+                {topPick._verificationStatus === 'APPROVED' && (
+                  <BadgeCheck size={13} className="text-primary flex-shrink-0" />
+                )}
+              </div>
+              <p className="font-inter text-xs text-secondary/50 truncate">
+                {(topPick.subjects || []).join(' · ')}
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                Top Pick
+              </span>
+              <span className="font-inter text-[10px] text-secondary/40">
+                Score {topPick._score}
+              </span>
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Selected tutor bottom sheet */}
       {selected && (
         <div className="absolute bottom-0 left-0 right-0 z-[1000] p-4 animate-slide-up">
           <GlassCard className="p-4" hover={false}>
@@ -165,14 +227,25 @@ export default function MapView() {
                 {`${selected.first_name?.[0]}${selected.last_name?.[0]}`.toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-outfit font-semibold text-base text-secondary">
-                  {selected.first_name} {selected.last_name}
-                </h3>
-                <p className="font-inter text-xs text-secondary/50">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h3 className="font-outfit font-semibold text-base text-secondary">
+                    {selected.first_name} {selected.last_name}
+                  </h3>
+                  {selected._verificationStatus === 'APPROVED' && (
+                    <BadgeCheck size={14} className="text-primary flex-shrink-0" />
+                  )}
+                  {sl && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ background: sl.color + '18', color: sl.color }}>
+                      {sl.label}
+                    </span>
+                  )}
+                </div>
+                <p className="font-inter text-xs text-secondary/50 mt-0.5">
                   {(selected.subjects || []).join(' · ')}
                 </p>
-                <div className="flex items-center gap-3 mt-1">
-                  {selected.rating > 0 && (
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                  {parseFloat(selected.rating) > 0 && (
                     <div className="flex items-center gap-1">
                       <Star size={12} className="text-accent fill-current" />
                       <span className="text-xs font-semibold">{selected.rating}</span>
@@ -181,12 +254,37 @@ export default function MapView() {
                   <span className="font-outfit font-bold text-sm text-primary">
                     ₦{Number(selected.hourly_rate).toLocaleString()}/hr
                   </span>
+                  {selected.distance_km != null && (
+                    <span className="font-inter text-xs text-secondary/40">
+                      {parseFloat(selected.distance_km).toFixed(1)} km
+                    </span>
+                  )}
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="text-secondary/30">
+              <button onClick={() => setSelected(null)} className="text-secondary/30 flex-shrink-0">
                 <X size={18} />
               </button>
             </div>
+
+            {/* Score bar */}
+            {selected._score != null && (
+              <div className="mt-3 mb-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-inter text-[10px] text-secondary/40 uppercase tracking-wider">Match Score</span>
+                  <span className="font-inter text-xs font-semibold text-secondary">{selected._score}/100</span>
+                </div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${selected._score}%`,
+                      background: sl?.color ?? '#1939D4',
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2 mt-3">
               <Button variant="ghost" size="sm" className="flex-1"
                 onClick={() => navigate(`/student/tutor/${selected.id}`)}>
@@ -204,7 +302,7 @@ export default function MapView() {
       {/* Recenter button */}
       {userCoords && (
         <button
-          onClick={() => {}}
+          onClick={() => mapRef.current?.flyTo(userCoords, 14)}
           className="absolute bottom-36 right-4 z-[1000] w-10 h-10 bg-white rounded-2xl shadow-glass flex items-center justify-center"
         >
           <Navigation size={16} className="text-primary" />
@@ -214,22 +312,22 @@ export default function MapView() {
   )
 }
 
-// Mock nearby tutors for development (offset from user position)
-function MOCK_TUTORS(center) {
-  const offsets = [[0.008, 0.005],[-0.004, 0.010],[0.012,-0.007],[-0.010, 0.003],[0.006, 0.015]]
-  const names = [
-    ['Kolade','Okonkwo'],['Fatima','Bello'],['Chidi','Abiodun'],['Tunde','Nwosu'],['Zainab','Ibrahim'],
+// ── Mock data (API fallback) ───────────────────────────────────────────────────
+function mockTutors(center) {
+  const offsets = [[0.008, 0.005], [-0.004, 0.010], [0.012, -0.007], [-0.010, 0.003], [0.006, 0.015]]
+  const data = [
+    { first_name: 'Kolade',  last_name: 'Okonkwo', subjects: ['Mathematics', 'Physics'],  hourly_rate: 3500, rating: 4.9, is_available: true,  verification_status: 'APPROVED', total_reviews: 47, completion_rate: 98 },
+    { first_name: 'Fatima',  last_name: 'Bello',   subjects: ['Chemistry', 'Biology'],    hourly_rate: 3000, rating: 4.7, is_available: true,  verification_status: 'APPROVED', total_reviews: 30, completion_rate: 95 },
+    { first_name: 'Chidi',   last_name: 'Abiodun', subjects: ['English', 'Literature'],   hourly_rate: 2800, rating: 4.5, is_available: false, verification_status: 'APPROVED', total_reviews: 22, completion_rate: 90 },
+    { first_name: 'Tunde',   last_name: 'Nwosu',   subjects: ['Economics', 'Commerce'],   hourly_rate: 2500, rating: 4.2, is_available: true,  verification_status: 'APPROVED', total_reviews: 18, completion_rate: 88 },
+    { first_name: 'Zainab',  last_name: 'Ibrahim',  subjects: ['Coding', 'Design'],       hourly_rate: 5000, rating: 4.8, is_available: false, verification_status: 'PENDING',  total_reviews: 0,  completion_rate: 100 },
   ]
   return offsets.map(([dlat, dlng], i) => ({
     id: `mock-${i}`,
-    first_name: names[i][0], last_name: names[i][1],
-    subjects: ['Mathematics','Physics'],
-    hourly_rate: 2500 + i * 500,
-    rating: (4.5 + i * 0.1).toFixed(1),
-    total_reviews: 20 + i * 15,
-    is_available: i % 3 !== 0,
-    latitude: center[0] + dlat,
-    longitude: center[1] + dlng,
-    distance_km: Math.abs(dlat * 111).toFixed(1),
+    ...data[i],
+    email: `mock${i}@dev.local`,
+    latitude:    center[0] + dlat,
+    longitude:   center[1] + dlng,
+    distance_km: parseFloat(Math.abs(dlat * 111).toFixed(1)),
   }))
 }

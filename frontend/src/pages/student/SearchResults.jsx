@@ -6,12 +6,15 @@ import PageHeader from '@/components/shared/PageHeader'
 import { TutorCardSkeleton } from '@/components/ui/Skeleton'
 import { usersAPI } from '@/services/api'
 import VerifiedBadge from '@/components/ui/VerifiedBadge'
+import { rankTutors, scoreLabel } from '@/utils/tutorRanking'
+import { useVerificationStore } from '@/store/verificationStore'
 
 export default function SearchResults() {
   const navigate = useNavigate()
+  const vStore   = useVerificationStore()
   const [params] = useSearchParams()
   const [query,    setQuery]    = useState(params.get('q') || '')
-  const [tutors,   setTutors]   = useState([])
+  const [rawTutors, setRawTutors] = useState([])
   const [loading,  setLoading]  = useState(false)
   const [showFilter, setShowFilter] = useState(false)
   const [maxDist,  setMaxDist]  = useState(10)
@@ -21,15 +24,18 @@ export default function SearchResults() {
     setLoading(true)
     try {
       const res = await usersAPI.getTutors({ q: query, max_distance: maxDist, max_rate: maxRate })
-      setTutors(Array.isArray(res.data) ? res.data : res.data?.results || [])
+      setRawTutors(Array.isArray(res.data) ? res.data : res.data?.results || [])
     } catch {
-      setTutors([])
+      setRawTutors([])
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => { search() }, [])
+
+  // Apply ranking (verifiedOnly false — backend filter handles it server-side)
+  const tutors = rankTutors(rawTutors, { verifiedOnly: false, verificationStore: vStore })
 
   const name = (t) => `${t.first_name} ${t.last_name}`
   const initials = (t) => `${t.first_name?.[0]}${t.last_name?.[0]}`.toUpperCase()
