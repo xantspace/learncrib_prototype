@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Calendar, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Calendar, CheckCircle, XCircle, Clock, Lock, ShieldCheck } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import PageHeader from '@/components/shared/PageHeader'
 import { sessionsAPI } from '@/services/api'
 import { useUIStore } from '@/store/uiStore'
+import { useEscrowStore, ESCROW_STATUS } from '@/store/escrowStore'
 
 const TABS = ['Requests', 'Upcoming', 'History']
 
@@ -114,6 +115,10 @@ export default function TutorSessions() {
 }
 
 function SessionCard({ session, tab, onAccept, onReject, onComplete }) {
+  const escrowStore  = useEscrowStore()
+  const escrowRecord = escrowStore.getBySessionId(session.id)
+  const escrowSC     = escrowRecord ? ESCROW_STATUS[escrowRecord.status] : null
+
   const studentName = [
     session.student_first_name || session.parent_first_name,
     session.student_last_name  || session.parent_last_name,
@@ -190,9 +195,20 @@ function SessionCard({ session, tab, onAccept, onReject, onComplete }) {
         <p className="font-inter text-xs text-secondary/50 mt-1">⏳ Awaiting student payment</p>
       )}
 
-      {/* History: status badge + payout */}
+      {/* Upcoming: escrow trust note */}
+      {tab === 'Upcoming' && session.status === 'SCHEDULED' && escrowRecord && (
+        <div className="mt-2 pt-2 border-t border-secondary/10 flex items-center gap-1.5">
+          <Lock size={11} className="text-blue-500 flex-shrink-0" />
+          <span className={`text-[0.7rem] font-semibold px-2 py-0.5 rounded-full ${escrowSC?.color}`}>
+            {escrowSC?.label}
+          </span>
+          <span className="font-inter text-[0.65rem] text-secondary/40">— you'll be paid after completion</span>
+        </div>
+      )}
+
+      {/* History: status badge + live escrow payout status */}
       {tab === 'History' && (
-        <div className="flex items-center justify-between mt-1">
+        <div className="flex items-center justify-between mt-1 flex-wrap gap-2">
           <span className={`text-[0.7rem] font-semibold px-2.5 py-1 rounded-full ${
             session.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
             session.status === 'CANCELLED' ? 'bg-red-100 text-red-500' :
@@ -200,11 +216,16 @@ function SessionCard({ session, tab, onAccept, onReject, onComplete }) {
           }`}>
             {session.status}
           </span>
-          {session.payout_status && (
-            <p className="font-inter text-xs text-secondary/50">
-              💰 {session.payout_status}
-            </p>
-          )}
+          {escrowRecord ? (
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck size={11} className={escrowRecord.status === 'RELEASED' ? 'text-green-500' : 'text-secondary/30'} />
+              <span className={`text-[0.7rem] font-semibold px-2 py-0.5 rounded-full ${escrowSC?.color}`}>
+                {escrowSC?.label}
+              </span>
+            </div>
+          ) : session.payout_status ? (
+            <p className="font-inter text-xs text-secondary/50">💰 {session.payout_status}</p>
+          ) : null}
         </div>
       )}
     </GlassCard>

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, Clock, CheckCircle, XCircle, X, AlertTriangle } from 'lucide-react'
+import { Calendar, Clock, CheckCircle, XCircle, X, AlertTriangle, ShieldCheck, Lock } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import PageHeader from '@/components/shared/PageHeader'
 import { sessionsAPI } from '@/services/api'
 import { useUIStore } from '@/store/uiStore'
+import { useEscrowStore, ESCROW_STATUS } from '@/store/escrowStore'
 
 // Returns hours remaining from now to a future date
 function hoursUntil(dateStr) {
@@ -115,6 +116,10 @@ export default function Sessions() {
 }
 
 function SessionItem({ session, navigate, onConfirm, onDispute }) {
+  const escrowStore = useEscrowStore()
+  const escrowRecord = escrowStore.getBySessionId(session.id)
+  const escrowSC     = escrowRecord ? ESCROW_STATUS[escrowRecord.status] : null
+
   const meta = STATUS_META[session.status] || STATUS_META.PENDING
   const Icon = meta.icon
   const tutorName = `${session.tutor_first_name || ''} ${session.tutor_last_name || ''}`.trim() || 'Tutor'
@@ -185,12 +190,20 @@ function SessionItem({ session, navigate, onConfirm, onDispute }) {
         )}
       </div>
 
-      {/* Escrow status for completed */}
-      {session.status === 'COMPLETED' && session.payout_status && (
-        <div className="mt-3 pt-3 border-t border-secondary/10">
-          <p className="font-inter text-xs text-secondary/50">
-            💰 Payout status: <span className="font-semibold text-secondary">{session.payout_status}</span>
-          </p>
+      {/* Escrow status strip */}
+      {escrowRecord && (
+        <div className="mt-3 pt-3 border-t border-secondary/10 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            {escrowRecord.status === 'ESCROW' || escrowRecord.status === 'IN_SESSION'
+              ? <Lock size={11} className="text-blue-500" />
+              : <ShieldCheck size={11} className="text-green-500" />}
+            <span className={`text-[0.7rem] font-semibold px-2 py-0.5 rounded-full ${escrowSC?.color}`}>
+              {escrowSC?.label}
+            </span>
+          </div>
+          <span className="font-inter text-[0.65rem] text-secondary/40">
+            {escrowSC?.desc}
+          </span>
         </div>
       )}
     </GlassCard>
