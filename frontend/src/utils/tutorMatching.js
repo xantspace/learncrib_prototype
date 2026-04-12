@@ -120,3 +120,81 @@ export function buildMatchedSession(tutor, { subject, studentLat, studentLng } =
   }
 }
 
+/**
+ * Fallback: Generate mock tutors near the student's location.
+ */
+export function getMockTutors([lat, lng] = [6.5244, 3.3792]) {
+  return [
+    {
+      id: 'm1',
+      first_name: 'Damilola',
+      last_name: 'Adeyemi',
+      email: 'tutor1@example.com',
+      subjects: ['Mathematics', 'Further Maths', 'Physics', 'Coding'],
+      hourly_rate: 5500,
+      rating: '4.8',
+      total_reviews: 42,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat + 0.0123,
+      longitude: lng - 0.0045,
+    },
+    {
+      id: 'm2',
+      first_name: 'Chinyere',
+      last_name: 'Okonkwo',
+      email: 'tutor2@example.com',
+      subjects: ['English', 'Literature', 'History', 'Government'],
+      hourly_rate: 4200,
+      rating: '4.9',
+      total_reviews: 28,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat - 0.0089,
+      longitude: lng + 0.0156,
+    },
+    {
+      id: 'm3',
+      first_name: 'Tunde',
+      last_name: 'Bakare',
+      email: 'tutor3@example.com',
+      subjects: ['Chemistry', 'Biology', 'Physics'],
+      hourly_rate: 4800,
+      rating: '4.5',
+      total_reviews: 15,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat + 0.0055,
+      longitude: lng + 0.0221,
+    },
+    {
+      id: 'm4',
+      first_name: 'Amaka',
+      last_name: 'Eze',
+      email: 'tutor4@example.com',
+      subjects: ['Economics', 'Commerce', 'Accountancy'],
+      hourly_rate: 3500,
+      rating: '4.7',
+      total_reviews: 31,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat - 0.0152,
+      longitude: lng - 0.0118,
+    },
+    {
+      id: 'm5',
+      first_name: 'Seyi',
+      last_name: 'Makinde',
+      email: 'tutor5@example.com',
+      subjects: ['Design', 'Coding', 'Mathematics'],
+      hourly_rate: 6000,
+      rating: '5.0',
+      total_reviews: 8,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat + 0.0189,
+      longitude: lng - 0.0203,
+    }
+  ]
+}
+
