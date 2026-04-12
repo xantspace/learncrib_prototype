@@ -85,13 +85,19 @@ export const reviewsAPI = {
 }
 
 /* ── Admin ─────────────────────────────────── */
+// Admin uses the same standard endpoints — the backend grants full access
+// when the requesting user has role=ADMIN.
 export const adminAPI = {
-  getTutors:    ()              => api.get('/api/admin/tutors/'),
-  getUsers:     ()              => api.get('/api/admin/users/'),
-  approve:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/approve/`),
-  reject:       (tutorId, data) => api.post(`/api/admin/tutors/${tutorId}/reject/`, data),
-  disable:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/disable/`),
-  enable:       (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/enable/`),
-  suspendUser:  (userId)        => api.post(`/api/admin/users/${userId}/suspend/`),
-  activateUser: (userId)        => api.post(`/api/admin/users/${userId}/activate/`),
+  // GET /api/users/ — returns all users for admin
+  getUsers:         ()       => api.get('/api/users/'),
+  // GET /api/users/tutors/?all=true — TutorViewSet; admins see all verification statuses
+  getTutorProfiles: ()       => api.get('/api/users/tutors/'),
+  // GET /api/sessions/ — all sessions for admin
+  getSessions:      ()       => api.get('/api/sessions/'),
+  // GET /api/payments/ — all payments for admin
+  getPayments:      ()       => api.get('/api/payments/'),
+  // GET /api/payouts/ — all payouts for admin
+  getPayouts:       ()       => api.get('/api/payouts/'),
+  // Patch a user (e.g. is_active)
+  patchUser:        (id, data) => api.patch(`/api/users/${id}/`, data),
 }

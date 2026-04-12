@@ -8,120 +8,20 @@
  *          → DISPUTED (frozen, under review)
  *          → REFUNDED (returned to student)
  *
- * In production: API responses populate this store.
- * In dev / offline: local actions write here and all views read from here.
+ * Records are written when a payment is initiated and updated as admin
+ * takes action (release/refund/dispute). All views read from here.
  */
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 const PLATFORM_FEE_RATE = 0.10
 
-// Seed records so admin always has something to view
-const SEED = {
-  'session-S001': {
-    sessionId:    'session-S001',
-    paymentRef:   'PAY-001',
-    studentName:  'Temi Adeyemi',
-    tutorName:    'Kolade Okonkwo',
-    tutorEmail:   'kolade@mail.com',
-    subject:      'Mathematics',
-    sessionAmount: 3500,
-    platformFee:   350,
-    total:         3850,
-    status:        'ESCROW',
-    createdAt:     '2025-04-10T09:00:00.000Z',
-    scheduledAt:   '2025-04-14T10:00:00.000Z',
-    completedAt:   null,
-    releasedAt:    null,
-  },
-  'session-S002': {
-    sessionId:    'session-S002',
-    paymentRef:   'PAY-002',
-    studentName:  'Fatima Musa',
-    tutorName:    'Amaka Eze',
-    tutorEmail:   'amaka@mail.com',
-    subject:      'Chemistry',
-    sessionAmount: 3000,
-    platformFee:   300,
-    total:         3300,
-    status:        'ESCROW',
-    createdAt:     '2025-04-10T11:00:00.000Z',
-    scheduledAt:   '2025-04-15T14:00:00.000Z',
-    completedAt:   null,
-    releasedAt:    null,
-  },
-  'session-S003': {
-    sessionId:    'session-S003',
-    paymentRef:   'PAY-003',
-    studentName:  'Emeka Okafor',
-    tutorName:    'Kolade Okonkwo',
-    tutorEmail:   'kolade@mail.com',
-    subject:      'Physics',
-    sessionAmount: 3500,
-    platformFee:   350,
-    total:         3850,
-    status:        'RELEASED',
-    createdAt:     '2025-04-09T08:00:00.000Z',
-    scheduledAt:   '2025-04-09T10:00:00.000Z',
-    completedAt:   '2025-04-09T11:00:00.000Z',
-    releasedAt:    '2025-04-11T08:00:00.000Z',
-  },
-  'session-S004': {
-    sessionId:    'session-S004',
-    paymentRef:   'PAY-004',
-    studentName:  'Chidi Obi',
-    tutorName:    'Amaka Eze',
-    tutorEmail:   'amaka@mail.com',
-    subject:      'Biology',
-    sessionAmount: 3000,
-    platformFee:   300,
-    total:         3300,
-    status:        'PENDING',
-    createdAt:     '2025-04-11T07:00:00.000Z',
-    scheduledAt:   '2025-04-16T10:00:00.000Z',
-    completedAt:   null,
-    releasedAt:    null,
-  },
-  'session-S005': {
-    sessionId:    'session-S005',
-    paymentRef:   'PAY-005',
-    studentName:  'Grace Nwosu',
-    tutorName:    'Babatunde Osei',
-    tutorEmail:   'baba@mail.com',
-    subject:      'Physics',
-    sessionAmount: 4000,
-    platformFee:   400,
-    total:         4400,
-    status:        'RELEASED',
-    createdAt:     '2025-04-08T09:00:00.000Z',
-    scheduledAt:   '2025-04-08T11:00:00.000Z',
-    completedAt:   '2025-04-08T12:00:00.000Z',
-    releasedAt:    '2025-04-10T09:00:00.000Z',
-  },
-  'session-S006': {
-    sessionId:    'session-S006',
-    paymentRef:   'PAY-006',
-    studentName:  'Tunde Bello',
-    tutorName:    'Ngozi Adeleke',
-    tutorEmail:   'ngozi@mail.com',
-    subject:      'Coding',
-    sessionAmount: 5000,
-    platformFee:   500,
-    total:         5500,
-    status:        'REFUNDED',
-    createdAt:     '2025-04-07T10:00:00.000Z',
-    scheduledAt:   '2025-04-07T14:00:00.000Z',
-    completedAt:   null,
-    releasedAt:    null,
-  },
-}
-
-let refCounter = 7  // for generating PAY-XXX references
+let refCounter = 0
 
 export const useEscrowStore = create(
   persist(
     (set, get) => ({
-      records: SEED,
+      records: {},
 
       /**
        * Called when a student pays. Creates ESCROW record.
