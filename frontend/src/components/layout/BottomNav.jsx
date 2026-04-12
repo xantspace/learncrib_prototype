@@ -1,16 +1,18 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   Home, Calendar, MessageSquare, User,
-  LayoutDashboard, ClipboardList, Wallet,
+  LayoutDashboard, ClipboardList, Wallet, Zap,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
+import { useMatchingStore, MATCH_STATUS } from '@/store/matchingStore'
 
 const studentNav = [
-  { to: '/student/dashboard',  icon: Home,           label: 'Home',     badge: false },
-  { to: '/student/sessions',   icon: Calendar,       label: 'Sessions', badge: false },
-  { to: '/messages',           icon: MessageSquare,  label: 'Messages', badge: true  },
-  { to: '/student/profile',    icon: User,           label: 'Profile',  badge: false },
+  { to: '/student/dashboard',  icon: Home,          label: 'Home',     badge: false },
+  { to: '/student/find',       icon: Zap,           label: 'Find',     badge: false, matchBadge: true },
+  { to: '/student/sessions',   icon: Calendar,      label: 'Sessions', badge: false },
+  { to: '/messages',           icon: MessageSquare, label: 'Messages', badge: true  },
+  { to: '/student/profile',    icon: User,          label: 'Profile',  badge: false },
 ]
 
 const tutorNav = [
@@ -22,14 +24,17 @@ const tutorNav = [
 ]
 
 export default function BottomNav() {
-  const { user } = useAuthStore()
+  const { user }     = useAuthStore()
+  const matchStatus  = useMatchingStore(s => s.status)
+  const isSearching  = matchStatus === MATCH_STATUS.SEARCHING
+
   const items = user?.role === 'TUTOR' ? tutorNav : studentNav
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50
       bg-white border-t border-secondary/10
       flex justify-around items-center px-4 pb-5 pt-3">
-      {items.map(({ to, icon: Icon, label, badge }) => (
+      {items.map(({ to, icon: Icon, label, badge, matchBadge }) => (
         <NavLink
           key={to}
           to={to}
@@ -42,12 +47,23 @@ export default function BottomNav() {
           {({ isActive }) => (
             <>
               <span className="relative">
-                <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                <Icon
+                  size={20}
+                  strokeWidth={isActive ? 2.5 : 1.8}
+                  className={matchBadge && isSearching ? 'text-primary animate-pulse' : ''}
+                />
+                {/* Static unread dot */}
                 {badge && (
                   <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent border border-white" />
                 )}
+                {/* Searching pulse dot on Find tab */}
+                {matchBadge && isSearching && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary border border-white animate-pulse" />
+                )}
               </span>
-              <span>{label}</span>
+              <span className={matchBadge && isSearching ? 'text-primary font-semibold' : ''}>
+                {label}
+              </span>
             </>
           )}
         </NavLink>

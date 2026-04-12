@@ -22,6 +22,7 @@ const BookingConfirm    = lazy(() => import('@/pages/student/BookingConfirmation
 const StudentSessions   = lazy(() => import('@/pages/student/Sessions'))
 const StudentProfile    = lazy(() => import('@/pages/student/Profile'))
 const MapView           = lazy(() => import('@/pages/student/MapView'))
+const FindTutor         = lazy(() => import('@/pages/student/FindTutor'))
 
 // Tutor
 const TutorDashboard    = lazy(() => import('@/pages/tutor/Dashboard'))
@@ -134,6 +135,11 @@ export default function App() {
         <Route path="/student/search" element={
           <RequireRole role="STUDENT">
             <AppShell><SearchResults /></AppShell>
+          </RequireRole>
+        } />
+        <Route path="/student/find" element={
+          <RequireRole role="STUDENT">
+            <AppShell showNav={false}><FindTutor /></AppShell>
           </RequireRole>
         } />
         <Route path="/student/map" element={

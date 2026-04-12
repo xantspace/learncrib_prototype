@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Star, MapPin, BookOpen, MessageCircle, Calendar } from 'lucide-react'
+import { Star, MapPin, BookOpen, MessageCircle, Calendar, Zap } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
@@ -104,12 +104,15 @@ export default function TutorProfile() {
       {/* Sticky CTA */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-5 pb-8 pt-4 z-50"
         style={{ background: 'linear-gradient(to top, white 75%, transparent)' }}>
-        <div className="flex gap-3">
-          <Button variant="ghost" size="md" className="flex-1" onClick={() => navigate('/messages')}>
-            <MessageCircle size={16} /> Message
+        <div className="flex gap-2">
+          <Button variant="ghost" size="md" className="flex-[0.7]" onClick={() => navigate('/messages')}>
+            <MessageCircle size={15} />
           </Button>
-          <Button size="md" className="flex-1" onClick={() => navigate(`/student/book/${id}`)}>
-            <Calendar size={16} /> Book Session
+          <Button variant="ghost" size="md" className="flex-1" onClick={() => navigate(`/student/book/${id}`)}>
+            <Calendar size={15} /> Schedule
+          </Button>
+          <Button size="md" className="flex-1" onClick={() => navigate('/student/find')}>
+            <Zap size={15} /> Match Now
           </Button>
         </div>
       </div>

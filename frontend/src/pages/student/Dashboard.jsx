@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, Search, SlidersHorizontal, MapPin, Star, ChevronRight, Video, MessageCircle, CalendarDays, Map } from 'lucide-react'
+import { Bell, Search, SlidersHorizontal, MapPin, Star, ChevronRight, Video, MessageCircle, CalendarDays, Map, Zap } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import Badge from '@/components/ui/Badge'
 import { TutorCardSkeleton } from '@/components/ui/Skeleton'
@@ -100,6 +100,22 @@ export default function StudentDashboard() {
 
       {/* ── Content ── */}
       <div className="px-5 mt-2">
+
+        {/* Instant Match CTA */}
+        <button
+          onClick={() => navigate('/student/find')}
+          className="w-full flex items-center gap-4 mb-3 rounded-3xl p-4 text-left"
+          style={{ background: 'linear-gradient(135deg, #1939D4 0%, #0F2391 100%)' }}
+        >
+          <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+            <Zap size={18} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="font-outfit font-semibold text-sm text-white">Find a Tutor Now</p>
+            <p className="font-inter text-xs text-white/60">Instant matching — connected in seconds</p>
+          </div>
+          <ChevronRight size={16} className="text-white/50" />
+        </button>
 
         {/* Map CTA */}
         <GlassCard
