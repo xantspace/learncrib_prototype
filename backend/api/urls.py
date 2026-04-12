@@ -11,6 +11,8 @@ from .views import (
     PayoutViewSet,
     ReviewViewSet,
     CustomTokenObtainPairView,
+    AuthMeView,
+    ChangePasswordView,
 )
 
 router = DefaultRouter()
@@ -28,6 +30,8 @@ urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/me/', AuthMeView.as_view(), name='auth_me'),
+    path('auth/change-password/', ChangePasswordView.as_view(), name='change_password'),
 
     # ── API Resources ───────────────────────────────
     path('', include(router.urls)),
