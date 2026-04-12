@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Star, MapPin, BookOpen, MessageCircle, Calendar } from 'lucide-react'
+import { Star, MapPin, BookOpen, MessageCircle, Calendar, Zap } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import PageHeader from '@/components/shared/PageHeader'
 import { usersAPI } from '@/services/api'
+import VerifiedBadge from '@/components/ui/VerifiedBadge'
 
 export default function TutorProfile() {
   const { id } = useParams()
@@ -51,6 +52,9 @@ export default function TutorProfile() {
           )}
         </div>
         <h1 className="font-outfit font-bold text-2xl text-secondary">{name}</h1>
+        {tutor.verification_status === 'APPROVED' && (
+          <VerifiedBadge size="md" className="mt-2" />
+        )}
         {tutor.rating > 0 && (
           <div className="flex items-center gap-1 mt-1">
             {[1,2,3,4,5].map(i => (
@@ -81,8 +85,8 @@ export default function TutorProfile() {
             <p className="font-outfit font-bold text-2xl text-primary">₦{Number(tutor.hourly_rate).toLocaleString()}</p>
           </div>
           <div className="text-right">
-            <p className="font-inter text-xs text-secondary/50">Verified</p>
-            <p className="font-inter text-sm font-semibold text-success">{tutor.verification_status === 'APPROVED' ? '✓ Yes' : 'Pending'}</p>
+            <p className="font-inter text-xs text-secondary/50">Sessions</p>
+            <p className="font-inter text-sm font-semibold text-secondary">{tutor.total_reviews || 0} completed</p>
           </div>
         </GlassCard>
 
@@ -100,12 +104,15 @@ export default function TutorProfile() {
       {/* Sticky CTA */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-5 pb-8 pt-4 z-50"
         style={{ background: 'linear-gradient(to top, white 75%, transparent)' }}>
-        <div className="flex gap-3">
-          <Button variant="ghost" size="md" className="flex-1" onClick={() => navigate('/messages')}>
-            <MessageCircle size={16} /> Message
+        <div className="flex gap-2">
+          <Button variant="ghost" size="md" className="flex-[0.7]" onClick={() => navigate('/messages')}>
+            <MessageCircle size={15} />
           </Button>
-          <Button size="md" className="flex-1" onClick={() => navigate(`/student/book/${id}`)}>
-            <Calendar size={16} /> Book Session
+          <Button variant="ghost" size="md" className="flex-1" onClick={() => navigate(`/student/book/${id}`)}>
+            <Calendar size={15} /> Schedule
+          </Button>
+          <Button size="md" className="flex-1" onClick={() => navigate('/student/find')}>
+            <Zap size={15} /> Match Now
           </Button>
         </div>
       </div>

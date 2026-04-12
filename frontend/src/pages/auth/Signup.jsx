@@ -62,8 +62,8 @@ export default function Signup() {
         ← Back
       </button>
 
-      <div className="mb-5 animate-slide-up">
-        <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-8 mb-3 object-contain" />
+      <div className="mb-5 animate-slide-up text-center">
+        <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-8 mb-3 object-contain mx-auto logo-adaptive" />
         <h1 className="font-outfit font-bold text-3xl text-secondary">Create account</h1>
         <p className="font-inter text-sm text-secondary/55 mt-1">Join thousands learning in their crib</p>
       </div>

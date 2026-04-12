@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, Search, SlidersHorizontal, MapPin, Star, ChevronRight, Video, MessageCircle, CalendarDays, Map } from 'lucide-react'
+import { Bell, Search, SlidersHorizontal, MapPin, Star, ChevronRight, Video, MessageCircle, CalendarDays, Map, Zap } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import Badge from '@/components/ui/Badge'
 import { TutorCardSkeleton } from '@/components/ui/Skeleton'
@@ -45,11 +45,9 @@ export default function StudentDashboard() {
   return (
     <div className="pb-2">
       {/* ── Sticky Header ── */}
-      <div className="sticky top-0 z-40 px-5 pt-10 pb-4"
-        style={{ background: 'linear-gradient(to bottom, white 85%, transparent)' }}
-      >
+      <div className="sticky top-0 z-40 px-5 pt-10 pb-4 sticky-header-fade">
         <div className="flex items-center justify-between mb-4">
-          <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-6 object-contain" />
+          <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-6 object-contain logo-adaptive" />
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -60,7 +58,7 @@ export default function StudentDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/notifications')}
-              className="relative w-10 h-10 rounded-2xl bg-white/70 backdrop-blur-glass border border-white/45 shadow-glass flex items-center justify-center">
+              className="relative w-10 h-10 rounded-2xl bg-gray-100 border border-secondary/10 flex items-center justify-center">
               <Bell size={18} className="text-secondary" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent" />
             </button>
@@ -91,7 +89,7 @@ export default function StudentDashboard() {
               className={`flex items-center gap-1 whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium font-inter transition-all ${
                 activeFilter === chip
                   ? 'bg-primary text-white'
-                  : 'bg-secondary text-white opacity-60 hover:opacity-80'
+                  : 'bg-secondary/10 text-secondary hover:bg-secondary/20'
               }`}
             >
               {activeFilter === chip && <span>✓</span>} {chip}
@@ -102,6 +100,22 @@ export default function StudentDashboard() {
 
       {/* ── Content ── */}
       <div className="px-5 mt-2">
+
+        {/* Instant Match CTA */}
+        <button
+          onClick={() => navigate('/student/find')}
+          className="w-full flex items-center gap-4 mb-3 rounded-3xl p-4 text-left"
+          style={{ background: 'linear-gradient(135deg, #1939D4 0%, #0F2391 100%)' }}
+        >
+          <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+            <Zap size={18} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="font-outfit font-semibold text-sm text-white">Find a Tutor Now</p>
+            <p className="font-inter text-xs text-white/60">Instant matching — connected in seconds</p>
+          </div>
+          <ChevronRight size={16} className="text-white/50" />
+        </button>
 
         {/* Map CTA */}
         <GlassCard

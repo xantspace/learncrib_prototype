@@ -2,17 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bell, Users, Star, CheckCircle, TrendingUp, MessageCircle, MapPin, Video } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
+import VerificationBanner from '@/components/shared/VerificationBanner'
 import { sessionsAPI, payoutsAPI } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
+import { useVerificationStore } from '@/store/verificationStore'
 import api from '@/services/api'
 
 export default function TutorDashboard() {
   const navigate = useNavigate()
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
+  const vStore   = useVerificationStore()
 
   const [sessions,  setSessions]  = useState([])
   const [earnings,  setEarnings]  = useState(null)
-  const [available, setAvailable] = useState(true)
+  const [available, setAvailable] = useState(user?.is_available ?? true)
   const [loading,   setLoading]   = useState(true)
 
   const initials = `${user?.first_name?.[0] || ''}${user?.last_name?.[0] || ''}`.toUpperCase()
@@ -27,13 +30,27 @@ export default function TutorDashboard() {
     }).finally(() => setLoading(false))
   }, [])
 
+  // Verification status: verificationStore is authoritative (updated by admin actions);
+  // fall back to authStore for users with no store record yet.
+  const storeRecord      = vStore.getRecord(user?.email)
+  const verificationStatus = storeRecord?.status ?? user?.verification_status ?? 'UNVERIFIED'
+  const isVerified = verificationStatus === 'APPROVED'
+
+  // Sync store status back into authStore so downstream components stay consistent
+  useEffect(() => {
+    if (storeRecord?.status && storeRecord.status !== user?.verification_status) {
+      setUser({ ...user, verification_status: storeRecord.status, rejection_reason: storeRecord.rejectionReason })
+    }
+  }, [storeRecord?.status])
+
   const toggleAvailability = async () => {
+    if (!isVerified) return  // block if not verified
     const next = !available
     setAvailable(next)
     try {
       await api.patch('/api/users/me/', { is_available: next })
     } catch {
-      setAvailable(!next) // revert on fail
+      setAvailable(!next)
     }
   }
 
@@ -43,9 +60,9 @@ export default function TutorDashboard() {
   return (
     <div>
       {/* Header */}
-      <div className="px-5 pt-10 pb-4">
+      <div className="sticky top-0 z-40 px-5 pt-10 pb-4 sticky-header-fade">
         <div className="flex items-center justify-between mb-4">
-          <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-6 object-contain" />
+          <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-6 object-contain logo-adaptive" />
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -54,7 +71,7 @@ export default function TutorDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/notifications')}
-              className="relative w-10 h-10 rounded-2xl bg-white/70 backdrop-blur-glass border border-white/45 shadow-glass flex items-center justify-center">
+              className="relative w-10 h-10 rounded-2xl bg-gray-100 border border-secondary/10 flex items-center justify-center">
               <Bell size={18} className="text-secondary" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent" />
             </button>
@@ -69,27 +86,36 @@ export default function TutorDashboard() {
         </div>
       </div>
 
+      {/* Verification banner — hidden when approved */}
+      <VerificationBanner
+        status={verificationStatus}
+        rejectionReason={storeRecord?.rejectionReason ?? user?.rejection_reason}
+      />
+
       {/* Availability toggle */}
       <div className="px-5 mb-5">
         <GlassCard className="p-4 flex items-center justify-between" hover={false}>
           <div className="flex items-center gap-3">
-            <span className={`w-2.5 h-2.5 rounded-full ${available ? 'bg-success animate-pulse-ring' : 'bg-gray-300'}`} />
+            <span className={`w-2.5 h-2.5 rounded-full ${available && isVerified ? 'bg-success animate-pulse-ring' : 'bg-gray-300'}`} />
             <div>
               <p className="font-outfit font-semibold text-sm text-secondary">
-                {available ? 'Available for sessions' : 'Currently offline'}
+                {!isVerified ? 'Verification required' : available ? 'Available for sessions' : 'Currently offline'}
               </p>
               <p className="font-inter text-xs text-secondary/50">
-                {available ? 'Students can book you now' : 'Toggle to go online'}
+                {!isVerified ? 'Get verified to go online' : available ? 'Students can book you now' : 'Toggle to go online'}
               </p>
             </div>
           </div>
           <div
             onClick={toggleAvailability}
-            className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${available ? 'bg-primary' : 'bg-secondary/25'}`}
+            className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${
+              !isVerified ? 'opacity-40 cursor-not-allowed bg-secondary/25' :
+              available ? 'bg-primary cursor-pointer' : 'bg-secondary/25 cursor-pointer'
+            }`}
           >
             <span
               className="absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-300"
-              style={{ transform: available ? 'translateX(26px)' : 'translateX(2px)' }}
+              style={{ transform: available && isVerified ? 'translateX(26px)' : 'translateX(2px)' }}
             />
           </div>
         </GlassCard>
@@ -99,7 +125,7 @@ export default function TutorDashboard() {
       <div className="px-5 mb-5">
         <button
           onClick={() => navigate('/tutor/earnings')}
-          className="block w-full rounded-3xl p-5 text-left"
+          className="earnings-banner block w-full rounded-3xl p-5 text-left"
           style={{ background: 'linear-gradient(135deg, #0A1444 0%, hsl(220,50%,25%) 100%)' }}
         >
           <p className="font-inter text-xs text-white/60 mb-1">Total Earnings This Month</p>

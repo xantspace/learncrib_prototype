@@ -12,8 +12,8 @@ export default function RoleSelect() {
     <div className="min-h-svh flex flex-col px-6 pt-16 pb-10"
       style={{ background: 'linear-gradient(160deg, hsl(175,60%,96%) 0%, white 50%, hsl(220,40%,97%) 100%)' }}
     >
-      <div className="mb-10 animate-slide-up">
-        <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-8 mb-5 object-contain" />
+      <div className="mb-10 animate-slide-up text-center">
+        <img src="/assets/img/logo_b.png" alt="LearnCrib" className="h-8 mb-5 object-contain mx-auto logo-adaptive" />
         <h1 className="font-outfit font-bold text-3xl text-secondary">I am a…</h1>
         <p className="font-inter text-sm text-secondary/55 mt-1">Choose your role to continue</p>
       </div>
