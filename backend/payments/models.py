@@ -39,10 +39,37 @@ class Payout(models.Model):
     processed_at = models.DateTimeField(null=True, blank=True)
 
 class Dispute(models.Model):
+    class Status(models.TextChoices):
+        OPEN = 'OPEN', 'Open'
+        RESOLVED = 'RESOLVED', 'Resolved'
+        CLOSED = 'CLOSED', 'Closed'
+
+    class Category(models.TextChoices):
+        NO_SHOW = 'NO_SHOW', 'No Show'
+        SESSION_QUALITY = 'SESSION_QUALITY', 'Session Quality'
+        SHORT_SESSION = 'SHORT_SESSION', 'Short Session'
+        WRONG_SUBJECT = 'WRONG_SUBJECT', 'Wrong Subject'
+        TUTOR_BEHAVIOUR = 'TUTOR_BEHAVIOUR', 'Tutor Behaviour'
+        PAYMENT_ISSUE = 'PAYMENT_ISSUE', 'Payment Issue'
+        OTHER = 'OTHER', 'Other'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     session = models.OneToOneField(Session, on_delete=models.CASCADE, related_name='dispute')
-    raised_by_type = models.CharField(max_length=50) # PARENT, TUTOR
+    raised_by_type = models.CharField(max_length=50)  # PARENT, TUTOR
+    raised_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='disputes_raised')
+
+    category = models.CharField(
+        max_length=20,
+        choices=Category.choices,
+        default=Category.OTHER
+    )  # AI Readiness: categorized reasons for pattern detection
     reason = models.TextField()
-    status = models.CharField(max_length=20, default='OPEN') # OPEN, RESOLVED, CLOSED
-    
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.OPEN)
+
+    resolution = models.TextField(blank=True, null=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    parent_refund = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    tutor_payment = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
+    

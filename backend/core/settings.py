@@ -45,8 +45,11 @@ INSTALLED_APPS = [
 
     # Local Apps
     'users',
-    'sessions_app', # Renamed from 'sessions' to avoid conflict with django.contrib.sessions
+    'curriculum',       # AI Readiness: subject/grade normalization, curriculum taxonomy, content resources
+    'sessions_app',     # Renamed from 'sessions' to avoid conflict with django.contrib.sessions
     'payments',
+    'reviews',          # Session ratings with dimension-specific scores
+    'ai_analytics',     # AI Readiness: behavioral event tracking for ML pipelines
     'api',
 ]
 

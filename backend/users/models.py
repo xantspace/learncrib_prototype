@@ -33,6 +33,10 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     is_active = models.BooleanField(default=True)
+
+    # AI Readiness: tracks ongoing engagement beyond login events
+    # V2 Impact: Churn prediction, filtering inactive tutors from recommendations
+    last_active_at = models.DateTimeField(null=True, blank=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
@@ -56,7 +60,14 @@ class Student(models.Model):
     parent = models.ForeignKey(ParentProfile, on_delete=models.CASCADE, related_name='students')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    grade_level = models.CharField(max_length=50)
+    grade_level_old = models.CharField(max_length=50, blank=True, null=True)  # Deprecated: kept for data migration
+    grade_level = models.ForeignKey(
+        'curriculum.GradeLevel',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='students'
+    )  # AI Readiness: normalized grade levels for Adaptive Learning & Content Generation
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -73,7 +84,12 @@ class TutorProfile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='tutor_profile')
     bio = models.TextField(blank=True, null=True)
-    subjects = models.JSONField(default=list) # Store as ["Math", "Physics"]
+    subjects_old = models.JSONField(default=list, blank=True)  # Deprecated: kept for data migration
+    subjects = models.ManyToManyField(
+        'curriculum.Subject',
+        blank=True,
+        related_name='tutors'
+    )  # AI Readiness: normalized subjects for Tutor Discovery Agent & matching
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2)
     
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -96,3 +112,4 @@ class TutorProfile(models.Model):
 
     def __str__(self):
         return f"Tutor: {self.user.email}"
+        

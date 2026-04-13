@@ -4,10 +4,19 @@ from .models import User, ParentProfile, Student, TutorProfile
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'is_parent', 'is_tutor', 'is_staff')
-    list_filter = ('is_parent', 'is_tutor', 'is_staff')
-    fieldsets = UserAdmin.fieldsets + (
-        ('Roles', {'fields': ('phone', 'is_parent', 'is_tutor')}),
+    list_display = ('email', 'first_name', 'last_name', 'role', 'is_staff')
+    list_filter = ('role', 'is_staff')
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'phone')}),
+        ('Roles & Permissions', {'fields': ('role', 'is_active', 'is_staff', 'is_superuser', 'last_active_at')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'first_name', 'last_name', 'role', 'password1', 'password2'),
+        }),
     )
     ordering = ('email',)
 
@@ -25,3 +34,4 @@ class TutorProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'hourly_rate', 'verification_status', 'created_at')
     list_filter = ('verification_status',)
     search_fields = ('user__email',)
+    

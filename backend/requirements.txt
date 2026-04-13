@@ -1,4 +1,4 @@
-Django>=6.0.0
+Django>=5.1,<6.0
 djangorestframework
 django-cors-headers
 drf-spectacular
