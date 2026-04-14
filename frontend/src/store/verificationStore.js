@@ -1,48 +1,19 @@
 /**
  * verificationStore — shared source of truth for tutor verification status.
  *
- * Why this exists: admin and tutor views live in the same browser session
- * during dev/demo. This store acts as the in-memory backend for verification
- * state so that admin approval instantly reflects on the tutor dashboard.
- * In production this state would come from real API calls, but the store
- * pattern keeps the plumbing identical — just swap the seeded data for
- * API responses.
+ * Bridges tutor verification submissions and admin approval actions in the
+ * same browser session. Keyed by tutor email for cross-component lookup.
  *
- * Keyed by tutor email for cross-component lookup consistency.
+ * Admin views read from here; tutor dashboard syncs status back to authStore
+ * when a record changes.
  */
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-// Seed: mirrors the pending entries in admin/Tutors.jsx MOCK_TUTORS
-const SEED = {
-  'adaeze@mail.com': {
-    email:       'adaeze@mail.com',
-    name:        'Adaeze Nnoli',
-    status:      'PENDING',
-    submittedAt: '2025-04-09',
-    idType:      'National ID (NIN)',
-    edu:         'B.A English',
-    subjects:    ['English', 'Literature'],
-    selfie:      true,
-    rejectionReason: null,
-  },
-  'ngozi@mail.com': {
-    email:       'ngozi@mail.com',
-    name:        'Ngozi Adeleke',
-    status:      'PENDING',
-    submittedAt: '2025-04-11',
-    idType:      'International Passport',
-    edu:         'B.Sc Computer Science',
-    subjects:    ['Coding', 'Design'],
-    selfie:      true,
-    rejectionReason: null,
-  },
-}
-
 export const useVerificationStore = create(
   persist(
     (set, get) => ({
-      records: SEED,   // { [email]: VerificationRecord }
+      records: {},   // { [email]: VerificationRecord }
 
       /** Tutor calls this when they complete the 5-step form */
       submit: (email, data) =>

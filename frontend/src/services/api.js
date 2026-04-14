@@ -37,14 +37,89 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Handle 401 — log out and redirect
+// ── Token Refresh Interceptor ──────────────────────────────────────────────
+// On 401: attempt a silent token refresh, then retry the original request.
+// Only force-logout if the refresh itself fails (i.e. refresh token is expired).
+let isRefreshing = false
+let failedQueue = []
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      useAuthStore.getState().logout()
-      window.location.href = '/login'
+  async (err) => {
+    const originalRequest = err.config
+
+    // Only attempt refresh on 401 and only once per request
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      const { refreshToken, setAuth, logout } = useAuthStore.getState()
+
+      // If no refresh token stored, give up immediately
+      if (!refreshToken) {
+        logout()
+        window.location.href = '/login'
+        return Promise.reject(err)
+      }
+
+      // If a refresh is already in-flight, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`
+            return api(originalRequest)
+          })
+          .catch((e) => Promise.reject(e))
+      }
+
+      // Mark this request so it doesn't loop
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        // Call the refresh endpoint (no auth header needed — sends refresh token)
+        const { data } = await axios.post(
+          `${BASE_URL}/api/auth/token/refresh/`,
+          { refresh: refreshToken },
+          { headers: { 'Content-Type': 'application/json' } }
+        )
+
+        const newAccess = data.access
+
+        // Persist the new access token
+        setAuth({
+          user: useAuthStore.getState().user,
+          access: newAccess,
+          refresh: refreshToken,
+        })
+
+        // Update the header for the retried request
+        api.defaults.headers.common.Authorization = `Bearer ${newAccess}`
+        originalRequest.headers.Authorization = `Bearer ${newAccess}`
+
+        processQueue(null, newAccess)
+        return api(originalRequest)
+      } catch (refreshError) {
+        // Refresh token is also bad — force logout
+        processQueue(refreshError, null)
+        logout()
+        window.location.href = '/login'
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
     }
+
     return Promise.reject(err)
   }
 )
@@ -71,6 +146,11 @@ export const usersAPI = {
   removePaymentMethod:(id)    => api.delete(`/api/users/payment-methods/${id}/`),
   getBankAccount:    ()       => api.get('/api/users/bank-account/'),
   saveBankAccount:   (data)   => api.post('/api/users/bank-account/', data),
+}
+
+/* ── Students (children of parent) ────────────── */
+export const studentsAPI = {
+  list: () => api.get('/api/users/students/'),
 }
 
 /* ── Sessions ──────────────────────────────── */
@@ -106,13 +186,19 @@ export const reviewsAPI = {
 }
 
 /* ── Admin ─────────────────────────────────── */
+// Admin uses the same standard endpoints — the backend grants full access
+// when the requesting user has role=ADMIN.
 export const adminAPI = {
-  getTutors:    ()              => api.get('/api/admin/tutors/'),
-  getUsers:     ()              => api.get('/api/admin/users/'),
-  approve:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/approve/`),
-  reject:       (tutorId, data) => api.post(`/api/admin/tutors/${tutorId}/reject/`, data),
-  disable:      (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/disable/`),
-  enable:       (tutorId)       => api.post(`/api/admin/tutors/${tutorId}/enable/`),
-  suspendUser:  (userId)        => api.post(`/api/admin/users/${userId}/suspend/`),
-  activateUser: (userId)        => api.post(`/api/admin/users/${userId}/activate/`),
+  // GET /api/users/ — returns all users for admin
+  getUsers:         ()       => api.get('/api/users/'),
+  // GET /api/users/tutors/?all=true — TutorViewSet; admins see all verification statuses
+  getTutorProfiles: ()       => api.get('/api/users/tutors/'),
+  // GET /api/sessions/ — all sessions for admin
+  getSessions:      ()       => api.get('/api/sessions/'),
+  // GET /api/payments/ — all payments for admin
+  getPayments:      ()       => api.get('/api/payments/'),
+  // GET /api/payouts/ — all payouts for admin
+  getPayouts:       ()       => api.get('/api/payouts/'),
+  // Patch a user (e.g. is_active)
+  patchUser:        (id, data) => api.patch(`/api/users/${id}/`, data),
 }

@@ -7,7 +7,7 @@ import PageHeader from '@/components/shared/PageHeader'
 import { useAuthStore } from '@/store/authStore'
 import { useVerificationStore } from '@/store/verificationStore'
 import { useMatchingStore, MATCH_STATUS } from '@/store/matchingStore'
-import { findCandidates, dispatchRequest, getMockTutors, buildMatchedSession, MATCH_TIMEOUT_MS } from '@/utils/tutorMatching'
+import { findCandidates, dispatchRequest, buildMatchedSession, MATCH_TIMEOUT_MS } from '@/utils/tutorMatching'
 import { usersAPI } from '@/services/api'
 
 const SUBJECTS = [
@@ -58,7 +58,7 @@ export default function FindTutor() {
       const res = await usersAPI.getTutors({ q: activeSubject })
       rawTutors = Array.isArray(res.data) ? res.data : res.data?.results || []
     } catch {
-      rawTutors = getMockTutors(userCoords ?? [6.5244, 3.3792])
+      rawTutors = []
     }
 
     const candidates = findCandidates(activeSubject, rawTutors, {

@@ -27,7 +27,7 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
@@ -155,6 +155,21 @@ REST_FRAMEWORK = {
 
 # CORS Config
 CORS_ALLOW_ALL_ORIGINS = True # Change in production
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-device-id',
+    'x-client-fingerprint',
+    'x-app-version',
+    'x-platform',
+]
 
 # Spectacular Settings
 SPECTACULAR_SETTINGS = {
@@ -184,6 +199,7 @@ LATE_CANCELLATION_REFUND_PERCENTAGE = 50
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Production Security Headers
 if not DEBUG:

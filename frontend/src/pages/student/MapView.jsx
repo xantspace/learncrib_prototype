@@ -100,15 +100,14 @@ export default function MapView() {
       radius: 10,
     })
       .then(r => setRawTutors(Array.isArray(r.data) ? r.data : r.data?.results || []))
-      .catch(() => setRawTutors(mockTutors(userCoords)))
+      .catch(() => setRawTutors([]))
   }, [userCoords])
 
   // Rank tutors: filter verified → score → sort
-  // verifiedOnly=false for mock/dev where we don't have real verification data
   const tutors = rankTutors(rawTutors, {
     studentLat: userCoords?.[0],
     studentLng: userCoords?.[1],
-    verifiedOnly: false,   // flip to true when backend populates verification_status
+    verifiedOnly: true,
     verificationStore: vStore,
   })
 
@@ -312,22 +311,3 @@ export default function MapView() {
   )
 }
 
-// ── Mock data (API fallback) ───────────────────────────────────────────────────
-function mockTutors(center) {
-  const offsets = [[0.008, 0.005], [-0.004, 0.010], [0.012, -0.007], [-0.010, 0.003], [0.006, 0.015]]
-  const data = [
-    { first_name: 'Kolade',  last_name: 'Okonkwo', subjects: ['Mathematics', 'Physics'],  hourly_rate: 3500, rating: 4.9, is_available: true,  verification_status: 'APPROVED', total_reviews: 47, completion_rate: 98 },
-    { first_name: 'Fatima',  last_name: 'Bello',   subjects: ['Chemistry', 'Biology'],    hourly_rate: 3000, rating: 4.7, is_available: true,  verification_status: 'APPROVED', total_reviews: 30, completion_rate: 95 },
-    { first_name: 'Chidi',   last_name: 'Abiodun', subjects: ['English', 'Literature'],   hourly_rate: 2800, rating: 4.5, is_available: false, verification_status: 'APPROVED', total_reviews: 22, completion_rate: 90 },
-    { first_name: 'Tunde',   last_name: 'Nwosu',   subjects: ['Economics', 'Commerce'],   hourly_rate: 2500, rating: 4.2, is_available: true,  verification_status: 'APPROVED', total_reviews: 18, completion_rate: 88 },
-    { first_name: 'Zainab',  last_name: 'Ibrahim',  subjects: ['Coding', 'Design'],       hourly_rate: 5000, rating: 4.8, is_available: false, verification_status: 'PENDING',  total_reviews: 0,  completion_rate: 100 },
-  ]
-  return offsets.map(([dlat, dlng], i) => ({
-    id: `mock-${i}`,
-    ...data[i],
-    email: `mock${i}@dev.local`,
-    latitude:    center[0] + dlat,
-    longitude:   center[1] + dlng,
-    distance_km: parseFloat(Math.abs(dlat * 111).toFixed(1)),
-  }))
-}

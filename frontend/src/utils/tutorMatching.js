@@ -37,11 +37,11 @@ export function findCandidates(subject, tutors, { studentLat, studentLng, verifi
     return t.is_available && matchesSubject
   })
 
-  // Step 2 — rank (verifiedOnly handled inside rankTutors)
+  // Step 2 — rank (verifiedOnly=true since backend only returns APPROVED tutors)
   const ranked = rankTutors(eligible, {
     studentLat,
     studentLng,
-    verifiedOnly: false,   // flip to true when backend marks verification_status
+    verifiedOnly: true,
     verificationStore,
   })
 
@@ -120,23 +120,81 @@ export function buildMatchedSession(tutor, { subject, studentLat, studentLng } =
   }
 }
 
-/** Mock tutor pool — used when the API is offline */
-export function getMockTutors(center = [6.5244, 3.3792]) {
-  const offsets = [[0.008, 0.005], [-0.004, 0.010], [0.012, -0.007], [-0.010, 0.003], [0.006, 0.015], [0.003, -0.008]]
-  const data = [
-    { first_name: 'Kolade',  last_name: 'Okonkwo',  subjects: ['Mathematics', 'Further Maths', 'Physics'],  hourly_rate: 3500, rating: 4.9, is_available: true,  verification_status: 'APPROVED', total_reviews: 47, completion_rate: 98 },
-    { first_name: 'Fatima',  last_name: 'Bello',    subjects: ['Chemistry', 'Biology'],                     hourly_rate: 3000, rating: 4.7, is_available: true,  verification_status: 'APPROVED', total_reviews: 30, completion_rate: 95 },
-    { first_name: 'Chidi',   last_name: 'Abiodun',  subjects: ['English', 'Literature', 'Government'],      hourly_rate: 2800, rating: 4.5, is_available: true,  verification_status: 'APPROVED', total_reviews: 22, completion_rate: 90 },
-    { first_name: 'Tunde',   last_name: 'Nwosu',    subjects: ['Economics', 'Commerce', 'Mathematics'],     hourly_rate: 2500, rating: 4.2, is_available: true,  verification_status: 'APPROVED', total_reviews: 18, completion_rate: 88 },
-    { first_name: 'Zainab',  last_name: 'Ibrahim',  subjects: ['Coding', 'Design', 'Further Maths'],        hourly_rate: 5000, rating: 4.8, is_available: true,  verification_status: 'APPROVED', total_reviews: 35, completion_rate: 97 },
-    { first_name: 'Amaka',   last_name: 'Eze',      subjects: ['Chemistry', 'Biology', 'Physics'],          hourly_rate: 3200, rating: 4.6, is_available: true,  verification_status: 'APPROVED', total_reviews: 28, completion_rate: 93 },
+/**
+ * Fallback: Generate mock tutors near the student's location.
+ */
+export function getMockTutors([lat, lng] = [6.5244, 3.3792]) {
+  return [
+    {
+      id: 'm1',
+      first_name: 'Damilola',
+      last_name: 'Adeyemi',
+      email: 'tutor1@example.com',
+      subjects: ['Mathematics', 'Further Maths', 'Physics', 'Coding'],
+      hourly_rate: 5500,
+      rating: '4.8',
+      total_reviews: 42,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat + 0.0123,
+      longitude: lng - 0.0045,
+    },
+    {
+      id: 'm2',
+      first_name: 'Chinyere',
+      last_name: 'Okonkwo',
+      email: 'tutor2@example.com',
+      subjects: ['English', 'Literature', 'History', 'Government'],
+      hourly_rate: 4200,
+      rating: '4.9',
+      total_reviews: 28,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat - 0.0089,
+      longitude: lng + 0.0156,
+    },
+    {
+      id: 'm3',
+      first_name: 'Tunde',
+      last_name: 'Bakare',
+      email: 'tutor3@example.com',
+      subjects: ['Chemistry', 'Biology', 'Physics'],
+      hourly_rate: 4800,
+      rating: '4.5',
+      total_reviews: 15,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat + 0.0055,
+      longitude: lng + 0.0221,
+    },
+    {
+      id: 'm4',
+      first_name: 'Amaka',
+      last_name: 'Eze',
+      email: 'tutor4@example.com',
+      subjects: ['Economics', 'Commerce', 'Accountancy'],
+      hourly_rate: 3500,
+      rating: '4.7',
+      total_reviews: 31,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat - 0.0152,
+      longitude: lng - 0.0118,
+    },
+    {
+      id: 'm5',
+      first_name: 'Seyi',
+      last_name: 'Makinde',
+      email: 'tutor5@example.com',
+      subjects: ['Design', 'Coding', 'Mathematics'],
+      hourly_rate: 6000,
+      rating: '5.0',
+      total_reviews: 8,
+      is_available: true,
+      verification_status: 'APPROVED',
+      latitude: lat + 0.0189,
+      longitude: lng - 0.0203,
+    }
   ]
-  return offsets.map(([dlat, dlng], i) => ({
-    id:          `mock-tutor-${i}`,
-    email:       `mock${i}@dev.local`,
-    ...data[i],
-    latitude:    center[0] + dlat,
-    longitude:   center[1] + dlng,
-    distance_km: parseFloat(Math.abs(dlat * 111).toFixed(1)),
-  }))
 }
+
