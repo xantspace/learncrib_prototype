@@ -15,6 +15,7 @@ from .views import (
     AuthMeView,
     ChangePasswordView,
     AdminViewSet,
+    StudentsView,
 )
 
 router = DefaultRouter()
@@ -36,6 +37,7 @@ urlpatterns = [
     path('auth/action-token/', ActionTokenView.as_view(), name='action_token'),
     path('auth/me/', AuthMeView.as_view(), name='auth_me'),
     path('auth/change-password/', ChangePasswordView.as_view(), name='change_password'),
+    path('users/students/', StudentsView.as_view(), name='students_list'),
 
     # ── API Resources ───────────────────────────────
     path('', include(router.urls)),

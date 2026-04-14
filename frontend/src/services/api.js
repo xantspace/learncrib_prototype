@@ -37,14 +37,89 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Handle 401 — log out and redirect
+// ── Token Refresh Interceptor ──────────────────────────────────────────────
+// On 401: attempt a silent token refresh, then retry the original request.
+// Only force-logout if the refresh itself fails (i.e. refresh token is expired).
+let isRefreshing = false
+let failedQueue = []
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      useAuthStore.getState().logout()
-      window.location.href = '/login'
+  async (err) => {
+    const originalRequest = err.config
+
+    // Only attempt refresh on 401 and only once per request
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      const { refreshToken, setAuth, logout } = useAuthStore.getState()
+
+      // If no refresh token stored, give up immediately
+      if (!refreshToken) {
+        logout()
+        window.location.href = '/login'
+        return Promise.reject(err)
+      }
+
+      // If a refresh is already in-flight, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`
+            return api(originalRequest)
+          })
+          .catch((e) => Promise.reject(e))
+      }
+
+      // Mark this request so it doesn't loop
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        // Call the refresh endpoint (no auth header needed — sends refresh token)
+        const { data } = await axios.post(
+          `${BASE_URL}/api/auth/token/refresh/`,
+          { refresh: refreshToken },
+          { headers: { 'Content-Type': 'application/json' } }
+        )
+
+        const newAccess = data.access
+
+        // Persist the new access token
+        setAuth({
+          user: useAuthStore.getState().user,
+          access: newAccess,
+          refresh: refreshToken,
+        })
+
+        // Update the header for the retried request
+        api.defaults.headers.common.Authorization = `Bearer ${newAccess}`
+        originalRequest.headers.Authorization = `Bearer ${newAccess}`
+
+        processQueue(null, newAccess)
+        return api(originalRequest)
+      } catch (refreshError) {
+        // Refresh token is also bad — force logout
+        processQueue(refreshError, null)
+        logout()
+        window.location.href = '/login'
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
     }
+
     return Promise.reject(err)
   }
 )
@@ -71,6 +146,11 @@ export const usersAPI = {
   removePaymentMethod:(id)    => api.delete(`/api/users/payment-methods/${id}/`),
   getBankAccount:    ()       => api.get('/api/users/bank-account/'),
   saveBankAccount:   (data)   => api.post('/api/users/bank-account/', data),
+}
+
+/* ── Students (children of parent) ────────────── */
+export const studentsAPI = {
+  list: () => api.get('/api/users/students/'),
 }
 
 /* ── Sessions ──────────────────────────────── */

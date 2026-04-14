@@ -145,6 +145,18 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(None)
 
 
+class StudentsView(generics.ListAPIView):
+    """GET /api/users/students/ — returns the children linked to the logged-in parent."""
+    serializer_class = StudentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        try:
+            return self.request.user.parent_profile.students.all()
+        except ParentProfile.DoesNotExist:
+            return Student.objects.none()
+
+
 class TutorViewSet(viewsets.ReadOnlyModelViewSet):
     """GET /api/tutors/ — browse approved tutors (public endpoint)."""
     serializer_class = TutorProfileSerializer

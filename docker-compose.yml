@@ -13,7 +13,7 @@ services:
     environment:
       - DEBUG=1
       - SECRET_KEY=dev-secret-key-123
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,192.168.0.3
       - DATABASE_URL=sqlite:////data/db.sqlite3
     stdin_open: true
     tty: true
@@ -26,7 +26,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://192.168.0.3:8000
     depends_on:
       - backend
 

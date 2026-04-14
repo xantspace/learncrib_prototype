@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { CalendarDays, Clock, Timer, Globe, Home, BookOpen, FileText, CreditCard, Star } from 'lucide-react'
+import { CalendarDays, Clock, Timer, Globe, Home, BookOpen, FileText, CreditCard, Star, Users } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import Button from '@/components/ui/Button'
 import PageHeader from '@/components/shared/PageHeader'
-import { usersAPI, sessionsAPI } from '@/services/api'
+import { usersAPI, sessionsAPI, studentsAPI } from '@/services/api'
 import { useUIStore } from '@/store/uiStore'
 
 const DURATIONS = [
@@ -49,12 +49,22 @@ export default function BookSession() {
   const [sessionType,  setSessionType]  = useState('online')
   const [subject,      setSubject]      = useState('')
   const [notes,        setNotes]        = useState('')
+  const [students,     setStudents]     = useState([])
+  const [selectedStudent, setSelectedStudent] = useState(null)
 
   useEffect(() => {
     setLoading(true)
-    usersAPI.getTutorById(tutorId)
-      .then(r => setTutor(r.data))
-      .catch(() => showToast('Failed to load tutor details', 'error'))
+    Promise.all([
+      usersAPI.getTutorById(tutorId),
+      studentsAPI.list(),
+    ])
+      .then(([tutorRes, studentsRes]) => {
+        setTutor(tutorRes.data)
+        const list = studentsRes.data || []
+        setStudents(list)
+        if (list.length === 1) setSelectedStudent(list[0]) // auto-select if only one child
+      })
+      .catch(() => showToast('Failed to load booking details', 'error'))
       .finally(() => setLoading(false))
   }, [tutorId])
 
@@ -64,7 +74,8 @@ export default function BookSession() {
   const total       = sessionCost + platformFee
 
   const handleBook = async () => {
-    if (!subject.trim()) { showToast('Please enter a subject/topic', 'error'); return }
+    if (!selectedStudent) { showToast('Please select which child this session is for', 'error'); return }
+    if (!subject.trim())  { showToast('Please enter a subject/topic', 'error'); return }
     setSubmitting(true)
 
     // Build ISO datetime from date + time
@@ -76,12 +87,11 @@ export default function BookSession() {
 
     try {
       const res = await sessionsAPI.create({
-        tutor_id:     tutorId,
+        tutor:        tutorId,           // ✅ correct key
+        student:      selectedStudent.id, // ✅ required field
         subject,
         notes,
         scheduled_at: scheduledAt.toISOString(),
-        duration_minutes: selectedDur.minutes,
-        session_type: sessionType,
       })
       navigate(`/student/payment/${res.data.id}`)
     } catch (err) {
@@ -187,6 +197,37 @@ export default function BookSession() {
             ))}
           </div>
         </Section>
+
+        {/* Student selector */}
+        {students.length > 0 && (
+          <Section icon={Users} title="Who is this session for?">
+            <div className="flex flex-col gap-2">
+              {students.map(s => (
+                <div
+                  key={s.id}
+                  onClick={() => setSelectedStudent(s)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl border-2 cursor-pointer transition-all ${
+                    selectedStudent?.id === s.id
+                      ? 'border-primary bg-primary-light'
+                      : 'border-transparent bg-gray-50 hover:border-primary/30'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-outfit font-bold text-sm flex-shrink-0 ${
+                    selectedStudent?.id === s.id ? 'bg-primary text-white' : 'bg-secondary/10 text-secondary'
+                  }`}>
+                    {s.first_name?.[0]}{s.last_name?.[0]}
+                  </div>
+                  <div>
+                    <p className={`font-outfit font-semibold text-sm ${
+                      selectedStudent?.id === s.id ? 'text-primary' : 'text-secondary'
+                    }`}>{s.first_name} {s.last_name}</p>
+                    <p className="font-inter text-xs text-secondary/50">{s.grade_level}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
 
         {/* Session type */}
         <Section icon={Globe} title="Session Type">
