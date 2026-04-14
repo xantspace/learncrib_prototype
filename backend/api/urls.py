@@ -16,6 +16,7 @@ from .views import (
     ChangePasswordView,
     AdminViewSet,
     StudentsView,
+    PaystackWebhookView,
 )
 
 router = DefaultRouter()
@@ -38,6 +39,7 @@ urlpatterns = [
     path('auth/me/', AuthMeView.as_view(), name='auth_me'),
     path('auth/change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('users/students/', StudentsView.as_view(), name='students_list'),
+    path('payments/webhook/', PaystackWebhookView.as_view(), name='paystack_webhook'),
 
     # ── API Resources ───────────────────────────────
     path('', include(router.urls)),

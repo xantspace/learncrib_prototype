@@ -64,6 +64,21 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+class BankAccount(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='bank_account')
+    bank_name = models.CharField(max_length=100)
+    account_number = models.CharField(max_length=20)
+    account_name = models.CharField(max_length=200)
+    bank_code = models.CharField(max_length=10, blank=True, null=True) # For Paystack transfers
+    
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.bank_name} - {self.account_number}"
+
+
 class TutorProfile(models.Model):
     class VerificationStatus(models.TextChoices):
         PENDING = 'PENDING', 'Pending'

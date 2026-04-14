@@ -12,7 +12,8 @@ class BotProtectionMiddleware:
     EXEMPT_PATHS = [
         '/admin/', 
         '/api/schema/', 
-        '/api/payouts/webhook/', # Example Webhook bypass
+        '/api/payouts/webhook/',
+        '/api/users/tutors/', # Allow public browsing
     ]
 
     def __init__(self, get_response):

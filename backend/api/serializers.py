@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from users.models import User, ParentProfile, TutorProfile, Student
+from users.models import User, ParentProfile, TutorProfile, Student, BankAccount
 from sessions_app.models import Session, SessionLog
 from payments.models import Payment, Payout, Dispute
 from reviews.models import Review
@@ -9,10 +9,19 @@ from .utils import obfuscate_id
 
 # ─── User & Profile Serializers ───────────────────────────────────────────────
 
+class BankAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankAccount
+        fields = ['id', 'bank_name', 'account_number', 'account_name', 'bank_code', 'is_verified']
+        read_only_fields = ['id', 'is_verified']
+
+
 class UserSerializer(serializers.ModelSerializer):
+    bank_account = BankAccountSerializer(read_only=True)
+    
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'role']
+        fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'role', 'bank_account']
         read_only_fields = ['id']
 
 

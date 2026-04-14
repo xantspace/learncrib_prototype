@@ -17,9 +17,10 @@ from .serializers import (
     TutorProfileSerializer, ParentProfileSerializer, StudentSerializer,
     SessionSerializer, SessionCreateSerializer, SessionStatusUpdateSerializer,
     PaymentSerializer, PayoutSerializer, DisputeSerializer,
-    ReviewSerializer, ChangePasswordSerializer
+    ReviewSerializer, ChangePasswordSerializer, BankAccountSerializer
 )
 from .utils import deobfuscate_id
+from payments.services import PaystackService
 
 
 # ─── Auth Views ────────────────────────────────────────────────────────────────
@@ -59,29 +60,6 @@ class ActionTokenView(APIView):
         return Response({'action_token': token})
 
 
-class AuthMeView(APIView):
-    """GET /api/auth/me/"""
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
-
-
-class ChangePasswordView(APIView):
-    """POST /api/auth/change-password/"""
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        serializer = ChangePasswordSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = request.user
-        if not user.check_password(serializer.validated_data.get("old_password")):
-            return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
-        user.set_password(serializer.validated_data.get("new_password"))
-        user.save()
-        return Response({"status": "success", "message": "Password updated successfully"})
-
 class AuthMeView(generics.RetrieveUpdateAPIView):
     """GET /api/auth/me/ and PATCH /api/users/me/ equivalent"""
     serializer_class = UserSerializer
@@ -90,18 +68,20 @@ class AuthMeView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+
 class ChangePasswordView(generics.GenericAPIView):
     """POST /api/auth/change-password/"""
     permission_classes = [IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
     
     def post(self, request, *args, **kwargs):
-        user = request.user
-        old_password = request.data.get("old_password")
-        new_password = request.data.get("new_password")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         
-        if not old_password or not new_password:
-            return Response({"detail": "old_password and new_password are required."}, status=status.HTTP_400_BAD_REQUEST)
-            
+        user = request.user
+        old_password = serializer.validated_data.get("old_password")
+        new_password = serializer.validated_data.get("new_password")
+        
         if not user.check_password(old_password):
             return Response({"detail": "Incorrect old password."}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -138,11 +118,24 @@ class UserViewSet(viewsets.ModelViewSet):
         # Placeholder for payment methods list
         return Response([])
 
-    @action(detail=False, methods=['get'], url_path='bank-account')
+    @action(detail=False, methods=['get', 'post', 'patch'], url_path='bank-account')
     def bank_account(self, request):
-        """GET /api/users/bank-account/"""
-        # Placeholder for bank account object
-        return Response(None)
+        """GET/POST/PATCH /api/users/bank-account/"""
+        user = request.user
+        if request.method == 'GET':
+            try:
+                account = user.bank_account
+                return Response(BankAccountSerializer(account).data)
+            except BankAccount.DoesNotExist:
+                return Response(None)
+        
+        elif request.method in ['POST', 'PATCH']:
+            # Create or update
+            account, created = BankAccount.objects.get_or_create(user=user)
+            serializer = BankAccountSerializer(account, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 
 class StudentsView(generics.ListAPIView):
@@ -165,7 +158,11 @@ class TutorViewSet(viewsets.ReadOnlyModelViewSet):
     def get_object(self):
         pk = self.kwargs.get('pk')
         resolved_id = deobfuscate_id(pk) or pk
-        return TutorProfile.objects.get(pk=resolved_id)
+        try:
+            return TutorProfile.objects.select_related('user').get(pk=resolved_id)
+        except (TutorProfile.DoesNotExist, ValueError):
+            from django.http import Http404
+            raise Http404("Tutor not found.")
 
     def get_queryset(self):
         qs = TutorProfile.objects.filter(
@@ -208,7 +205,11 @@ class SessionViewSet(viewsets.ModelViewSet):
     def get_object(self):
         pk = self.kwargs.get('pk')
         resolved_id = deobfuscate_id(pk) or pk
-        return Session.objects.get(pk=resolved_id)
+        try:
+            return Session.objects.select_related('parent', 'student', 'tutor').get(pk=resolved_id)
+        except (Session.DoesNotExist, ValueError):
+            from django.http import Http404
+            raise Http404("Session not found.")
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -328,32 +329,43 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     def initiate(self, request):
         """POST /api/payments/initiate/"""
         session_id = request.data.get('session_id')
-        amount = request.data.get('amount', 5000) # Default mock fallback
         
         if not session_id:
             return Response({"detail": "session_id required"}, status=status.HTTP_400_BAD_REQUEST)
             
         try:
-            from sessions_app.models import Session
             booking = Session.objects.get(id=session_id)
-        except Exception:
+        except Session.DoesNotExist:
             return Response({"detail": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
             
-        import uuid
-        reference = f"PS_{uuid.uuid4().hex[:10]}"
+        # Calculate amount: duration * tutor's hourly_rate
+        amount = booking.tutor.hourly_rate * booking.duration
         
-        Payment.objects.create(
+        # Initialize with Paystack
+        paystack = PaystackService()
+        result = paystack.initialize_transaction(
+            email=request.user.email,
+            amount_in_naira=float(amount),
+            metadata={'session_id': str(booking.id), 'user_id': str(request.user.id)}
+        )
+        
+        if not result:
+            return Response({"detail": "Paystack initialization failed."}, status=status.HTTP_502_BAD_GATEWAY)
+            
+        # Create payment record
+        payment = Payment.objects.create(
             session=booking,
             parent=request.user,
             amount=amount,
             provider='paystack',
-            provider_reference=reference,
+            provider_reference=result['reference'],
             status=Payment.Status.PENDING
         )
         
         return Response({
-            "checkout_url": f"https://checkout.paystack.com/{reference}", 
-            "reference": reference
+            "checkout_url": result['authorization_url'], 
+            "reference": result['reference'],
+            "amount": float(amount)
         })
 
     @action(detail=False, methods=['get'], url_path='verify/(?P<ref>[^/.]+)')
@@ -405,6 +417,35 @@ class PayoutViewSet(viewsets.ReadOnlyModelViewSet):
         })
 
 
+class PaystackWebhookView(APIView):
+    """POST /api/payments/webhook/ — handled by Paystack."""
+    permission_classes = [AllowAny] # Paystack won't have a JWT
+
+    def post(self, request):
+        # In production, verify the Paystack signature (X-Paystack-Signature)
+        event = request.data.get('event')
+        data = request.data.get('data')
+        
+        if event == 'charge.success':
+            reference = data.get('reference')
+            try:
+                payment = Payment.objects.get(provider_reference=reference)
+                if payment.status != Payment.Status.SUCCESSFUL:
+                    payment.status = Payment.Status.SUCCESSFUL
+                    payment.save()
+                    
+                    # Also update session status maybe?
+                    session = payment.session
+                    if session.status == Session.Status.PENDING:
+                        session.status = Session.Status.ACCEPTED
+                        session.save()
+                        
+            except Payment.DoesNotExist:
+                pass # Or log error
+                
+        return Response(status=status.HTTP_200_OK)
+
+
 # ─── Review Views ──────────────────────────────────────────────────────────────
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -413,10 +454,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Review.objects.filter(
-            tutor__user=self.request.user
-        ).select_related('student', 'tutor') if self.request.user.role == User.Role.TUTOR else \
-        Review.objects.all()
+        qs = Review.objects.all().select_related('student', 'tutor__user', 'booking')
+        if self.request.user.role == User.Role.TUTOR:
+            return qs.filter(tutor__user=self.request.user)
+        return qs
 
     def perform_create(self, serializer):
         # Security check: Session must be completed to leave a review
